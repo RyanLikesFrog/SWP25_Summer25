@@ -17,6 +17,12 @@ namespace RepoLayer.Implements
         {
             _context = context;
         }
+
+        public async Task AddDoctorAsync(Doctor doctor)
+        {
+            await _context.Doctors.AddAsync(doctor);
+        }
+
         public async Task<Doctor?> GetDoctorByUserIdAsync(Guid userId)
         {
             return await _context.Doctors.FirstOrDefaultAsync(x => x.UserId == userId);

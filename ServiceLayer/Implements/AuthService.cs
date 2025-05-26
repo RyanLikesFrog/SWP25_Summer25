@@ -80,8 +80,8 @@ namespace ServiceLayer.Implements
                     response.DoctorId = doctor.Id;
                 }
             }
-            // Đối với Staff, Manager, Admin, UserId là đủ nếu không có entity riêng biệt.
-            // Nếu có entity riêng, bạn sẽ thêm logic tương tự ở đây.
+                // Đối với Staff, Manager, Admin, UserId là đủ nếu không có entity riêng biệt.
+                // Nếu có entity riêng, bạn sẽ thêm logic tương tự ở đây.
 
             return response;
         }
