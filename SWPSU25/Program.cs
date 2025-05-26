@@ -39,6 +39,17 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 // Register Service
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPatientService, PatientService>();
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddScoped<ITreatmentStageService, TreatmentStageService>();
+builder.Services.AddScoped<IBlogService, BlogService>();
+builder.Services.AddScoped<ILabResultService, LabResultService>();
+builder.Services.AddScoped<IARVProtocolService, ARVProtocolService>();
+builder.Services.AddScoped<IDoctorService, DoctorService>();
+builder.Services.AddScoped<IDoctorScheduleService, DoctorScheduleService>();
+builder.Services.AddScoped<IMedicalRecordService, MedicalRecordService>();
+builder.Services.AddScoped<IPatientTreatmentProtocolService, PatientTreatmentProtocolService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 
 builder.Services.AddAuthentication(options =>
 {
