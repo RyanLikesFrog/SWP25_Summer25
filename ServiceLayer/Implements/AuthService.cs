@@ -1,9 +1,13 @@
-﻿using DataLayer.Enum;
+﻿using DataLayer.DbContext;
+using DataLayer.Entities;
+using DataLayer.Enum;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using RepoLayer.Interfaces;
 using ServiceLayer.DTOs.Auth;
+using ServiceLayer.DTOs.Patient.Request;
+using ServiceLayer.DTOs.Patient.Response;
 using ServiceLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -20,11 +24,13 @@ namespace ServiceLayer.Implements
         private readonly IUserRepository _userRepository;
         private readonly IPatientRepository _patientRepository;
         private readonly IDoctorRepository _doctorRepository;
+        private readonly IRepository _repository;
         private readonly IConfiguration _configuration;
 
-        public AuthService(IUserRepository userRepository, IPatientRepository patientRepository, IDoctorRepository doctorRepository, IConfiguration configuration)
+        public AuthService(IUserRepository userRepository, IPatientRepository patientRepository, IDoctorRepository doctorRepository, IRepository repository, IConfiguration configuration)
         {
             _userRepository = userRepository;
+            _repository = repository;
             _patientRepository = patientRepository;
             _doctorRepository = doctorRepository;
             _configuration = configuration;
@@ -78,6 +84,70 @@ namespace ServiceLayer.Implements
             // Nếu có entity riêng, bạn sẽ thêm logic tương tự ở đây.
 
             return response;
+        }
+
+        public async Task<RegisterResponse> RegisterPatientAsync(PatientRegisterRequest request)
+        {
+            // 1. Kiểm tra username hoặc email đã tồn tại chưa
+            var existingUserByUsername = await _userRepository.GetUserByUsernameAsync(request.Username);
+            if (existingUserByUsername != null)
+            {
+                return new RegisterResponse { Success = false, Message = "Username already exists." };
+            }
+
+            var existingUserByEmail = await _userRepository.GetUserByEmailAsync(request.Email);
+            if (existingUserByEmail != null)
+            {
+                return new RegisterResponse { Success = false, Message = "Email already registered." };
+            }
+
+            // 2. Hash mật khẩu
+            // string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+            // 3. Tạo đối tượng User
+            var newUser = new User
+            {
+                Id = Guid.NewGuid(),
+                Username = request.Username,
+                Password = request.Password,
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+                Role = UserRole.Patient, // Đặt vai trò là Patient
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            // 4. Lưu User vào database
+            await _userRepository.AddUserAsync(newUser);
+
+            // 5. Tạo đối tượng Patient liên kết với User mới
+            var newPatient = new Patient
+            {
+                Id = Guid.NewGuid(),
+                UserId = newUser.Id, // Liên kết Patient với User vừa tạo
+                FullName = request.FullName,
+                DateOfBirth = request.DateOfBirth,
+                Gender = request.Gender,
+                Address = request.Address,
+                ContactPersonName = request.ContactPersonName,
+                ContactPersonPhone = request.ContactPersonPhone,
+                IsAnonymous = request.IsAnonymous,
+            };
+
+            // 6. Lưu Patient vào database
+            await _patientRepository.AddPatientAsync(newPatient);
+
+            await _repository.SaveChangesAsync(); // Lưu tất cả thay đổi vào database
+            return new RegisterResponse
+            {
+                Success = true,
+                Message = "Patient registration successful.",
+                UserId = newUser.Id,
+                Username = newUser.Username,
+                Email = newUser.Email,
+                Role = newUser.Role,
+                PatientId = newPatient.Id
+            };
         }
 
         private async Task<string> GenerateJwtTokenAsync(DataLayer.Entities.User user) // Đổi sang async

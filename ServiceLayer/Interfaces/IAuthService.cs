@@ -1,4 +1,6 @@
 ﻿using ServiceLayer.DTOs.Auth;
+using ServiceLayer.DTOs.Patient.Request;
+using ServiceLayer.DTOs.Patient.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,7 @@ namespace ServiceLayer.Interfaces
 {
     public interface IAuthService
     {
-        Task<LoginResponse> LoginAsync(LoginRequest request);
+        public Task<LoginResponse> LoginAsync(LoginRequest request);
+        public Task<RegisterResponse> RegisterPatientAsync(PatientRegisterRequest request);
     }
 }

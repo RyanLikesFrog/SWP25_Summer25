@@ -10,5 +10,7 @@ namespace RepoLayer.Interfaces
     public interface IPatientRepository
     {
         public Task<Patient?> GetPatientByUserIdAsync(Guid userId);
+        public Task AddPatientAsync(Patient patient);
+        public Task UpdatePatientAsync(Patient patient);
     }
 }

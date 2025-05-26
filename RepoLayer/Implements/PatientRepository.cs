@@ -17,9 +17,22 @@ namespace RepoLayer.Implements
         {
             _context = context;
         }
+
+        public async Task AddPatientAsync(Patient patient)
+        {
+            await _context.Patients.AddAsync(patient);
+        }
+
         public async Task<Patient?> GetPatientByUserIdAsync(Guid userId)
         {
-            return await _context.Patients.FirstOrDefaultAsync(x => x.UserId == userId);
+            return await _context.Patients
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.UserId == userId);
+        }
+
+        public async Task UpdatePatientAsync(Patient patient)
+        {
+            _context.Patients.Update(patient);
         }
     }
 }

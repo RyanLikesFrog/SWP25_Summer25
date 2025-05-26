@@ -1,4 +1,5 @@
 ﻿using DataLayer.Entities;
+using DataLayer.Enum;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -36,7 +37,22 @@ namespace DataLayer.DbContext
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // --- Cấu hình mối quan hệ và ánh xạ dữ liệu ---
+            // tạo sẵn admin trong database
+            var  adminUserId = Guid.Parse("7f85377c-d97f-4219-b76c-2ae926013d79"); // Tạo ID duy nhất cho admin user
+
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = adminUserId, // Đảm bảo khớp với tên thuộc tính Id của bạn
+                    Username = "admin",
+                    Password = "admin",
+                    Email = "admin@yourdomain.com",
+                    PhoneNumber = "0123456789",
+                    Role = UserRole.Admin, // Đảm bảo UserRole.Admin tồn tại trong enum của bạn
+                    CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc), // Dùng DateTime tĩnh
+                    UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)  // Dùng DateTime tĩnh
+                }
+            );
 
             // --- User Entity ---
             modelBuilder.Entity<User>()

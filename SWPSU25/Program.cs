@@ -35,6 +35,7 @@ builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IPatientTreatmentProtocolRepository, PatientTreatmentProtocolRepository>();
 builder.Services.AddScoped<ITreatmentStageRepository, TreatmentStageRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRepository, BaseRepository>();
 
 // Register Service
 builder.Services.AddScoped<IAuthService, AuthService>();
