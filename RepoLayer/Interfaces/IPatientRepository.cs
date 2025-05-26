@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace RepoLayer.Interfaces
 {
-    public interface IUserRepository
+    public interface IPatientRepository
     {
-        public Task<User?> GetUserByUsernameAsync(string username);
+        public Task<Patient?> GetPatientByUserIdAsync(Guid userId);
     }
 }

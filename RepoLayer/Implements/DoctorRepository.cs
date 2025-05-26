@@ -10,17 +10,16 @@ using System.Threading.Tasks;
 
 namespace RepoLayer.Implements
 {
-    public class UserRepository : IUserRepository
+    public class DoctorRepository : IDoctorRepository
     {
         private readonly SWPSU25Context _context;
-        public UserRepository(SWPSU25Context context)
+        public DoctorRepository(SWPSU25Context context)
         {
             _context = context;
         }
-        public async Task<User?> GetUserByUsernameAsync(string username)
+        public async Task<Doctor?> GetDoctorByUserIdAsync(Guid userId)
         {
-            return await _context.Users
-                 .FirstOrDefaultAsync(u => u.Username == username);
+            return await _context.Doctors.FirstOrDefaultAsync(x => x.UserId == userId);
         }
     }
 }
