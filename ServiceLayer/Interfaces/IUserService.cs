@@ -11,8 +11,8 @@ namespace ServiceLayer.Interfaces
 {
     public interface IUserService
     {
-        public Task<UserDto?> GetUserByIdAsync(Guid userId); // Thêm phương thức này
-        public Task<List<UserDto>> GetAllUsersAsync(); // Thêm phương thức này
+        public Task<User?> GetUserByIdAsync(Guid userId); // Thêm phương thức này
+        public Task<List<User>>? GetAllUsersAsync(); // Thêm phương thức này
         public Task<CreateUserResponse> CreateUserAccountByAdminAsync(CreateAccountByAdminRequest request);
         public Task<User?> GetUserByUsernameAsync(string username);
         public Task<User?> GetUserByEmailAsync(string email);

@@ -230,67 +230,15 @@ namespace ServiceLayer.Implements
             return (true, $"Cập nhật thông tin người dùng {user.Role} thành công.", user);
         }
 
-        public async Task<UserDto?> GetUserByIdAsync(Guid userId)
+        public async Task<User?> GetUserByIdAsync(Guid userId)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
-            if (user == null)
-            {
-                return null;
-            }
-
-            return MapUserToUserDto(user);
+            return await _userRepository.GetUserByIdAsync(userId);
         }
 
-        public async Task<List<UserDto>> GetAllUsersAsync()
+        public async Task<List<User>>? GetAllUsersAsync()
         {
-            var users = await _userRepository.GetAllUsersAsync();
-            return users.Select(u => MapUserToUserDto(u)).ToList();
-        }
-
-        // --- Phương thức hỗ trợ chuyển đổi Entity sang DTO ---
-        private UserDto MapUserToUserDto(User user)
-        {
-            var userDto = new UserDto
-            {
-                UserID = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                Role = user.Role,
-                CreatedAt = user.CreatedAt,
-                UpdatedAt = user.UpdatedAt
-            };
-
-            if (user.Role == UserRole.Doctor && user.Doctor != null)
-            {
-                userDto.DoctorInfo = new DoctorDto
-                {
-                    DoctorID = user.Doctor.Id,
-                    FullName = user.Doctor.FullName,
-                    Specialization = user.Doctor.Specialization,
-                    Qualifications = user.Doctor.Qualifications,
-                    Experience = user.Doctor.Experience,
-                    Bio = user.Doctor.Bio,
-                    ProfilePictureURL = user.Doctor.ProfilePictureURL
-                };
-            }
-            else if (user.Role == UserRole.Patient && user.Patient != null)
-            {
-                userDto.PatientInfo = new PatientDto
-                {
-                    PatientID = user.Patient.Id, // Sử dụng Id từ Patient.cs
-                    FullName = user.Patient.FullName,
-                    DateOfBirth = user.Patient.DateOfBirth,
-                    Gender = user.Patient.Gender,
-                    Address = user.Patient.Address,
-                    ContactPersonName = user.Patient.ContactPersonName,
-                    ContactPersonPhone = user.Patient.ContactPersonPhone,
-                    IsAnonymous = user.Patient.IsAnonymous
-                };
-            }
-
-            return userDto;
-        }
+            return await _userRepository.GetAllUsersAsync();
+        } 
     }
 }
 
