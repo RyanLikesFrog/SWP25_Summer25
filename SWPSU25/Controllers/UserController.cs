@@ -18,6 +18,28 @@ namespace SWPSU25.Controllers
             _userService = userService;
         }
 
+        [HttpGet("get-by-id")]
+        public async Task<IActionResult> GetUserById([FromBody] Guid userId)
+        {
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { Message = $"Người dùng với ID {userId} không tìm thấy." });
+            }
+            return Ok(user);
+        }
+
+        /// <summary>
+        /// Lấy danh sách tất cả người dùng.
+        /// </summary>
+        /// <returns>HTTP 200 OK với danh sách người dùng.</returns>
+        [HttpGet("get-list-user")]
+        public async Task<IActionResult> GetListUser()
+        {
+            var users = await _userService.GetAllUsersAsync();
+            return Ok(users);
+        }
+
         // API chung cho Admin tạo tài khoản Doctor, Staff hoặc Manager
         [HttpPost("admin/create-account")]
         [Authorize(Roles = nameof(UserRole.Admin))] // Chỉ Admin mới có thể truy cập
@@ -68,5 +90,6 @@ namespace SWPSU25.Controllers
 
             return Ok(new { Message = result.Message, UserId = result.User?.Id });
         }
+
     }
 }

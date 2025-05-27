@@ -48,7 +48,17 @@ namespace RepoLayer.Implements
 
         public async Task<User?> GetUserByIdAsync(Guid userId)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            return await _context.Users
+                .Include(u => u.Doctor)
+                .Include(u => u.Patient)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+        }
+
+        public async Task<List<User>> GetAllUsersAsync()
+        {
+            return await _context.Users.Include(u => u.Doctor)
+                                       .Include(u => u.Patient)
+                                       .ToListAsync();
         }
     }
 }
