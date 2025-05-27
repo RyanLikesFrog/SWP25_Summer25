@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using RepoLayer.Implements;
 using RepoLayer.Interfaces;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,7 +69,8 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
-        ClockSkew = TimeSpan.Zero // Đảm bảo không có độ lệch thời gian cho token hết hạn
+        ClockSkew = TimeSpan.Zero, // Đảm bảo không có độ lệch thời gian cho token hết hạn
+        RoleClaimType = ClaimTypes.Role
     };
 });
 

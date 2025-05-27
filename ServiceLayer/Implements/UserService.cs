@@ -109,6 +109,126 @@ namespace ServiceLayer.Implements
         {
             return await _userRepository.GetUserByEmailAsync(email);
         }
+
+        public async Task<(bool Success, string Message, User? User)> UpdateUserInformationAsync(Guid userId, UpdateUserRequest request)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return (false, $"Người dùng với ID {userId} không tìm thấy.", null);
+            }
+
+            // --- Cập nhật thông tin User ---
+            if (!string.IsNullOrEmpty(request.Username) && user.Username != request.Username)
+            {
+                var existingUserWithUsername = await _userRepository.GetUserByUsernameAsync(request.Username);
+                if (existingUserWithUsername != null && existingUserWithUsername.Id != userId)
+                {
+                    return (false, "Tên người dùng đã tồn tại.", null);
+                }
+                user.Username = request.Username;
+            }
+            
+            if (!string.IsNullOrEmpty(request.Email) && user.Email != request.Email)
+            {
+                var existingUserWithEmail = await _userRepository.GetUserByEmailAsync(request.Email);
+                if (existingUserWithEmail != null && existingUserWithEmail.Id != userId)
+                {
+                    return (false, "Email đã tồn tại.", null);
+                }
+                user.Email = request.Email;
+            }
+
+            if (!string.IsNullOrEmpty(request.PhoneNumber))
+            {
+                user.PhoneNumber = request.PhoneNumber;
+            }
+
+            // --- Xử lý thay đổi Role và thông tin Doctor ---
+            bool roleChanged = false;
+            UserRole? oldRole = user.Role;
+
+            if (request.Role.HasValue && user.Role != request.Role.Value)
+            {
+                // Logic bảo vệ để ngăn chặn việc hạ cấp Admin khác
+                if (user.Role == UserRole.Admin && request.Role != UserRole.Admin)
+                {
+                    return (false, "Không thể hạ cấp vai trò của một quản trị viên khác.", null);
+                }
+                user.Role = request.Role.Value;
+                roleChanged = true;
+            }
+
+            Doctor? doctor = null;
+            if (user.Role == UserRole.Doctor)
+            {
+                doctor = await _doctorRepository.GetDoctorByUserIdAsync(userId);
+
+                if (doctor == null && (oldRole != UserRole.Doctor || roleChanged))
+                {
+                    // Nếu user được chuyển sang vai trò Doctor và chưa có hồ sơ Doctor
+                    doctor = new Doctor
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = user.Id,
+                        FullName = request.FullName ?? user.Username, // Dùng FullName từ request hoặc Username
+                        Specialization = request.Specialization,
+                        Qualifications = request.Qualifications,
+                        Experience = request.Experience,
+                        Bio = request.Bio,
+                        ProfilePictureURL = request.ProfilePictureURL
+                    };
+                    await _doctorRepository.AddDoctorAsync(doctor);
+                }
+                else if (doctor != null)
+                {
+                    // Cập nhật thông tin Doctor hiện có
+                    if (!string.IsNullOrEmpty(request.FullName)) doctor.FullName = request.FullName;
+                    if (!string.IsNullOrEmpty(request.Specialization)) doctor.Specialization = request.Specialization;
+                    if (!string.IsNullOrEmpty(request.Qualifications)) doctor.Qualifications = request.Qualifications;
+                    if (!string.IsNullOrEmpty(request.Experience)) doctor.Experience = request.Experience;
+                    if (!string.IsNullOrEmpty(request.Bio)) doctor.Bio = request.Bio;
+                    if (!string.IsNullOrEmpty(request.ProfilePictureURL)) doctor.ProfilePictureURL = request.ProfilePictureURL;
+
+                    await _doctorRepository.UpdateDoctorAsync(doctor);
+                }
+                // Nếu doctor vẫn là null ở đây, có thể do lỗi logic hoặc dữ liệu không nhất quán
+                // Có thể thêm log hoặc throw exception
+            }
+            else if (oldRole == UserRole.Doctor && user.Role != UserRole.Doctor)
+            {
+                // Chuyển từ Doctor sang vai trò khác: Xóa thông tin Doctor
+                var doctorToDelete = await _doctorRepository.GetDoctorByUserIdAsync(userId);
+                if (doctorToDelete != null)
+                {
+                    doctorToDelete.isActive = false; // Đánh dấu là không hoạt động thay vì xóa
+                }
+            }
+            // Không làm gì nếu không phải Doctor và không chuyển sang Doctor
+
+            user.UpdatedAt = DateTime.UtcNow;
+
+            // --- Lưu tất cả các thay đổi ---
+            try
+            {
+                await _userRepository.UpdateUserAsync(user);
+
+                // Lưu thay đổi của Doctor nếu có (Add, Update, Remove đều được theo dõi bởi DbContext)
+                await _repository.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // _logger.LogError(ex, $"Lỗi cập nhật cơ sở dữ liệu cho người dùng {userId}.");
+                return (false, "Lỗi cơ sở dữ liệu khi cập nhật thông tin.", null);
+            }
+            catch (Exception ex)
+            {
+                // _logger.LogError(ex, $"Lỗi không mong muốn khi cập nhật người dùng {userId}.");
+                return (false, "Đã xảy ra lỗi không mong muốn.", null);
+            }
+
+            return (true, $"Cập nhật thông tin người dùng {user.Role} thành công.", user);
+        }
     }
 }
 

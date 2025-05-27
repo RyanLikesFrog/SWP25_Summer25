@@ -30,6 +30,7 @@ namespace DataLayer.Entities
 
         [MaxLength(255)]
         public string? ProfilePictureURL { get; set; }
+        public bool isActive { get; set; } = true; // Trạng thái hoạt động của bác sĩ
 
         // Navigation properties cho mối quan hệ 1-N
         public virtual ICollection<DoctorSchedule>? DoctorSchedules { get; set; }

@@ -31,7 +31,7 @@ namespace DataLayer.DbContext
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var conn = "Server=localhost;Database=default;Trusted_Connection=True;TrustServerCertificate=True;";
+                var conn = "Server=localhost;Database=SWPSU25;Trusted_Connection=True;TrustServerCertificate=True;";
                 optionsBuilder.UseSqlServer(conn);
             }
         }

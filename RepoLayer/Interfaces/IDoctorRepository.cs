@@ -11,5 +11,7 @@ namespace RepoLayer.Interfaces
     {
         public Task<Doctor?> GetDoctorByUserIdAsync(Guid userId);
         public Task AddDoctorAsync(Doctor doctor);
+        public Task UpdateDoctorAsync(Doctor doctor);
+        public Task RemoveDoctorAsync(Doctor doctor);
     }
 }

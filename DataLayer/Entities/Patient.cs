@@ -36,7 +36,7 @@ namespace DataLayer.Entities
 
         [MaxLength(20)]
         public string? ContactPersonPhone { get; set; }
-
+        public bool IsActive { get; set; } = true; // Trạng thái hoạt động của bệnh nhân
         public bool IsAnonymous { get; set; } // Cờ ẩn danh
 
         // Navigation properties cho mối quan hệ 1-N

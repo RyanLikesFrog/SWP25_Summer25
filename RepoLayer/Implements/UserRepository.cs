@@ -33,5 +33,22 @@ namespace RepoLayer.Implements
             return await _context.Users
                  .FirstOrDefaultAsync(u => u.Username == username);
         }
+
+        public Task UpdateUserAsync(User user)
+        {
+            _context.Users.Update(user);
+            return Task.CompletedTask;
+        }
+
+        public Task RemoveUserAsync(User user)
+        {
+            _context.Users.Update(user);
+            return Task.CompletedTask; 
+        }
+
+        public async Task<User?> GetUserByIdAsync(Guid userId)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        }
     }
 }

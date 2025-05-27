@@ -14,5 +14,6 @@ namespace ServiceLayer.Interfaces
         public Task<CreateUserResponse> CreateUserAccountByAdminAsync(CreateAccountByAdminRequest request);
         public Task<User?> GetUserByUsernameAsync(string username);
         public Task<User?> GetUserByEmailAsync(string email);
+        public Task<(bool Success, string Message, User? User)> UpdateUserInformationAsync(Guid userId, UpdateUserRequest request);
     }
 }

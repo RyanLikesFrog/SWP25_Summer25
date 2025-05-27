@@ -27,5 +27,17 @@ namespace RepoLayer.Implements
         {
             return await _context.Doctors.FirstOrDefaultAsync(x => x.UserId == userId);
         }
+
+        public Task RemoveDoctorAsync(Doctor doctor)
+        {
+            _context.Doctors.Update(doctor);
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateDoctorAsync(Doctor doctor)
+        {
+            _context.Doctors.Update(doctor);
+            return Task.CompletedTask;
+        }
     }
 }
