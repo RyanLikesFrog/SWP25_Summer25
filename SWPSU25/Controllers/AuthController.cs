@@ -35,7 +35,7 @@ namespace SWPSU25.Controllers
             return Ok(response);
         }
         [HttpPost("register-patient")] // <-- Thêm endpoint này
-        public async Task<IActionResult> RegisterPatient([FromBody] PatientRegisterRequest request)
+        public async Task<IActionResult> RegisterPatient(PatientRegisterRequest request)
         {
             // Kiểm tra các ràng buộc từ model (Data Annotations)
             if (!ModelState.IsValid)

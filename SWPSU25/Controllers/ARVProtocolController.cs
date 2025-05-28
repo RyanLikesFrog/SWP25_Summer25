@@ -17,7 +17,7 @@ namespace SWPSU25.Controllers
         }
 
         [HttpGet("get-by-id")]
-        public async Task<IActionResult> GetARVProtocolById([FromBody] Guid protocolId)
+        public async Task<IActionResult> GetARVProtocolById([Guid protocolId)
         {
             var user = await _aRVProtocolService.GetARVProtocolByIdAsync(protocolId);
             if (user == null)

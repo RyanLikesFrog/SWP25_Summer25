@@ -10,10 +10,11 @@ namespace ServiceLayer.Implements
 {
     public class PatientService : IPatientService
     {
-        public Task<List<Patient>>? GetAllPatientServicesAsync()
+        public Task<List<Patient>>? GetAllPatientsAsync()
         {
             throw new NotImplementedException();
         }
+
 
         public Task<Patient?> GetPatientByIdAsync(Guid patientId)
         {

@@ -17,7 +17,7 @@ namespace SWPSU25.Controllers
         }
 
         [HttpGet("get-by-id")]
-        public async Task<IActionResult> GetBlogById([FromBody] Guid blogId)
+        public async Task<IActionResult> GetBlogById(Guid blogId)
         {
             var user = await _blogService.GetBlogByIdAsync(blogId);
             if (user == null)

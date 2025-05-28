@@ -17,7 +17,7 @@ namespace SWPSU25.Controllers
         }
 
         [HttpGet("get-by-id")]
-        public async Task<IActionResult> GetPatientTreatmentProtocolById([FromBody] Guid patientTreatmentProtocolId)
+        public async Task<IActionResult> GetPatientTreatmentProtocolById(Guid patientTreatmentProtocolId)
         {
             var user = await _patientTreatmentProtocolService.GetPatientTreatmentProtocolByIdAsync(patientTreatmentProtocolId);
             if (user == null)

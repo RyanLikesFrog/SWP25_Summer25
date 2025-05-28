@@ -17,7 +17,7 @@ namespace SWPSU25.Controllers
         }
 
         [HttpGet("get-by-id")]
-        public async Task<IActionResult> GetLabResultById([FromBody] Guid labResultId)
+        public async Task<IActionResult> GetLabResultById(Guid labResultId)
         {
             var user = await _labResultService.GetLabResultByIdAsync(labResultId);
             if (user == null)

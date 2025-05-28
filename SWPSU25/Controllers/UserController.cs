@@ -19,7 +19,7 @@ namespace SWPSU25.Controllers
         }
 
         [HttpGet("get-by-id")]
-        public async Task<IActionResult> GetUserById([FromBody] Guid userId)
+        public async Task<IActionResult> GetUserById(Guid userId)
         {
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null)
