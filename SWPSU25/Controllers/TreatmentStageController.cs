@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
 
 namespace SWPSU25.Controllers
@@ -24,6 +25,13 @@ namespace SWPSU25.Controllers
                 return NotFound(new { Message = $"Giai đoạn điều trị với ID {treatmentStageId} không tìm thấy." });
             }
             return Ok(user);
+        }
+
+        [HttpGet("get-list-treatment-stage")]
+        public async Task<IActionResult> GetListTreatmentStage()
+        {
+            var treatmentStages = await _treatmentStageService.GetAllTreatmentStagesAsync();
+            return Ok(treatmentStages);
         }
     }
 }

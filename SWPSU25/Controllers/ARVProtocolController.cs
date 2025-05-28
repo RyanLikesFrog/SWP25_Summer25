@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
 
 namespace SWPSU25.Controllers
@@ -24,6 +25,13 @@ namespace SWPSU25.Controllers
                 return NotFound(new { Message = $"Phác thảo với ID {protocolId} không tìm thấy." });
             }
             return Ok(user);
+        }
+
+        [HttpGet("get-list-arv-protocol")]
+        public async Task<IActionResult> GetListARVProtocol()
+        {
+            var arvProtocols = await _aRVProtocolService.GetAllARVProtocolsAsync();
+            return Ok(arvProtocols);
         }
     }
 }

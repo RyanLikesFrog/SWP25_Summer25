@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
 
 namespace SWPSU25.Controllers
@@ -24,6 +25,13 @@ namespace SWPSU25.Controllers
                 return NotFound(new { Message = $"Kết quả phòng lab với ID {labResultId} không tìm thấy." });
             }
             return Ok(user);
+        }
+
+        [HttpGet("get-list-lab-result")]
+        public async Task<IActionResult> GetListLabResult()
+        {
+            var labResults = await _labResultService.GetAllLabResultsAsync();
+            return Ok(labResults);
         }
     }
 }

@@ -11,6 +11,6 @@ namespace ServiceLayer.Interfaces
     public interface IPatientService
     {
         public Task<Patient?> GetPatientByIdAsync(Guid patientId);
-        public Task<List<Patient>>? GetAllPatientServicesAsync();
+        public Task<List<Patient>>? GetAllPatientsAsync();
     }
 }

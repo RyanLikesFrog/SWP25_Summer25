@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
 
 namespace SWPSU25.Controllers
@@ -24,6 +25,13 @@ namespace SWPSU25.Controllers
                 return NotFound(new { Message = $"Hồ sơ bệnh án với ID {medicalRecordId} không tìm thấy." });
             }
             return Ok(user);
+        }
+
+        [HttpGet("get-list-medical-record")]
+        public async Task<IActionResult> GetListMedicalRecord()
+        {
+            var medicalRecords = await _medicalRecordService.GetAllMedicalRecordsAsync();
+            return Ok(medicalRecords);
         }
     }
 }

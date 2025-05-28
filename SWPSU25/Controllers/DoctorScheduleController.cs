@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
 
 namespace SWPSU25.Controllers
@@ -24,6 +25,13 @@ namespace SWPSU25.Controllers
                 return NotFound(new { Message = $"Thời khóa biểu với ID {scheduleId} không tìm thấy." });
             }
             return Ok(user);
+        }
+
+        [HttpGet("get-list-doctor-schedule")]
+        public async Task<IActionResult> GetListDoctorSchedule()
+        {
+            var doctorSchedules = await _doctorScheduleService.GetAllDoctorSchedulesAsync();
+            return Ok(doctorSchedules);
         }
     }
 }

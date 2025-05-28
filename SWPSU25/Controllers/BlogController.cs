@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
 
 namespace SWPSU25.Controllers
@@ -24,6 +25,13 @@ namespace SWPSU25.Controllers
                 return NotFound(new { Message = $"Blog với ID {blogId} không tìm thấy." });
             }
             return Ok(user);
+        }
+
+        [HttpGet("get-list-blog")]
+        public async Task<IActionResult> GetListBlog()
+        {
+            var blogs = await _blogService.GetAllBlogsAsync();
+            return Ok(blogs);
         }
     }
 }
