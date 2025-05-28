@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataLayer.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,7 @@ namespace ServiceLayer.Interfaces
 {
     public interface IAppointmentService
     {
+        public Task<Appointment?> GetAppointmentByIdAsync(Guid appointmentId);
+        public Task<List<Appointment>>? GetAllAppointmentsAsync();
     }
 }

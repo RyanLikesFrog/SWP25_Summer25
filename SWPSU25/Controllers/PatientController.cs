@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.Implements;
+using ServiceLayer.Interfaces;
 
 namespace SWPSU25.Controllers
 {
@@ -7,5 +9,22 @@ namespace SWPSU25.Controllers
     [ApiController]
     public class PatientController : ControllerBase
     {
+        private readonly IPatientService _patientService;
+
+        public PatientController(IPatientService patientService)
+        {
+            _patientService = patientService;
+        }
+
+        [HttpGet("get-by-id")]
+        public async Task<IActionResult> GetPatientById([FromBody] Guid patientId)
+        {
+            var user = await _patientService.GetPatientByIdAsync(patientId);
+            if (user == null)
+            {
+                return NotFound(new { Message = $"Bệnh nhân với ID {patientId} không tìm thấy." });
+            }
+            return Ok(user);
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DataLayer.Entities;
+using ServiceLayer.Implements;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,7 @@ namespace ServiceLayer.Interfaces
 {
     public interface IPatientService
     {
+        public Task<Patient?> GetPatientByIdAsync(Guid patientId);
+        public Task<List<Patient>>? GetAllPatientServicesAsync();
     }
 }
