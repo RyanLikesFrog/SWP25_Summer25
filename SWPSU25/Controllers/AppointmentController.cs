@@ -17,7 +17,7 @@ namespace SWPSU25.Controllers
         }
 
         [HttpGet("get-by-id")]
-        public async Task<IActionResult> GetAppointmentById([Guid appointmentId)
+        public async Task<IActionResult> GetAppointmentById(Guid appointmentId)
         {
             var user = await _appointmentService.GetAppointmentByIdAsync(appointmentId);
             if (user == null)
