@@ -19,15 +19,18 @@ namespace ServiceLayer.Implements
         private readonly IUserRepository _userRepository;
         private readonly IDoctorRepository _doctorRepository; // Cần inject DoctorRepository
         private readonly IRepository _repository; // Inject DbContext trực tiếp để quản lý transaction
+        private readonly IPatientRepository _patientRepository; // Cần inject PatientRepository nếu cần
 
         public UserService(
             IUserRepository userRepository,
             IDoctorRepository doctorRepository,
-            IRepository repository)
+            IRepository repository,
+            IPatientRepository patientRepository)
         {
             _userRepository = userRepository;
             _doctorRepository = doctorRepository;
             _repository = repository;
+            _patientRepository = patientRepository;
         }
 
         public async Task<CreateUserResponse> CreateUserAccountByAdminAsync(CreateAccountByAdminRequest request)
@@ -238,7 +241,58 @@ namespace ServiceLayer.Implements
         public async Task<List<User>>? GetAllUsersAsync()
         {
             return await _userRepository.GetAllUsersAsync();
-        } 
+        }
+
+        public async Task<(bool Success, string Message, User? User)> InActiveUserAsync(Guid userId)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return (false, $"Người dùng với ID {userId} không tìm thấy.", null);
+            }
+            try
+            {
+                user.isActive = false;  // Đánh dấu người dùng là không hoạt động
+                await _userRepository.UpdateUserAsync(user);
+
+                if (user.Role == UserRole.Doctor)
+                {
+                    var doctor = await _doctorRepository.GetDoctorByUserIdAsync(userId);
+                    if (doctor == null)
+                    {
+                        return (false, "Không tìm thấy thông tin Doctor liên kết với người dùng này.", null);
+                    }
+                    doctor.isActive = false; // Đánh dấu Doctor là không hoạt động
+                }
+                else if (user.Role == UserRole.Patient)
+                {
+                    var patient = await _patientRepository.GetPatientByUserIdAsync(userId);
+                    if (patient == null)
+                    {
+                        return (false, "Không tìm thấy thông tin Patient liên kết với người dùng này.", null);
+                    }
+                    patient.IsActive = false; // Đánh dấu Patient là không hoạt động
+                }
+                else if (user.Role == UserRole.Admin)
+                {
+                    return (false, "Không thể đánh dấu quản trị viên là không hoạt động.", null);
+                }
+
+                await _repository.SaveChangesAsync(); // Lưu thay đổi vào cơ sở dữ liệu
+
+                return (true, "Người dùng đã được đánh dấu là không hoạt động.", user);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log lỗi nếu cần thiết
+                return (false, "Lỗi cơ sở dữ liệu khi đánh dấu người dùng là không hoạt động.", null);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần thiết
+                return (false, "Đã xảy ra lỗi không mong muốn khi đánh dấu người dùng là không hoạt động.", null);
+            }
+        }
     }
 }
 
