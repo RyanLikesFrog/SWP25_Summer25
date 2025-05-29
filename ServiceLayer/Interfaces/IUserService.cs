@@ -17,5 +17,6 @@ namespace ServiceLayer.Interfaces
         public Task<User?> GetUserByUsernameAsync(string username);
         public Task<User?> GetUserByEmailAsync(string email);
         public Task<(bool Success, string Message, User? User)> UpdateUserInformationAsync(Guid userId, UpdateUserRequest request);
+        public Task<(bool Success, string Message, User? User)> InActiveUserAsync(Guid userId);
     }
 }

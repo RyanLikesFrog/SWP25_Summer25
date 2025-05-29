@@ -73,23 +73,40 @@ namespace SWPSU25.Controllers
 
             if (!result.Success)
             {
-                if (result.Message.Contains("không tìm thấy"))
-                {
-                    return NotFound(new { Message = result.Message });
-                }
-                if (result.Message.Contains("đã tồn tại"))
-                {
-                    return Conflict(new { Message = result.Message });
-                }
-                if (result.Message.Contains("hạ cấp vai trò"))
-                {
-                    return Forbid(result.Message); // Return 403 Forbidden
-                }
+                //if (result.Message.Contains("không tìm thấy"))
+                //{
+                //    return NotFound(new { Message = result.Message });
+                //}
+                //if (result.Message.Contains("đã tồn tại"))
+                //{
+                //    return Conflict(new { Message = result.Message });
+                //}
+                //if (result.Message.Contains("hạ cấp vai trò"))
+                //{
+                //    return Forbid(result.Message); // Return 403 Forbidden
+                //}
                 return StatusCode(500, new { Message = result.Message });
             }
 
             return Ok(new { Message = result.Message, UserId = result.User?.Id });
         }
+        [HttpPut("admin/inactive-account")]
+        [Authorize(Roles = nameof(UserRole.Admin))] // Chỉ Admin mới có thể truy cập
+        public async Task<IActionResult> InactiveUserAccount(Guid UserId)
+        {
+            if (!ModelState.IsValid) // Kiểm tra Data Annotations validation
+            {
+                return BadRequest(ModelState);
+            }
 
+            var result = await _userService.InActiveUserAsync(UserId);
+
+            if (!result.Success)
+            {
+                return StatusCode(500, new { Message = result.Message });
+            }
+
+            return Ok(new { Message = result.Message, UserId = result.User?.Id });
+        }
     }
 }
