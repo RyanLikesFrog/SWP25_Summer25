@@ -1,4 +1,5 @@
 ﻿using DataLayer.Entities;
+using RepoLayer.Interfaces;
 using ServiceLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,14 +11,16 @@ namespace ServiceLayer.Implements
 {
     public class ARVProtocolService : IARVProtocolService
     {
-        public Task<List<Appointment>>? GetAllARVProtocolsAsync()
+        private readonly IARVProtocolRepository _aRVProtocolRepository;
+
+        public async Task<List<ARVProtocol>>? GetAllARVProtocolsAsync()
         {
-            throw new NotImplementedException();
+            return await _aRVProtocolRepository.GetAllARVProtocolsAsync();
         }
 
-        public Task<ARVProtocol?> GetARVProtocolByIdAsync(Guid protocolId)
+        public async Task<ARVProtocol?> GetARVProtocolByIdAsync(Guid protocolId)
         {
-            throw new NotImplementedException();
+            return await _aRVProtocolRepository.GetARVProtocolByIdAsync(protocolId);
         }
     }
 }

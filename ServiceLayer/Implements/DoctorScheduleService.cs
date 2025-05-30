@@ -1,4 +1,5 @@
 ﻿using DataLayer.Entities;
+using RepoLayer.Interfaces;
 using ServiceLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,14 +11,15 @@ namespace ServiceLayer.Implements
 {
     public class DoctorScheduleService : IDoctorScheduleService
     {
-        public Task<List<DoctorSchedule>>? GetAllDoctorSchedulesAsync()
+        private readonly IDoctorScheduleRepository _doctorScheduleRepository;
+        public async Task<List<DoctorSchedule>>? GetAllDoctorSchedulesAsync()
         {
-            throw new NotImplementedException();
+            return await _doctorScheduleRepository.GetAllDoctorSchedulesAsync();
         }
 
-        public Task<DoctorSchedule?> GetDoctorSchedulebyIdAsync(Guid scheduleId)
+        public async Task<DoctorSchedule?> GetDoctorSchedulebyIdAsync(Guid scheduleId)
         {
-            throw new NotImplementedException();
+            return await _doctorScheduleRepository.GetDoctorScheduleByIdAsync(scheduleId);
         }
     }
 }

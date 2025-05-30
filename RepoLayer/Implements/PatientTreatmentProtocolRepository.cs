@@ -1,4 +1,6 @@
-﻿using DataLayer.Entities;
+﻿using DataLayer.DbContext;
+using DataLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using RepoLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,14 +12,26 @@ namespace RepoLayer.Implements
 {
     public class PatientTreatmentProtocolRepository : IPatientTreatmentProtocolRepository
     {
-        public Task<List<PatientTreatmentProtocol>> GetAllPatientTreatmentProtocolsAsync()
+        private readonly SWPSU25Context _context;
+
+        public PatientTreatmentProtocolRepository(SWPSU25Context context)
         {
-            throw new NotImplementedException();
+            _context = context;
+        }
+        public async Task<List<PatientTreatmentProtocol>> GetAllPatientTreatmentProtocolsAsync()
+        {
+            return await _context.PatientTreatmentProtocols
+                .Include(ptp => ptp.Patient)
+                .Include(ptp => ptp.Doctor)
+                .ToListAsync();
         }
 
-        public Task<PatientTreatmentProtocol?> GetPatientTreatmentProtocolByIdAsync(Guid patientTreatmentProtocolId)
+        public async Task<PatientTreatmentProtocol?> GetPatientTreatmentProtocolByIdAsync(Guid patientTreatmentProtocolId)
         {
-            throw new NotImplementedException();
+            return await _context.PatientTreatmentProtocols
+                .Include(ptp => ptp.Patient)
+                .Include(ptp => ptp.Doctor)
+                .FirstOrDefaultAsync(ptp => ptp.Id == patientTreatmentProtocolId);
         }
     }
 }

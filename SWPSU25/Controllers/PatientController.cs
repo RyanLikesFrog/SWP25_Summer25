@@ -19,7 +19,7 @@ namespace SWPSU25.Controllers
         [HttpGet("get-by-id")]
         public async Task<IActionResult> GetPatientById(Guid patientId)
         {
-            var user = await _patientService.GetPatientByIdAsync(patientId);
+            var user = await _patientService.GetPatientByUserIdAsync(patientId);
             if (user == null)
             {
                 return NotFound(new { Message = $"Bệnh nhân với ID {patientId} không tìm thấy." });

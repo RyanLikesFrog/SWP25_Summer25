@@ -28,14 +28,14 @@ namespace ServiceLayer.Implements
             _appointmentRepository = appointmentRepository;
             _repository = repository;
         }
-        public Task<List<Appointment>>? GetAllAppointmentsAsync()
+        public async Task<List<Appointment>>? GetAllAppointmentsAsync()
         {
-            throw new NotImplementedException();
+            return await _appointmentRepository.GetAllAppointmentsAsync();
         }
 
-        public Task<Appointment?> GetAppointmentByIdAsync(Guid appointmentId)
+        public async Task<Appointment?> GetAppointmentByIdAsync(Guid appointmentId)
         {
-            throw new NotImplementedException();
+            return await _appointmentRepository.GetAppointmentByIdAsync(appointmentId);
         }
 
         public async Task<AppointmentDetailResponse> RegisterAppointmentAsync(UserCreateAppointmentRequest request)
@@ -52,7 +52,7 @@ namespace ServiceLayer.Implements
             {
                 Id = Guid.NewGuid(),
                 PatientId = request.PatientId,
-                DoctorId = request.DoctorId,
+                DoctorId = request.DoctorId, // Có thể null nếu không có bác sĩ
                 AppointmentTitle = request.ApointmentTitle,
                 AppointmentStartDate = request.AppointmentStartDate,
                 AppointmentType = request.AppointmentType,
