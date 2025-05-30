@@ -12,23 +12,25 @@ namespace RepoLayer.Implements
 {
     public class AppointmentRepository : IAppointmentRepository
     {
-        private readonly SWPSU25Context _Context;
+        private readonly SWPSU25Context _context;
 
         public AppointmentRepository(SWPSU25Context context)
         {
-            _Context = context;
+            _context = context;
         }
 
         public async Task<List<Appointment>> GetAllAppointmentsAsync()
         {
-            return await _Context.Appointments.Include(u => u.Patient)
+            return await _context.Appointments.Include(u => u.Patient)
                                               .ToListAsync();
         }
 
         public async Task<Appointment?> GetAppointmentByIdAsync(Guid appointmentId)
         {
-            return await _Context.Appointments.Include(u => u.Patient)
-                                              .FirstOrDefaultAsync(u => u.Id == appointmentId);
+            return await _context.Appointments
+                .Include(a => a.Patient)
+                .Include(a => a.Doctor)
+                .FirstOrDefaultAsync(a => a.Id == appointmentId);
         }
     }
 }

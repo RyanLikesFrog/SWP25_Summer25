@@ -12,22 +12,22 @@ namespace RepoLayer.Implements
 {
     public class ARVProtocolRepository : IARVProtocolRepository
     {
-        private readonly SWPSU25Context _Context;
+        private readonly SWPSU25Context _context;
 
         public ARVProtocolRepository(SWPSU25Context context)
         {
-            _Context = context;
+            _context = context;
         }
 
         public async Task<List<ARVProtocol>> GetAllARVProtocolsAsync()
         {
-            return await _Context.ARVProtocols.Include(u => u.PatientTreatmentProtocols)
+            return await _context.ARVProtocols.Include(u => u.PatientTreatmentProtocols)
                                               .ToListAsync();
         }
 
         public async Task<ARVProtocol?> GetARVProtocolByIdAsync(Guid protocolId)
         {
-            return await _Context.ARVProtocols.Include(u => u.PatientTreatmentProtocols)
+            return await _context.ARVProtocols.Include(u => u.PatientTreatmentProtocols)
                                               .FirstOrDefaultAsync(u => u.ProtocolId == protocolId);
         }
     }

@@ -28,6 +28,11 @@ namespace RepoLayer.Implements
             return await _context.Doctors.FirstOrDefaultAsync(x => x.UserId == userId);
         }
 
+        public async Task<List<Doctor>> GetAllDoctorsAsync()
+        {
+            return await _context.Doctors.ToListAsync();
+        }
+
         public Task RemoveDoctorAsync(Doctor doctor)
         {
             _context.Doctors.Update(doctor);

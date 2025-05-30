@@ -1,4 +1,6 @@
-﻿using DataLayer.Entities;
+﻿using DataLayer.DbContext;
+using DataLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using RepoLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,14 +12,22 @@ namespace RepoLayer.Implements
 {
     public class BlogRepository : IBlogRepository
     {
-        public Task<List<Blog>> GetAllBlogsAsync()
+        private readonly SWPSU25Context _context;
+
+        public BlogRepository(SWPSU25Context context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public Task<Blog?> GetBlogByIdAsync(Guid blogId)
+        public async Task<List<Blog>> GetAllBlogsAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Blogs.Include(b => b.AuthorID).ToListAsync();
+        }
+
+        public async Task<Blog?> GetBlogByIdAsync(Guid blogId)
+        {
+            return await _context.Blogs.Include(b => b.AuthorID)
+                                       .FirstOrDefaultAsync(b => b.Id == blogId);
         }
     }
 }

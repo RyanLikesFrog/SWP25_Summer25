@@ -1,4 +1,5 @@
 ﻿using DataLayer.Entities;
+using RepoLayer.Interfaces;
 using ServiceLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,14 +11,15 @@ namespace ServiceLayer.Implements
 {
     public class BlogService : IBlogService
     {
-        public Task<List<Blog>>? GetAllBlogsAsync()
+        private readonly IBlogRepository _blogRepository;
+        public async Task<List<Blog>>? GetAllBlogsAsync()
         {
-            throw new NotImplementedException();
+            return await _blogRepository.GetAllBlogsAsync();
         }
 
-        public Task<Blog?> GetBlogByIdAsync(Guid blogId)
+        public async Task<Blog?> GetBlogByIdAsync(Guid blogId)
         {
-            throw new NotImplementedException();
+            return await _blogRepository.GetBlogByIdAsync(blogId);
         }
     }
 }
