@@ -17,7 +17,7 @@ namespace DataLayer.Entities
         [ForeignKey("Patient")]
         public Guid? PatientId { get; set; }
         public virtual Patient? Patient { get; set; }
-        public string? ApointmentTitle { get; set; }
+        public string? AppointmentTitle { get; set; }
 
         [Required]
         public DateTime AppointmentStartDate { get; set; }

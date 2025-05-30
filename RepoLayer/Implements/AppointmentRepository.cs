@@ -1,4 +1,6 @@
-﻿using DataLayer.Entities;
+﻿using DataLayer.DbContext;
+using DataLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using RepoLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,14 +12,23 @@ namespace RepoLayer.Implements
 {
     public class AppointmentRepository : IAppointmentRepository
     {
-        public Task<List<Appointment>> GetAllAppointmentsAsync()
+        private readonly SWPSU25Context _Context;
+
+        public AppointmentRepository(SWPSU25Context context)
         {
-            throw new NotImplementedException();
+            _Context = context;
         }
 
-        public Task<Appointment?> GetAppointmentByIdAsync(Guid appointmentId)
+        public async Task<List<Appointment>> GetAllAppointmentsAsync()
         {
-            throw new NotImplementedException();
+            return await _Context.Appointments.Include(u => u.Patient)
+                                              .ToListAsync();
+        }
+
+        public async Task<Appointment?> GetAppointmentByIdAsync(Guid appointmentId)
+        {
+            return await _Context.Appointments.Include(u => u.Patient)
+                                              .FirstOrDefaultAsync(u => u.Id == appointmentId);
         }
     }
 }

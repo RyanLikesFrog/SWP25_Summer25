@@ -1,4 +1,6 @@
-﻿using DataLayer.Entities;
+﻿using DataLayer.DbContext;
+using DataLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using RepoLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,14 +12,23 @@ namespace RepoLayer.Implements
 {
     public class ARVProtocolRepository : IARVProtocolRepository
     {
-        public Task<List<ARVProtocol>> GetAllARVProtocolsAsync()
+        private readonly SWPSU25Context _Context;
+
+        public ARVProtocolRepository(SWPSU25Context context)
         {
-            throw new NotImplementedException();
+            _Context = context;
         }
 
-        public Task<ARVProtocol?> GetARVProtocolByIdAsync(Guid protocolId)
+        public async Task<List<ARVProtocol>> GetAllARVProtocolsAsync()
         {
-            throw new NotImplementedException();
+            return await _Context.ARVProtocols.Include(u => u.PatientTreatmentProtocols)
+                                              .ToListAsync();
+        }
+
+        public async Task<ARVProtocol?> GetARVProtocolByIdAsync(Guid protocolId)
+        {
+            return await _Context.ARVProtocols.Include(u => u.PatientTreatmentProtocols)
+                                              .FirstOrDefaultAsync(u => u.ProtocolId == protocolId);
         }
     }
 }

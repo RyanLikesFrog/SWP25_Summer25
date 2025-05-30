@@ -24,6 +24,6 @@ namespace DataLayer.Entities
         public bool IsDefault { get; set; }
 
         // Navigation property cho mối quan hệ 1-N
-        public virtual ICollection<PatientTreatmentProtocol>? PatientTreatmentProtocols { get; set; }
+        public virtual ICollection<PatientTreatmentProtocol>? PatientTreatmentProtocols{ get; set; }
     }
 }
