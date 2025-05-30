@@ -19,6 +19,11 @@ namespace RepoLayer.Implements
             _Context = context;
         }
 
+        public async Task CreateAppointmentAsync(Appointment appointment)
+        {
+            await _Context.Appointments.AddAsync(appointment);
+        }
+
         public async Task<List<Appointment>> GetAllAppointmentsAsync()
         {
             return await _Context.Appointments.Include(u => u.Patient)
@@ -29,6 +34,12 @@ namespace RepoLayer.Implements
         {
             return await _Context.Appointments.Include(u => u.Patient)
                                               .FirstOrDefaultAsync(u => u.Id == appointmentId);
+        }
+
+        public Task UpdateAppointmentAsync(Appointment appointment)
+        {
+            _Context.Appointments.Update(appointment);
+            return Task.CompletedTask;
         }
     }
 }

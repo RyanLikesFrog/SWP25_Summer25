@@ -1,4 +1,7 @@
 ﻿using DataLayer.Entities;
+using ServiceLayer.DTOs.Patient.Request;
+using ServiceLayer.DTOs.Patient.Response;
+using ServiceLayer.DTOs.User.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +14,7 @@ namespace ServiceLayer.Interfaces
     {
         public Task<Appointment?> GetAppointmentByIdAsync(Guid appointmentId);
         public Task<List<Appointment>>? GetAllAppointmentsAsync();
+        Task<AppointmentDetailResponse> RegisterAppointmentAsync(UserCreateAppointmentRequest request);
+        Task<AppointmentDetailResponse> StaffUpdateAppointmentAsync(StaffManageAppointmentRequest request);
     }
 }
