@@ -33,5 +33,12 @@ namespace SWPSU25.Controllers
             var doctorSchedules = await _doctorScheduleService.GetAllDoctorSchedulesAsync();
             return Ok(doctorSchedules);
         }
+
+        [HttpGet("get-list-doctor-schedule-by-startdate-enddate")]
+        public async Task<IActionResult> GetDuplicatedDoctorScheduleByStartDateEndDate(Guid doctorId, DateTime StartTime, DateTime? EndTime)
+        {
+            var doctorSchedules = await _doctorScheduleService.GetDuplicatedDoctorScheduleByStartDateEndDateAsync(doctorId, StartTime, EndTime);
+            return Ok(doctorSchedules);
+        }
     }
 }

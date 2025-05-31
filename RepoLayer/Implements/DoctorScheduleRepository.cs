@@ -5,6 +5,7 @@ using RepoLayer.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,6 +19,7 @@ namespace RepoLayer.Implements
         {
             _context = context;
         }
+
         public async Task<List<DoctorSchedule>> GetAllDoctorSchedulesAsync()
         {
             return await _context.DoctorSchedules
@@ -25,11 +27,32 @@ namespace RepoLayer.Implements
                 .ToListAsync();
         }
 
-        public Task<DoctorSchedule?> GetDoctorScheduleByIdAsync(Guid scheduleId)
+        public async Task<DoctorSchedule?> GetDoctorScheduleByIdAsync(Guid scheduleId)
         {
-            return _context.DoctorSchedules
+            return await _context.DoctorSchedules
                 .Include(ds => ds.Doctor)
                 .FirstOrDefaultAsync(ds => ds.Id == scheduleId);    
+        }
+
+        public Task<DoctorSchedule?> GetDuplicatedDoctorScheduleByStartDateEndDateAsync(Guid? doctorId, DateTime startDate, DateTime? endDate)
+        {
+            if (endDate != null)
+            {
+                return _context.DoctorSchedules.Where(x => x.DoctorId == doctorId && (x.StartTime >= startDate && x.StartTime <= endDate)).FirstOrDefaultAsync();
+            }
+            else
+            {
+                return _context.DoctorSchedules.Where(x => x.DoctorId == doctorId && x.StartTime >= startDate && x.StartTime <= startDate.AddHours(1)).FirstOrDefaultAsync();
+            }
+        }
+        public async Task CreateDoctorScheduleAsync(DoctorSchedule doctorSchedule)
+        {
+            await _context.DoctorSchedules.AddAsync(doctorSchedule);
+        }
+
+        public async Task<DoctorSchedule?> GetDoctorScheduleByDoctorIdAsync(Guid doctorId)
+        {
+            return await _context.DoctorSchedules.Where(x => x.DoctorId == doctorId).FirstOrDefaultAsync();
         }
     }
 }

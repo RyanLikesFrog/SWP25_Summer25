@@ -17,16 +17,19 @@ namespace ServiceLayer.Implements
     {
         private readonly IPatientRepository _patientRepository;
         private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IDoctorScheduleRepository _doctorScheduleRepository;
         private readonly IRepository _repository;
 
         public AppointmentService(
             IPatientRepository patientRepository,
             IAppointmentRepository appointmentRepository,
-            IRepository repository)
+            IRepository repository,
+            IDoctorScheduleRepository doctorScheduleRepository)
         {
             _patientRepository = patientRepository;
             _appointmentRepository = appointmentRepository;
             _repository = repository;
+            _doctorScheduleRepository = doctorScheduleRepository;
         }
         public async Task<List<Appointment>>? GetAllAppointmentsAsync()
         {
@@ -97,6 +100,24 @@ namespace ServiceLayer.Implements
             await _appointmentRepository.UpdateAppointmentAsync(appointment);
 
             // Nếu có thay đổi về bác sĩ, cần cập nhật schedule cho bác sĩ
+            var dupDoctorSchedule = await _doctorScheduleRepository.GetDuplicatedDoctorScheduleByStartDateEndDateAsync(appointment.DoctorId, appointment.AppointmentStartDate, appointment.AppointmentEndDate);
+            if (dupDoctorSchedule != null)
+            {
+                throw new ArgumentException("Duplicated schedule");
+            }
+            else
+            {
+                var doctorSchedule = new DoctorSchedule
+                {
+                    Id = Guid.NewGuid(),
+                    AppointmentId = appointment.Id,
+                    DoctorId = appointment.DoctorId.Value,
+                    StartTime = request.AppointmentStartDate,
+                    EndTime = request.AppointmentEndDate.Value,
+                    IsAvailable = true,
+                };
+                await _doctorScheduleRepository.CreateDoctorScheduleAsync(doctorSchedule);
+            }
 
             await _repository.SaveChangesAsync();
             return new AppointmentDetailResponse
