@@ -66,10 +66,13 @@ namespace ServiceLayer.Implements
             // Gắn các ID cụ thể dựa trên vai trò
             if (user.Role == UserRole.Patient)
             {
-                var patient = await _patientRepository.GetPatientByUserIdAsync(user.Patient.Id);
-                if (patient != null)
+                if (user.Patient != null)
                 {
-                    response.PatientId = patient.Id;
+                    var patient = await _patientRepository.GetPatientByUserIdAsync(user.Patient.Id);
+                    if (patient != null)
+                    {
+                        response.PatientId = patient.Id;
+                    }
                 }
             }
             else if (user.Role == UserRole.Doctor)
