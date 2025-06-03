@@ -44,5 +44,12 @@ namespace RepoLayer.Implements
             _context.Doctors.Update(doctor);
             return Task.CompletedTask;
         }
+
+        public async Task<List<DoctorSchedule>>? ViewDoctorScheduleAsync(Guid doctorId)
+        {
+            return await _context.DoctorSchedules
+                .Where(ds => ds.DoctorId == doctorId)
+                .ToListAsync();
+        }
     }
 }

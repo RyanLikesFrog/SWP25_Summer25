@@ -33,5 +33,33 @@ namespace SWPSU25.Controllers
             var doctors = await _doctorService.GetAllDoctorsAsync();
             return Ok(doctors);
         }
+
+        [HttpGet("doctor-schedule")]
+        public async Task<IActionResult> ViewDoctorSchedule([FromQuery] Guid doctorId)
+        {
+            var (schedules, message) = await _doctorService.ViewDoctorScheduleAsync(doctorId);
+
+            if (schedules == null)
+            {
+                return NotFound(new { Message = message });
+            }
+
+            return Ok(new { Message = message, Schedules = schedules });
+        }
+
+        [HttpGet("doctor-appointments")]
+        public async Task<IActionResult> ViewAppointments([FromQuery] Guid doctorId)
+        {
+            var (appointments, message) = await _doctorService.ViewAppointmentAsync(doctorId);
+
+            if (appointments == null)
+            {
+                return NotFound(new { Message = message });
+            }
+
+            return Ok(new { Message = message, Appointments = appointments });
+        }
+
+
     }
 }

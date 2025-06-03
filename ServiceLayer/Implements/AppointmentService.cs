@@ -137,5 +137,17 @@ namespace ServiceLayer.Implements
                 ApointmentTitle = appointment.AppointmentTitle
             };
         }
+
+        public async Task<(List<Appointment>? appointments, string Message)> ViewAppointmentAsync(Guid doctorId)
+        {
+            var appointments = await _appointmentRepository.GetAppointmentsByDoctorIdAsync(doctorId);
+
+            if (appointments == null || !appointments.Any())
+            {
+                return (null, "No appointments found for this doctor.");
+            }
+
+            return (appointments, "Doctor appointments retrieved successfully.");
+        }
     }
 }

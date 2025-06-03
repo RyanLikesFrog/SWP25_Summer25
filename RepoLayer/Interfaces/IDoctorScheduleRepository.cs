@@ -13,6 +13,7 @@ namespace RepoLayer.Interfaces
         public Task<List<DoctorSchedule>>  GetAllDoctorSchedulesAsync();
         public Task<DoctorSchedule>? GetDuplicatedDoctorScheduleByStartDateEndDateAsync(Guid? doctorId, DateTime startDate, DateTime? endDate);
         public Task<DoctorSchedule?> GetDoctorScheduleByDoctorIdAsync(Guid doctorId);
-        public Task CreateDoctorScheduleAsync(DoctorSchedule doctorSchedule);
+        public Task<List<DoctorSchedule>> GetDoctorSchedulesByDoctorIdAsync(Guid doctorId);
+        public Task<DoctorSchedule> CreateDoctorScheduleAsync(DoctorSchedule doctorSchedule);
     }
 }
