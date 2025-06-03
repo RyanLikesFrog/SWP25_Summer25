@@ -16,5 +16,6 @@ namespace ServiceLayer.Interfaces
         public Task<List<Appointment>>? GetAllAppointmentsAsync();
         Task<AppointmentDetailResponse> RegisterAppointmentAsync(UserCreateAppointmentRequest request);
         Task<AppointmentDetailResponse> StaffUpdateAppointmentAsync(StaffManageAppointmentRequest request);
+        public Task<(List<Appointment>? appointments, string Message)> ViewAppointmentAsync(Guid doctorId);
     }
 }

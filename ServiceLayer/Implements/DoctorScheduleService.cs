@@ -13,9 +13,9 @@ namespace ServiceLayer.Implements
     {
         private readonly IDoctorScheduleRepository _doctorScheduleRepository;
 
-        public Task CreateDoctorScheduleAsync(DoctorSchedule doctorSchedule)
+        public async Task CreateDoctorScheduleAsync(DoctorSchedule doctorSchedule)
         {
-            throw new NotImplementedException();
+            await _doctorScheduleRepository.CreateDoctorScheduleAsync(doctorSchedule);
         }
 
         public async Task<List<DoctorSchedule>>? GetAllDoctorSchedulesAsync()
@@ -36,6 +36,20 @@ namespace ServiceLayer.Implements
                 return (null, "Khong bi trung lich");
             }
             return (doctorSchedule, "Bi trung lich");
+        }
+
+        public async Task<(List<DoctorSchedule>? schedules, string Message)> ViewDoctorScheduleAsync(Guid doctorId)
+        {
+            var schedules = await _doctorScheduleRepository.GetDoctorSchedulesByDoctorIdAsync(doctorId);
+
+            if (schedules == null || !schedules.Any())
+            {
+                return (null, "khong tim thay lich");
+            }
+            else
+            {
+                return (schedules, "tim lich thanh cong.");
+            }
         }
     }
 }

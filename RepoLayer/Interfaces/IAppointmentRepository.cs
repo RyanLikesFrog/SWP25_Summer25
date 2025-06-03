@@ -13,6 +13,7 @@ namespace RepoLayer.Interfaces
         public Task<List<Appointment>> GetAllAppointmentsAsync();
         public Task CreateAppointmentAsync(Appointment appointment);
         public Task UpdateAppointmentAsync(Appointment appointment);
+        public Task<List<Appointment>> GetAppointmentsByDoctorIdAsync(Guid doctorId);
 
     }
 }   

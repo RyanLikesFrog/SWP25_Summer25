@@ -18,18 +18,21 @@ namespace ServiceLayer.Implements
         private readonly IPatientRepository _patientRepository;
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IDoctorScheduleRepository _doctorScheduleRepository;
+        private readonly IDoctorRepository _doctorRepository;
         private readonly IRepository _repository;
 
         public AppointmentService(
             IPatientRepository patientRepository,
             IAppointmentRepository appointmentRepository,
             IRepository repository,
-            IDoctorScheduleRepository doctorScheduleRepository)
+            IDoctorScheduleRepository doctorScheduleRepository,
+            IDoctorRepository doctorRepository)
         {
             _patientRepository = patientRepository;
             _appointmentRepository = appointmentRepository;
             _repository = repository;
             _doctorScheduleRepository = doctorScheduleRepository;
+            _doctorRepository = doctorRepository;
         }
         public async Task<List<Appointment>>? GetAllAppointmentsAsync()
         {
@@ -44,10 +47,19 @@ namespace ServiceLayer.Implements
         public async Task<AppointmentDetailResponse> RegisterAppointmentAsync(UserCreateAppointmentRequest request)
         {
             // Sử dụng các Repository để lấy dữ liệu
-            var patient = await _patientRepository.GetPatientByUserIdAsync(request.PatientId);
+            var patient = await _patientRepository.GetPatientByIdAsync(request.PatientId);
             if (patient == null)
             {
-                throw new ArgumentException("Patient not found.");
+                throw new ArgumentException("Patient not found with the provided Patient ID.");
+            }
+
+            if (request.DoctorId.HasValue)
+            {
+                var doctor = await _doctorRepository.GetDoctorByIdAsync(request.DoctorId.Value);
+                if(doctor == null)
+                {
+                    throw new ArgumentException("Doctor not found with the provided Doctor ID");
+                }
             }
 
             // Tạo Entity
@@ -136,6 +148,18 @@ namespace ServiceLayer.Implements
                 OnlineLink = appointment.OnlineLink,
                 ApointmentTitle = appointment.AppointmentTitle
             };
+        }
+
+        public async Task<(List<Appointment>? appointments, string Message)> ViewAppointmentAsync(Guid doctorId)
+        {
+            var appointments = await _appointmentRepository.GetAppointmentsByDoctorIdAsync(doctorId);
+
+            if (appointments == null || !appointments.Any())
+            {
+                return (null, "Khong tim thay lich hen.");
+            }
+
+            return (appointments, "Tim lich hen thanh cong.");
         }
     }
 }

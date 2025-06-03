@@ -43,5 +43,13 @@ namespace RepoLayer.Implements
             _context.Appointments.Update(appointment);
             return Task.CompletedTask;
         }
+
+        public async Task<List<Appointment>> GetAppointmentsByDoctorIdAsync(Guid doctorId)
+        {
+            return await _context.Appointments
+                .Where(a => a.DoctorId == doctorId)
+                .Include(a => a.Patient)
+                .ToListAsync();
+        }
     }
 }

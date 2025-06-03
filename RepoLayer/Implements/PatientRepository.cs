@@ -27,6 +27,13 @@ namespace RepoLayer.Implements
                 .Include(p => p.User)
                 .ToListAsync();
 
+        public async Task<Patient?> GetPatientByIdAsync(Guid patientId)
+        {
+            return await _context.Patients
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == patientId);
+        }
+
         public async Task<Patient?> GetPatientByUserIdAsync(Guid userId)
         {
             return await _context.Patients

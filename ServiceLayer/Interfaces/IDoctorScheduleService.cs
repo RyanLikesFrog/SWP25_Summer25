@@ -13,6 +13,7 @@ namespace ServiceLayer.Interfaces
         public Task<List<DoctorSchedule>>? GetAllDoctorSchedulesAsync();
         public Task CreateDoctorScheduleAsync(DoctorSchedule doctorSchedule);
         public Task<(DoctorSchedule? doctorSchedule, string Message)>? GetDuplicatedDoctorScheduleByStartDateEndDateAsync(Guid? doctorId, DateTime startDate, DateTime? endDate);
+        public Task<(List<DoctorSchedule>? schedules, string Message)> ViewDoctorScheduleAsync(Guid doctorId);
 
     }
 }

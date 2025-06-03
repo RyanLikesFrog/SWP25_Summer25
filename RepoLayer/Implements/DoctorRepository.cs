@@ -25,7 +25,9 @@ namespace RepoLayer.Implements
 
         public async Task<Doctor?> GetDoctorByUserIdAsync(Guid userId)
         {
-            return await _context.Doctors.FirstOrDefaultAsync(x => x.UserId == userId);
+            return await _context.Doctors
+                                        .AsNoTracking()
+                                        .FirstOrDefaultAsync(p => p.UserId == userId);
         }
 
         public async Task<List<Doctor>> GetAllDoctorsAsync()
@@ -43,6 +45,20 @@ namespace RepoLayer.Implements
         {
             _context.Doctors.Update(doctor);
             return Task.CompletedTask;
+        }
+
+        public async Task<List<DoctorSchedule>>? ViewDoctorScheduleAsync(Guid doctorId)
+        {
+            return await _context.DoctorSchedules
+                .Where(ds => ds.Id == doctorId)
+                .ToListAsync();
+        }
+
+        public async Task<Doctor?> GetDoctorByIdAsync(Guid doctorId)
+        {
+            return await _context.Doctors
+                                        .AsNoTracking()
+                                        .FirstOrDefaultAsync(p => p.Id == doctorId);
         }
     }
 }
