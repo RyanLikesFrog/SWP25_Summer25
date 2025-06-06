@@ -57,5 +57,10 @@ namespace RepoLayer.Implements
                                  .Where(s => s.DoctorId == doctorId) 
                                  .ToListAsync(); 
         }
+
+        public Task<List<DoctorSchedule>> GetDoctorSchedulesByDoctorIdAsync(Guid doctorId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
