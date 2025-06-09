@@ -8,10 +8,10 @@ namespace DataLayer.Enum
 {
     public enum UserRole
     {
-        Patient,
-        Staff,
-        Doctor,
-        Manager,
-        Admin
+        Patient, /* 0 */
+        Staff, /* 1 */
+        Doctor, /* 2 */
+        Manager, /* 3 */
+        Admin /* 4 */
     }
 }

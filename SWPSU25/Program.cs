@@ -12,9 +12,38 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Define a policy name for CORS (you can choose any meaningful name)
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+// Add CORS services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          // Replace "http://localhost:3000" with the actual URL of your frontend application.
+                          // If your frontend is on a different port or domain, you need to add it here.
+                          // You can add multiple origins separated by commas.
+                          policy.WithOrigins("http://localhost:3000", // Example: Your React/Angular/Vue dev server
+                                             "https://yourproductionfrontend.com") // Example: Your deployed frontend URL
+                                .AllowAnyHeader()    // Allows all headers from the specified origins
+                                .AllowAnyMethod();   // Allows all HTTP methods (GET, POST, PUT, DELETE, etc.)
+                                                     // .AllowCredentials(); // Uncomment if your frontend needs to send cookies/auth headers
+                                                     // If you use AllowCredentials, you cannot use AllowAnyOrigin().
+                      });
+
+    // Optionally, if you want to allow all origins during development (less secure for production)
+    // options.AddDefaultPolicy(
+    //     policy =>
+    //     {
+    //         policy.AllowAnyOrigin()
+    //               .AllowAnyHeader()
+    //               .AllowAnyMethod();
+    //     });
+});
+
+
 // Add services to the container.
-
-
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
@@ -122,6 +151,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// IMPORTANT: The order of middleware matters!
+// UseRouting should be before UseCors.
+app.UseRouting();
+
+// Enable the CORS policy using the name defined above
+app.UseCors(MyAllowSpecificOrigins);
+
+// UseAuthorization should be after UseCors (and UseRouting)
 app.UseAuthorization();
 
 app.MapControllers();
