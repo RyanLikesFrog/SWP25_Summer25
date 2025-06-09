@@ -12,34 +12,19 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Define a policy name for CORS (you can choose any meaningful name)
+// Tên policy tùy ý đặt
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-// Add CORS services to the container.
+// 1. Đăng ký CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          // Replace "http://localhost:3000" with the actual URL of your frontend application.
-                          // If your frontend is on a different port or domain, you need to add it here.
-                          // You can add multiple origins separated by commas.
-                          policy.WithOrigins("http://localhost:3000", // Example: Your React/Angular/Vue dev server
-                                             "https://yourproductionfrontend.com") // Example: Your deployed frontend URL
-                                .AllowAnyHeader()    // Allows all headers from the specified origins
-                                .AllowAnyMethod();   // Allows all HTTP methods (GET, POST, PUT, DELETE, etc.)
-                                                     // .AllowCredentials(); // Uncomment if your frontend needs to send cookies/auth headers
-                                                     // If you use AllowCredentials, you cannot use AllowAnyOrigin().
-                      });
-
-    // Optionally, if you want to allow all origins during development (less secure for production)
-    // options.AddDefaultPolicy(
-    //     policy =>
-    //     {
-    //         policy.AllowAnyOrigin()
-    //               .AllowAnyHeader()
-    //               .AllowAnyMethod();
-    //     });
+        policy =>
+        {
+            policy.WithOrigins("*") // hoặc "*" để cho tất cả (cẩn thận)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
 });
 
 
