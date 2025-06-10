@@ -12,7 +12,7 @@ namespace ServiceLayer.Implements
     public class BlogService : IBlogService
     {
         private readonly IBlogRepository _blogRepository;
-        public async Task<List<Blog>>? GetAllBlogsAsync()
+        public async Task<List<Blog?>> GetAllBlogsAsync()
         {
             return await _blogRepository.GetAllBlogsAsync();
         }

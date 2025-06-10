@@ -18,7 +18,7 @@ namespace ServiceLayer.Implements
             await _doctorScheduleRepository.CreateDoctorScheduleAsync(doctorSchedule);
         }
 
-        public async Task<List<DoctorSchedule>>? GetAllDoctorSchedulesAsync()
+        public async Task<List<DoctorSchedule?>> GetAllDoctorSchedulesAsync()
         {
             return await _doctorScheduleRepository.GetAllDoctorSchedulesAsync();
         }
@@ -38,7 +38,7 @@ namespace ServiceLayer.Implements
             return (doctorSchedule, "Bi trung lich");
         }
 
-        public async Task<(List<DoctorSchedule>? schedules, string Message)> ViewDoctorScheduleAsync(Guid doctorId)
+        public async Task<(List<DoctorSchedule?> schedules, string Message)> ViewDoctorScheduleAsync(Guid doctorId)
         {
             var schedules = await _doctorScheduleRepository.GetDoctorSchedulesByDoctorIdAsync(doctorId);
 

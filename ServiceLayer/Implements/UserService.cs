@@ -238,7 +238,7 @@ namespace ServiceLayer.Implements
             return await _userRepository.GetUserByIdAsync(userId);
         }
 
-        public async Task<List<User>>? GetAllUsersAsync()
+        public async Task<List<User?>> GetAllUsersAsync()
         {
             return await _userRepository.GetAllUsersAsync();
         }

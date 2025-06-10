@@ -10,6 +10,6 @@ namespace RepoLayer.Interfaces
     public interface IMedicalRecordRepository
     {
         public Task<MedicalRecord?> GetMedicalRecordByIdAsync(Guid medicalRecordId);
-        public Task<List<MedicalRecord>> GetAllMedicalRecordsAsync();
+        public Task<List<MedicalRecord?>> GetAllMedicalRecordsAsync();
     }
 }

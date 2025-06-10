@@ -10,6 +10,6 @@ namespace ServiceLayer.Interfaces
     public interface IARVProtocolService 
     {
         public Task<ARVProtocol?> GetARVProtocolByIdAsync(Guid protocolId);
-        public Task<List<ARVProtocol>>? GetAllARVProtocolsAsync();
+        public Task<List<ARVProtocol?>> GetAllARVProtocolsAsync();
     }
 }

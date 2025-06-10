@@ -12,7 +12,7 @@ namespace ServiceLayer.Implements
     public class TreatmentStageService : ITreatmentStageService
     {
         private readonly ITreatmentStageRepository _treatmentStageRepository;
-        public async Task<List<TreatmentStage>>? GetAllTreatmentStagesAsync()
+        public async Task<List<TreatmentStage?>> GetAllTreatmentStagesAsync()
         {
             return await _treatmentStageRepository.GetAllTreatmentStagesAsync();
         }

@@ -18,7 +18,7 @@ namespace RepoLayer.Implements
         {
             _context = context;
         }
-        public Task<List<MedicalRecord>> GetAllMedicalRecordsAsync()
+        public Task<List<MedicalRecord?>> GetAllMedicalRecordsAsync()
         {
             return _context.MedicalRecords
                 .Include(mr => mr.Patient)

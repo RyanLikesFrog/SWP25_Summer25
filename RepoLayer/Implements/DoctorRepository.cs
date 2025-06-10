@@ -30,7 +30,7 @@ namespace RepoLayer.Implements
                                         .FirstOrDefaultAsync(p => p.UserId == userId);
         }
 
-        public async Task<List<Doctor>> GetAllDoctorsAsync()
+        public async Task<List<Doctor?>> GetAllDoctorsAsync()
         {
             return await _context.Doctors.ToListAsync();
         }
@@ -47,11 +47,11 @@ namespace RepoLayer.Implements
             return Task.CompletedTask;
         }
 
-        public async Task<List<DoctorSchedule>>? ViewDoctorScheduleAsync(Guid doctorId)
+        public async Task<List<DoctorSchedule?>> ViewDoctorScheduleAsync(Guid doctorId)
         {
             return await _context.DoctorSchedules
-                .Where(ds => ds.Id == doctorId)
-                .ToListAsync();
+                                .Where(ds => ds.Id == doctorId)
+                                .ToListAsync();
         }
 
         public async Task<Doctor?> GetDoctorByIdAsync(Guid doctorId)

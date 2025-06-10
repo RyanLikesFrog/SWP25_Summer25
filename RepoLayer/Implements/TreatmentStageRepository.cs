@@ -20,7 +20,7 @@ namespace RepoLayer.Implements
         }
 
 
-        public async Task<List<TreatmentStage>> GetAllTreatmentStagesAsync()
+        public async Task<List<TreatmentStage?>> GetAllTreatmentStagesAsync()
         {
             return await _Context.TreatmentStages.Include(u => u.PatientTreatmentProtocol)
                                                   .ToListAsync();

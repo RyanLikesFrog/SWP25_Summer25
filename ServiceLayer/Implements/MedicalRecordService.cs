@@ -12,7 +12,7 @@ namespace ServiceLayer.Implements
     public class MedicalRecordService : IMedicalRecordService
     {
         private readonly IMedicalRecordRepository _medicalRecordRepository;
-        public async Task<List<MedicalRecord>>? GetAllMedicalRecordsAsync()
+        public async Task<List<MedicalRecord?>> GetAllMedicalRecordsAsync()
         {
             return await _medicalRecordRepository.GetAllMedicalRecordsAsync();
         }

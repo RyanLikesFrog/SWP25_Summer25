@@ -11,6 +11,6 @@ namespace RepoLayer.Interfaces
     {
 
         public Task<LabResult?> GetLabResultByIdAsync(Guid labResultId);
-        public Task<List<LabResult>> GetAllLabResultsAsync();
+        public Task<List<LabResult?>> GetAllLabResultsAsync();
     }
 }

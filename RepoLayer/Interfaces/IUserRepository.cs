@@ -12,7 +12,7 @@ namespace RepoLayer.Interfaces
         public Task<User?> GetUserByUsernameAsync(string username);
         public Task<User?> GetUserByEmailAsync(string email);
         public Task<User?> GetUserByIdAsync(Guid userId);
-        public Task<List<User>> GetAllUsersAsync();
+        public Task<List<User?>> GetAllUsersAsync();
         public Task AddUserAsync(User user);
         public Task UpdateUserAsync(User user);
         public Task RemoveUserAsync(User user);

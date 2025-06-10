@@ -23,7 +23,7 @@ namespace RepoLayer.Implements
             await _context.Patients.AddAsync(patient);
         }
 
-        public async Task<List<Patient>> GetAllPatientsAsync() 
+        public async Task<List<Patient?>> GetAllPatientsAsync() 
         {
             return await _context.Patients.ToListAsync();
         }

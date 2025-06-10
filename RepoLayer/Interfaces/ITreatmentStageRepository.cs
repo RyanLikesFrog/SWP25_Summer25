@@ -10,6 +10,6 @@ namespace RepoLayer.Interfaces
     public interface ITreatmentStageRepository
     {
         public Task<TreatmentStage?> GetTreatmentStageByIdAsync(Guid treatmentStageId);
-        public Task<List<TreatmentStage>> GetAllTreatmentStagesAsync();
+        public Task<List<TreatmentStage?>> GetAllTreatmentStagesAsync();
     }
 }

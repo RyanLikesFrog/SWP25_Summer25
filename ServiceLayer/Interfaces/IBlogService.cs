@@ -10,6 +10,6 @@ namespace ServiceLayer.Interfaces
     public interface IBlogService
     {
         public Task<Blog?> GetBlogByIdAsync(Guid blogId);
-        public Task<List<Blog>>? GetAllBlogsAsync();
+        public Task<List<Blog?>> GetAllBlogsAsync();
     }
 }

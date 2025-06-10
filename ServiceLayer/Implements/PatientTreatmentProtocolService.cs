@@ -12,7 +12,7 @@ namespace ServiceLayer.Implements
     public class PatientTreatmentProtocolService : IPatientTreatmentProtocolService
     {
         private readonly IPatientTreatmentProtocolRepository _patientTreatmentProtocolRepository;
-        public async Task<List<PatientTreatmentProtocol>>? GetAllPatientTreatmentProtocolsAsync()
+        public async Task<List<PatientTreatmentProtocol?>> GetAllPatientTreatmentProtocolsAsync()
         {
             return await _patientTreatmentProtocolRepository.GetAllPatientTreatmentProtocolsAsync();
         }

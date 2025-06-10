@@ -10,6 +10,6 @@ namespace ServiceLayer.Interfaces
     public interface ITreatmentStageService
     {
         public Task<TreatmentStage?> GetTreatmentStagebyIdAsync(Guid treatmentStageId);
-        public Task<List<TreatmentStage>>? GetAllTreatmentStagesAsync();
+        public Task<List<TreatmentStage?>> GetAllTreatmentStagesAsync();
     }
 }

@@ -10,7 +10,7 @@ namespace RepoLayer.Interfaces
     public interface IBlogRepository
     {
         public Task<Blog?> GetBlogByIdAsync(Guid blogId);
-        public Task<List<Blog>> GetAllBlogsAsync();
+        public Task<List<Blog?>> GetAllBlogsAsync();
 
     }
 }

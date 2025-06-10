@@ -19,7 +19,7 @@ namespace RepoLayer.Implements
             _context = context;
         }
 
-        public async Task<List<Blog>> GetAllBlogsAsync()
+        public async Task<List<Blog?>> GetAllBlogsAsync()
         {
             return await _context.Blogs.Include(b => b.AuthorID).ToListAsync();
         }

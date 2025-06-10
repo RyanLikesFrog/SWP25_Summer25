@@ -150,7 +150,7 @@ namespace ServiceLayer.Implements
             };
         }
 
-        public async Task<(List<Appointment>? appointments, string Message)> ViewAppointmentAsync(Guid doctorId)
+        public async Task<(List<Appointment?> appointments, string Message)> ViewAppointmentAsync(Guid doctorId)
         {
             var appointments = await _appointmentRepository.GetAppointmentsByDoctorIdAsync(doctorId);
 

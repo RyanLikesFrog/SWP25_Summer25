@@ -24,7 +24,7 @@ namespace RepoLayer.Implements
             await _context.Appointments.AddAsync(appointment);
         }
 
-        public async Task<List<Appointment>> GetAllAppointmentsAsync()
+        public async Task<List<Appointment?>> GetAllAppointmentsAsync()
         {
             return await _context.Appointments.Include(u => u.Patient)
                                               .ToListAsync();
@@ -44,7 +44,7 @@ namespace RepoLayer.Implements
             return Task.CompletedTask;
         }
 
-        public async Task<List<Appointment>> GetAppointmentsByDoctorIdAsync(Guid doctorId)
+        public async Task<List<Appointment?>> GetAppointmentsByDoctorIdAsync(Guid doctorId)
         {
             return await _context.Appointments
                 .Where(a => a.DoctorId == doctorId)

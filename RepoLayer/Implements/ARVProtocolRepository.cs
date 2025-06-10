@@ -19,7 +19,7 @@ namespace RepoLayer.Implements
             _context = context;
         }
 
-        public async Task<List<ARVProtocol>> GetAllARVProtocolsAsync()
+        public async Task<List<ARVProtocol?>> GetAllARVProtocolsAsync()
         {
             return await _context.ARVProtocols.Include(u => u.PatientTreatmentProtocols)
                                               .ToListAsync();

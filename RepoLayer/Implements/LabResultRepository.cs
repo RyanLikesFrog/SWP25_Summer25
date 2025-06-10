@@ -18,7 +18,7 @@ namespace RepoLayer.Implements
         {
             _context = context;
         }
-        public async Task<List<LabResult>> GetAllLabResultsAsync()
+        public async Task<List<LabResult?>> GetAllLabResultsAsync()
         {
             return await _context.LabResults
                 .Include(lr => lr.Patient)

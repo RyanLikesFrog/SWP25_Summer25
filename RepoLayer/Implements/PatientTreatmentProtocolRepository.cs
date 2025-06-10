@@ -18,7 +18,7 @@ namespace RepoLayer.Implements
         {
             _context = context;
         }
-        public async Task<List<PatientTreatmentProtocol>> GetAllPatientTreatmentProtocolsAsync()
+        public async Task<List<PatientTreatmentProtocol?>> GetAllPatientTreatmentProtocolsAsync()
         {
             return await _context.PatientTreatmentProtocols
                 .Include(ptp => ptp.Patient)

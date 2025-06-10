@@ -12,7 +12,7 @@ namespace ServiceLayer.Implements
     public class LabResultService : ILabResultService
     {
         private readonly ILabResultRepository _labResultRepository;
-        public async Task<List<LabResult>>? GetAllLabResultsAsync()
+        public async Task<List<LabResult?>> GetAllLabResultsAsync()
         {
             return await _labResultRepository.GetAllLabResultsAsync();
         }

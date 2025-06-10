@@ -13,7 +13,7 @@ namespace ServiceLayer.Implements
     {
         private readonly IARVProtocolRepository _aRVProtocolRepository;
 
-        public async Task<List<ARVProtocol>>? GetAllARVProtocolsAsync()
+        public async Task<List<ARVProtocol?>> GetAllARVProtocolsAsync()
         {
             return await _aRVProtocolRepository.GetAllARVProtocolsAsync();
         }

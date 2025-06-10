@@ -20,7 +20,7 @@ namespace RepoLayer.Implements
             _context = context;
         }
 
-        public async Task<List<DoctorSchedule>> GetAllDoctorSchedulesAsync()
+        public async Task<List<DoctorSchedule?>> GetAllDoctorSchedulesAsync()
         {
             return await _context.DoctorSchedules
                 .Include(ds => ds.Doctor)
@@ -45,12 +45,12 @@ namespace RepoLayer.Implements
                 return _context.DoctorSchedules.Where(x => x.DoctorId == doctorId && x.StartTime >= startDate && x.StartTime <= startDate.AddHours(1)).FirstOrDefaultAsync();
             }
         }
-        public async Task<DoctorSchedule> CreateDoctorScheduleAsync(DoctorSchedule doctorSchedule)
+        public async Task<DoctorSchedule?> CreateDoctorScheduleAsync(DoctorSchedule doctorSchedule)
         {
             return (await _context.DoctorSchedules.AddAsync(doctorSchedule)).Entity;
         }
 
-        public async Task<List<DoctorSchedule>> GetDoctorSchedulesByDoctorIdAsync(Guid doctorId)
+        public async Task<List<DoctorSchedule?>> GetDoctorSchedulesByDoctorIdAsync(Guid doctorId)
         {
             return await _context.DoctorSchedules
                                  .AsNoTracking()

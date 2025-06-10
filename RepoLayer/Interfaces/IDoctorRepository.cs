@@ -11,10 +11,10 @@ namespace RepoLayer.Interfaces
     {
         public Task<Doctor?> GetDoctorByUserIdAsync(Guid userId);
         public Task<Doctor?> GetDoctorByIdAsync(Guid doctorId);
-        public Task<List<Doctor>> GetAllDoctorsAsync();
+        public Task<List<Doctor?>> GetAllDoctorsAsync();
         public Task AddDoctorAsync(Doctor doctor);
         public Task UpdateDoctorAsync(Doctor doctor);
         public Task RemoveDoctorAsync(Doctor doctor);
-        public Task<List<DoctorSchedule>>? ViewDoctorScheduleAsync(Guid doctorId);
+        public Task<List<DoctorSchedule?>> ViewDoctorScheduleAsync(Guid doctorId);
     }
 }

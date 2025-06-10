@@ -10,6 +10,6 @@ namespace ServiceLayer.Interfaces
     public interface ILabResultService
     {
         public Task<LabResult?> GetLabResultByIdAsync(Guid labResultId);
-        public Task<List<LabResult>>? GetAllLabResultsAsync();
+        public Task<List<LabResult?>> GetAllLabResultsAsync();
     }
 }
