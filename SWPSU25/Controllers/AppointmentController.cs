@@ -98,5 +98,18 @@ namespace SWPSU25.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while registering the appointment.", error = ex.Message });
             }
         }
+
+        [HttpGet("doctor-get-appointments")]
+        public async Task<IActionResult> ViewAppointments([FromQuery] Guid doctorId)
+        {
+            var (appointments, message) = await _appointmentService.ViewAppointmentAsync(doctorId);
+
+            if (appointments == null)
+            {
+                return NotFound(new { Message = message });
+            }
+
+            return Ok(new { Message = message, Appointments = appointments });
+        }
     }
 }

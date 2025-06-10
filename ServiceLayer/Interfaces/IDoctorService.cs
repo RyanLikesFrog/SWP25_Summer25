@@ -13,7 +13,5 @@ namespace ServiceLayer.Interfaces
         public Task<Doctor?> GetDoctorByIdAsync(Guid doctorId);
         public Task<List<Doctor>>? GetAllDoctorsAsync();
 
-        public Task<(List<DoctorSchedule?> schedules, string Message)> ViewDoctorScheduleAsync(Guid doctorId);
-        public Task<(List<Appointment?> appointments, string Message)> ViewAppointmentAsync(Guid doctorId);
     }
 }

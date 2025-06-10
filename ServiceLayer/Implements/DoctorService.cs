@@ -38,33 +38,5 @@ namespace ServiceLayer.Implements
         {
             return await _doctorRepository.GetDoctorByUserIdAsync(doctorId);
         }
-
-        public async Task<(List<DoctorSchedule?> schedules, string Message)> ViewDoctorScheduleAsync(Guid doctorId)
-        {
-            var schedules = await _doctorScheduleRepository.GetDoctorSchedulesByDoctorIdAsync(doctorId);
-
-            if (schedules == null || !schedules.Any())
-            {
-                return (null, "khong tim thay lich.");
-            }
-            else
-            {
-                return (schedules, "tim lich thanh cong.");
-            }
-        }
-
-        public async Task<(List<Appointment?> appointments, string Message)> ViewAppointmentAsync(Guid doctorId)
-        {
-            var appointments = await _appointmentRepository.GetAppointmentsByDoctorIdAsync(doctorId);
-
-            if (appointments == null || !appointments.Any())
-            {
-                return (null, "khong tim thay cuoc hen.");
-            }
-            else
-            {
-                return (appointments, "tim cuoc hen thanh cong.");
-            }
-        }
     }
 }

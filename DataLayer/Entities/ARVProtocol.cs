@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataLayer.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -22,6 +23,9 @@ namespace DataLayer.Entities
         public string? SideEffects { get; set; } // TEXT
 
         public bool IsDefault { get; set; }
+        
+        [Required]
+        public ARVProtocolType ProtocolType { get; set; } // Enum to define the type of ARV protocol
 
         // Navigation property cho mối quan hệ 1-N
         public virtual ICollection<PatientTreatmentProtocol>? PatientTreatmentProtocols{ get; set; }

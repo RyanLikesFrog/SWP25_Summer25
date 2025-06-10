@@ -40,5 +40,18 @@ namespace SWPSU25.Controllers
             var doctorSchedules = await _doctorScheduleService.GetDuplicatedDoctorScheduleByStartDateEndDateAsync(doctorId, StartTime, EndTime);
             return Ok(doctorSchedules);
         }
+
+        [HttpGet("doctor-get-schedule")]
+        public async Task<IActionResult> ViewDoctorSchedule([FromQuery] Guid doctorId)
+        {
+            var (schedules, message) = await _doctorScheduleService.ViewDoctorScheduleAsync(doctorId);
+
+            if (schedules == null)
+            {
+                return NotFound(new { Message = message });
+            }
+
+            return Ok(new { Message = message, Schedules = schedules });
+        }
     }
 }

@@ -19,6 +19,11 @@ namespace RepoLayer.Implements
             _context = context;
         }
 
+        public async Task<ARVProtocol?> CreateARVProtocolAsync(ARVProtocol arvProto)
+        {
+            return (await _context.ARVProtocols.AddAsync(arvProto)).Entity;
+        }
+
         public async Task<List<ARVProtocol?>> GetAllARVProtocolsAsync()
         {
             return await _context.ARVProtocols.Include(u => u.PatientTreatmentProtocols)
@@ -29,6 +34,11 @@ namespace RepoLayer.Implements
         {
             return await _context.ARVProtocols.Include(u => u.PatientTreatmentProtocols)
                                               .FirstOrDefaultAsync(u => u.ProtocolId == protocolId);
+        }
+
+        public async Task<List<ARVProtocol?>> GetDefaultProtocolAsync()
+        {
+            return await _context.ARVProtocols.Where(p => p.IsDefault).ToListAsync();
         }
     }
 }

@@ -16,6 +16,7 @@ namespace ServiceLayer.Implements
     public class AppointmentService : IAppointmentService
     {
         private readonly IPatientRepository _patientRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IDoctorScheduleRepository _doctorScheduleRepository;
         private readonly IDoctorRepository _doctorRepository;
@@ -23,11 +24,13 @@ namespace ServiceLayer.Implements
 
         public AppointmentService(
             IPatientRepository patientRepository,
+            IUserRepository userRepository,
             IAppointmentRepository appointmentRepository,
             IRepository repository,
             IDoctorScheduleRepository doctorScheduleRepository,
             IDoctorRepository doctorRepository)
         {
+            _userRepository = userRepository;
             _patientRepository = patientRepository;
             _appointmentRepository = appointmentRepository;
             _repository = repository;
