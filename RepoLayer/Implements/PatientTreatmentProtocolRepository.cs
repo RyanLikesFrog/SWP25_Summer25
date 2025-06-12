@@ -18,6 +18,12 @@ namespace RepoLayer.Implements
         {
             _context = context;
         }
+
+        public async Task<PatientTreatmentProtocol?> CreatePatientTreatmentProtocol(PatientTreatmentProtocol patientTreatmentProtocol)
+        {
+            return (await _context.PatientTreatmentProtocols.AddAsync(patientTreatmentProtocol)).Entity;
+        }
+
         public async Task<List<PatientTreatmentProtocol?>> GetAllPatientTreatmentProtocolsAsync()
         {
             return await _context.PatientTreatmentProtocols

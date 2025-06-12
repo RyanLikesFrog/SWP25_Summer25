@@ -20,7 +20,7 @@ namespace DataLayer.Entities
         public string? Description { get; set; }
 
         [ForeignKey("PatientTreatmentProtocol")]
-        public Guid? PatientTreatmentProtocolId { get; set; } // Bắt buộc
+        public Guid? PatientTreatmentProtocolId { get; set; }
         public virtual PatientTreatmentProtocol? PatientTreatmentProtocol { get; set; } // Navigation property
 
         [Required]

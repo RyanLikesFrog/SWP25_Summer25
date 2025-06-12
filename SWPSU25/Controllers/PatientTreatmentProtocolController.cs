@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.DTOs;
 using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
 
@@ -32,6 +33,32 @@ namespace SWPSU25.Controllers
         {
             var patientTreatmentProtocols = await _patientTreatmentProtocolService.GetAllPatientTreatmentProtocolsAsync();
             return Ok(patientTreatmentProtocols);
+        }
+
+        [HttpPost("create-patient-treatment-protocol")]
+        public async Task<IActionResult> CreatePatientTreatmentProtocol([FromBody] CreatePatientTreatmentProtocolRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var response = await _patientTreatmentProtocolService.CreatePatientTreatmentProtocolAsync(request);
+                if (response != null)
+                {
+                    return CreatedAtAction(nameof(GetPatientTreatmentProtocolById), new { id = response.Id }, response);
+                }
+                else
+                {
+                    // Trường hợp service trả về null: có thể là lỗi DB hoặc lỗi không xác định
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Không thể tạo phác đồ điều trị bệnh nhân do lỗi nội bộ hoặc lỗi cơ sở dữ liệu." });
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

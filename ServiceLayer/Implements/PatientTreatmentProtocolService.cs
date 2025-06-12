@@ -1,5 +1,6 @@
 ﻿using DataLayer.Entities;
 using RepoLayer.Interfaces;
+using ServiceLayer.DTOs;
 using ServiceLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,93 @@ namespace ServiceLayer.Implements
     public class PatientTreatmentProtocolService : IPatientTreatmentProtocolService
     {
         private readonly IPatientTreatmentProtocolRepository _patientTreatmentProtocolRepository;
+        private readonly IRepository _repository;
+        private readonly IPatientRepository _patientRepository;
+        private readonly IDoctorRepository _doctorRepository;
+        private readonly IARVProtocolRepository _aRVProtocolRepository;
+        private readonly IAppointmentRepository _appointmentRepository;
+
+        public PatientTreatmentProtocolService(
+            IPatientTreatmentProtocolRepository patientTreatmentProtocolRepository,
+            IRepository repository,
+            IPatientRepository patientRepository,
+            IDoctorRepository doctorRepository,
+            IARVProtocolRepository aRVProtocolRepository,
+            IAppointmentRepository appointmentRepository)
+        {
+            _patientTreatmentProtocolRepository = patientTreatmentProtocolRepository;
+            _repository = repository;
+            _patientRepository = patientRepository;
+            _doctorRepository = doctorRepository;
+            _aRVProtocolRepository = aRVProtocolRepository;
+            _appointmentRepository = appointmentRepository;
+        }
+
+        public async Task<PatientTreatmentProtocolDetailResponse> CreatePatientTreatmentProtocolAsync(CreatePatientTreatmentProtocolRequest request)
+        {
+            var patient = await _patientRepository.GetPatientByIdAsync(request.PatientId);
+            if (patient == null)
+            {
+                throw new ArgumentException("Patient not found with the provided Patient ID.");
+            }
+
+            if (request.DoctorId != Guid.Empty) // Fix: Check if DoctorId is not an empty Guid instead of using HasValue
+            {
+                var doctor = await _doctorRepository.GetDoctorByIdAsync(request.DoctorId);
+                if (doctor == null)
+                {
+                    throw new ArgumentException("Doctor not found with the provided Doctor ID");
+                }
+            }
+
+            if (request.ProtocolId.HasValue)
+            {
+                var protocol = await _aRVProtocolRepository.GetARVProtocolByIdAsync(request.ProtocolId.Value);
+                if (protocol == null)
+                {
+                    throw new ArgumentException("ARVPRotocol not found with the provided PRotocol ID");
+                }
+            }
+
+            if (request.AppointmentId.HasValue)
+            {
+                var appointment = await _appointmentRepository.GetAppointmentByIdAsync(request.AppointmentId.Value);
+                if (appointment == null)
+                {
+                    throw new ArgumentException("Appointment not found with the provided Appointment ID");
+                }
+            }
+
+            var newPatientTreatmentProtocol = new PatientTreatmentProtocol
+            {
+                Id = Guid.NewGuid(),
+                PatientId = request.PatientId,
+                DoctorId = request.DoctorId,
+                ProtocolId = request.ProtocolId,
+                AppointmentId = request.AppointmentId,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
+                Status = request.Status
+            };
+
+            await _patientTreatmentProtocolRepository.CreatePatientTreatmentProtocol(newPatientTreatmentProtocol);
+            await _repository.SaveChangesAsync();
+
+            return new PatientTreatmentProtocolDetailResponse
+            {
+                Id = newPatientTreatmentProtocol.Id,
+                PatientId = newPatientTreatmentProtocol.PatientId,
+                DoctorId = newPatientTreatmentProtocol.DoctorId,
+                ProtocolId = newPatientTreatmentProtocol.ProtocolId,
+                AppointmentId = newPatientTreatmentProtocol.AppointmentId,
+                StartDate = newPatientTreatmentProtocol.StartDate,
+                EndDate = newPatientTreatmentProtocol.EndDate,
+                Status = newPatientTreatmentProtocol.Status,
+
+                TreatmentStages = new List<TreatmentStageResponse>()
+            };
+        }
+
         public async Task<List<PatientTreatmentProtocol?>> GetAllPatientTreatmentProtocolsAsync()
         {
             return await _patientTreatmentProtocolRepository.GetAllPatientTreatmentProtocolsAsync();

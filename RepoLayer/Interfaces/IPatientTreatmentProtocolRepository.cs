@@ -9,6 +9,7 @@ namespace RepoLayer.Interfaces
 {
     public interface IPatientTreatmentProtocolRepository
     {
+        public Task<PatientTreatmentProtocol?> CreatePatientTreatmentProtocol(PatientTreatmentProtocol patientTreatmentProtocol);   
         public Task<PatientTreatmentProtocol?> GetPatientTreatmentProtocolByIdAsync(Guid patientTreatmentProtocolId);
         public Task<List<PatientTreatmentProtocol?>> GetAllPatientTreatmentProtocolsAsync();
     }

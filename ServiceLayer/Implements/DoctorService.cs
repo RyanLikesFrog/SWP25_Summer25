@@ -36,7 +36,7 @@ namespace ServiceLayer.Implements
 
         public async Task<Doctor?> GetDoctorByIdAsync(Guid doctorId)
         {
-            return await _doctorRepository.GetDoctorByUserIdAsync(doctorId);
+            return await _doctorRepository.GetDoctorByIdAsync(doctorId);
         }
     }
 }
