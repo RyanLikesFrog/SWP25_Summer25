@@ -23,13 +23,15 @@ namespace DataLayer.Entities
         public virtual Doctor? Doctor { get; set; }
 
         [ForeignKey("ARVProtocol")]
-        public Guid? ProtocolId { get; set; } // Nullable nếu là phác đồ tùy chỉnh hoàn toàn
+        public Guid? ProtocolId { get; set; } 
         public virtual ARVProtocol? ARVProtocol { get; set; }
 
         [ForeignKey("Appointment")]
         public Guid? AppointmentId {get; set; }
         public virtual Appointment? Appointment { get; set; }
 
+        public string? TreatmentName { get; set; } // ten  treatment protocol
+        public string? Description { get; set; } // Mô tả
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 

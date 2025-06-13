@@ -20,23 +20,20 @@ namespace DataLayer.Entities
         [ForeignKey("TreatmentStage")]
         public Guid? TreatmentStageId { get; set; }
         public virtual TreatmentStage? TreatmentStage { get; set; }
+        [ForeignKey("Doctor")]
+        public Guid? DoctorId { get; set; }
+        public virtual Doctor? Doctor { get; set; } // Navigation property
 
         [Required]
         [MaxLength(100)]
-        public string? TestType { get; set; }
-
+        public string? TestName { get; set; }
+        public string? TestType { get; set; } // Loại xét nghiệm
         [Required]
         public DateTime TestDate { get; set; }
 
         [MaxLength(50)]
-        public string? ResultValue { get; set; }
-
-        [MaxLength(20)]
-        public string? Unit { get; set; }
-
-        [MaxLength(100)]
-        public string? ReferenceRange { get; set; }
-
+        public string? ResultSummary { get; set; }  
+        public string? Conclusion { get; set; } // Kết luận từ bác sĩ
         public string? Notes { get; set; } // TEXT
     }
 }
