@@ -9,6 +9,8 @@ using System.Text;
 using RepoLayer.Implements;
 using RepoLayer.Interfaces;
 using System.Security.Claims;
+using ServiceLayer.Implements.Reminder;
+using SWPSU25.SignalRHubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +72,10 @@ builder.Services.AddScoped<IMedicalRecordService, MedicalRecordService>();
 builder.Services.AddScoped<IPatientTreatmentProtocolService, PatientTreatmentProtocolService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+// add signalR
+builder.Services.AddScoped<ReminderService>();
+builder.Services.AddSignalR();
+builder.Services.AddHostedService<ReminderBackgroundService>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -147,5 +153,6 @@ app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ReminderHub>("/reminderHub");
 
 app.Run();
