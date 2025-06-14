@@ -6,6 +6,8 @@ namespace ServiceLayer.DTOs
 {
     public class CreatePatientTreatmentProtocolRequest
     {
+        internal Guid patientTreatmentProtocolId;
+
         [Required]
         public Guid PatientId { get; set; }
 

@@ -18,6 +18,12 @@ namespace RepoLayer.Implements
         {
             _context = context;
         }
+
+        public async Task<MedicalRecord?> CreateMedicalRecordAsync(MedicalRecord medicalRecord)
+        {
+            return (await _context.MedicalRecords.AddAsync(medicalRecord)).Entity;
+        }
+
         public Task<List<MedicalRecord?>> GetAllMedicalRecordsAsync()
         {
             return _context.MedicalRecords

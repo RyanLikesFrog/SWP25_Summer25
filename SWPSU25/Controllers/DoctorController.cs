@@ -27,7 +27,7 @@ namespace SWPSU25.Controllers
             return Ok(user);
         }
 
-        [HttpGet("get-list-doctoc")]
+        [HttpGet("get-list-doctor")]
         public async Task<IActionResult> GetListDoctor()
         {
             var doctors = await _doctorService.GetAllDoctorsAsync();

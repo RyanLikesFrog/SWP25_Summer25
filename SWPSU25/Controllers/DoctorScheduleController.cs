@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.DTOs;
 using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
 
@@ -52,6 +53,32 @@ namespace SWPSU25.Controllers
             }
 
             return Ok(new { Message = message, Schedules = schedules });
+        }
+
+        [HttpPost("create-doctor-schedule")]
+        public async Task<IActionResult> CreateDoctorSchedule([FromBody] CreateDoctorScheduleRequest request)
+        {
+            try
+            {
+                var result = await _doctorScheduleService.CreateDoctorScheduleAsync(request);
+                return Ok(new
+                {
+                    Message = "Tạo lịch làm việc bác sĩ thành công.",
+    
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Message = "Đã xảy ra lỗi trong quá trình tạo lịch làm việc bác sĩ.",
+                    Details = ex.Message
+                });
+            }
         }
     }
 }

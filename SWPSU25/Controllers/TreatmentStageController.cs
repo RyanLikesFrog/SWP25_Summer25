@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.DTOs;
 using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
 
@@ -33,5 +34,24 @@ namespace SWPSU25.Controllers
             var treatmentStages = await _treatmentStageService.GetAllTreatmentStagesAsync();
             return Ok(treatmentStages);
         }
+
+        [HttpPost("create-treatment-stage-medical-record")]
+        public async Task<IActionResult> CreateTreatmentStage([FromBody] CreateTreatmentStageRequest request)
+        {
+            try
+            {
+                var result = await _treatmentStageService.CreateTreatmentStageAsync(request);
+                return Ok(new { Message = "Tạo giai đoạn điều trị thành công", Data = result });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Đã xảy ra lỗi trong quá trình tạo giai đoạn điều trị.", Detail = ex.Message });
+            }
+        }
+
     }
 }

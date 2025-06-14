@@ -1,5 +1,6 @@
 ﻿using DataLayer.Entities;
 using RepoLayer.Interfaces;
+using ServiceLayer.DTOs;
 using ServiceLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,10 +13,60 @@ namespace ServiceLayer.Implements
     public class DoctorScheduleService : IDoctorScheduleService
     {
         private readonly IDoctorScheduleRepository _doctorScheduleRepository;
+        private readonly IDoctorRepository _doctorRepository;
+        private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IRepository _repository;
 
-        public async Task CreateDoctorScheduleAsync(DoctorSchedule doctorSchedule)
+        public DoctorScheduleService(IDoctorScheduleRepository doctorScheduleRepository, IDoctorRepository doctorRepository, IAppointmentRepository appointmentRepository, IRepository repository)
         {
-            await _doctorScheduleRepository.CreateDoctorScheduleAsync(doctorSchedule);
+            _doctorScheduleRepository = doctorScheduleRepository;
+            _doctorRepository = doctorRepository;
+            _appointmentRepository = appointmentRepository;
+            _repository = repository;
+        }
+
+        public async Task<DoctorScheduleDetailResponse> CreateDoctorScheduleAsync(CreateDoctorScheduleRequest request)
+        {
+            if (request.AppointmentId == null)
+            {
+                throw new ArgumentException("AppointmentId is required.");
+            }
+
+            var appointment = await _appointmentRepository.GetAppointmentByIdAsync(request.AppointmentId.Value);
+            if (appointment == null)
+            {
+                throw new ArgumentException($"Appointment with ID {request.AppointmentId} not found.");
+            }
+
+            if (request.DoctorId != appointment.DoctorId)
+            {
+                throw new ArgumentException($"Doctor ID {request.DoctorId} does not match the Appointment's Doctor ID {appointment.DoctorId}.");
+            }
+
+            var newDoctorSchedule = new DoctorSchedule
+            {
+                Id = Guid.NewGuid(),
+                DoctorId = request.DoctorId,
+                AppointmentId = request.AppointmentId.Value,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                Notes = request.Notes,
+                IsAvailable = request.IsAvailable
+            };
+
+            await _doctorScheduleRepository.CreateDoctorScheduleAsync(newDoctorSchedule);
+            await _repository.SaveChangesAsync();
+
+            return new DoctorScheduleDetailResponse
+            {
+                Id = newDoctorSchedule.Id,
+                DoctorId = newDoctorSchedule.DoctorId,
+                AppointmentId = newDoctorSchedule.AppointmentId,
+                StartTime = newDoctorSchedule.StartTime,
+                EndTime = newDoctorSchedule.EndTime,
+                Notes = newDoctorSchedule.Notes,
+                IsAvailable = newDoctorSchedule.IsAvailable
+            };
         }
 
         public async Task<List<DoctorSchedule?>> GetAllDoctorSchedulesAsync()

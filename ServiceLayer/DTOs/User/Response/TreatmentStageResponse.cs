@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DataLayer.Enum;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ServiceLayer.DTOs
 {
@@ -15,5 +17,6 @@ namespace ServiceLayer.DTOs
         public string? ReminderTimes { get; set; }
         public string? CustomProtocolDetails { get; set; }
         public int LabResultCount { get; set; }
+        public PatientTreatmentStatus Status { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DataLayer.Entities;
+using ServiceLayer.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,9 @@ namespace ServiceLayer.Interfaces
     {
         public Task<DoctorSchedule?> GetDoctorSchedulebyIdAsync(Guid scheduleId);
         public Task<List<DoctorSchedule?>> GetAllDoctorSchedulesAsync();
-        public Task CreateDoctorScheduleAsync(DoctorSchedule doctorSchedule);
         public Task<(DoctorSchedule? doctorSchedule, string Message)>? GetDuplicatedDoctorScheduleByStartDateEndDateAsync(Guid? doctorId, DateTime startDate, DateTime? endDate);
         public Task<(List<DoctorSchedule?> schedules, string Message)> ViewDoctorScheduleAsync(Guid doctorId);
+        public Task<DoctorScheduleDetailResponse> CreateDoctorScheduleAsync(CreateDoctorScheduleRequest request);
 
     }
 }

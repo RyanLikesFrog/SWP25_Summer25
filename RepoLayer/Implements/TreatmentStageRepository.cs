@@ -19,6 +19,10 @@ namespace RepoLayer.Implements
             _Context = context;
         }
 
+        public async Task<TreatmentStage?> CreateTreatmentStageAsync(TreatmentStage treatmentStage)
+        {
+            return (await _Context.TreatmentStages.AddAsync(treatmentStage)).Entity;
+        }
 
         public async Task<List<TreatmentStage?>> GetAllTreatmentStagesAsync()
         {
