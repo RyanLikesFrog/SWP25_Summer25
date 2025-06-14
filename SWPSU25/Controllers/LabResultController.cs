@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.DTOs;
 using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
 
@@ -33,5 +34,20 @@ namespace SWPSU25.Controllers
             var labResults = await _labResultService.GetAllLabResultsAsync();
             return Ok(labResults);
         }
+
+        [HttpPost("create-lab-result")]
+        public async Task<IActionResult> CreateLabResult([FromBody] CreateLabResultRequest request)
+        {
+            try
+            {
+                var result = await _labResultService.CreateLabResultAsync(request);
+                return CreatedAtAction(nameof(GetLabResultById), new { labResultId = result.Id }, result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
     }
 }

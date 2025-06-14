@@ -18,6 +18,12 @@ namespace RepoLayer.Implements
         {
             _context = context;
         }
+
+        public async Task<LabResult?> CreateLabResultAsync(LabResult labResult)
+        {
+            return (await _context.AddAsync(labResult)).Entity;
+        }
+
         public async Task<List<LabResult?>> GetAllLabResultsAsync()
         {
             return await _context.LabResults
