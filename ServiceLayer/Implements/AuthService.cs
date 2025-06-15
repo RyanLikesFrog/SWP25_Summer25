@@ -182,7 +182,6 @@ namespace ServiceLayer.Implements
                 {
                     claims.Add(new Claim("doctor_id", doctor.Id.ToString()));
                     claims.Add(new Claim("full_name", doctor.FullName!)); // Thêm tên đầy đủ của bác sĩ
-                    claims.Add(new Claim("specialization", doctor.Specialization!)); // Thêm chuyên khoa
                 }
             }
             // Không cần thêm claims đặc biệt cho Staff, Manager, Admin nếu bạn chỉ muốn dựa vào Role claim chung.
