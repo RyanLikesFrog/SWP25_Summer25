@@ -43,7 +43,7 @@ namespace SWPSU25.Controllers
             return Ok(doctorSchedules);
         }
 
-        [HttpGet("doctor-get-schedule")]
+        [HttpGet("doctor-get-schedule-by-id")]
         [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> ViewDoctorSchedule([FromQuery] Guid doctorId)
         {
