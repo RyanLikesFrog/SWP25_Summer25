@@ -186,14 +186,12 @@ namespace ServiceLayer.Implements
                 else if (doctor != null)
                 {
                     // Cập nhật thông tin Doctor hiện có
-                    if (!string.IsNullOrEmpty(request.FullName)) doctor.FullName = request.FullName;
-                    if (!string.IsNullOrEmpty(request.Specialization)) doctor.Specialization = request.Specialization;
-                    if (!string.IsNullOrEmpty(request.Qualifications)) doctor.Qualifications = request.Qualifications;
-                    if (!string.IsNullOrEmpty(request.Experience)) doctor.Experience = request.Experience;
-                    if (!string.IsNullOrEmpty(request.Bio)) doctor.Bio = request.Bio;
-                    if (!string.IsNullOrEmpty(request.ProfilePictureURL)) doctor.ProfilePictureURL = request.ProfilePictureURL;
-
-                    await _doctorRepository.UpdateDoctorAsync(doctor);
+                    if (!string.IsNullOrEmpty(request.FullName)) user.Doctor.FullName = request.FullName;
+                    if (!string.IsNullOrEmpty(request.Specialization)) user.Doctor.Specialization = request.Specialization;
+                    if (!string.IsNullOrEmpty(request.Qualifications)) user.Doctor.Qualifications = request.Qualifications;
+                    if (!string.IsNullOrEmpty(request.Experience)) user.Doctor.Experience = request.Experience;
+                    if (!string.IsNullOrEmpty(request.Bio)) user.Doctor.Bio = request.Bio;
+                    if (!string.IsNullOrEmpty(request.ProfilePictureURL)) user.Doctor.ProfilePictureURL = request.ProfilePictureURL;
                 }
                 // Nếu doctor vẫn là null ở đây, có thể do lỗi logic hoặc dữ liệu không nhất quán
                 // Có thể thêm log hoặc throw exception
@@ -204,7 +202,7 @@ namespace ServiceLayer.Implements
                 var doctorToDelete = await _doctorRepository.GetDoctorByUserIdAsync(userId);
                 if (doctorToDelete != null)
                 {
-                    doctorToDelete.isActive = false; // Đánh dấu là không hoạt động thay vì xóa
+                    user.Doctor.isActive = false; // Đánh dấu là không hoạt động thay vì xóa
                 }
             }
             // Không làm gì nếu không phải Doctor và không chuyển sang Doctor
