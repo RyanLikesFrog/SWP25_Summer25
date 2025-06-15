@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.DTOs;
 using ServiceLayer.Implements;
@@ -43,6 +44,7 @@ namespace SWPSU25.Controllers
         }
 
         [HttpGet("doctor-get-schedule")]
+        [Authorize(Roles = "Doctor")]
         public async Task<IActionResult> ViewDoctorSchedule([FromQuery] Guid doctorId)
         {
             var (schedules, message) = await _doctorScheduleService.ViewDoctorScheduleAsync(doctorId);

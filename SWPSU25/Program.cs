@@ -104,16 +104,17 @@ builder.Services.AddAuthorization(); // Thêm dịch vụ ủy quyền
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
 
     // Cấu hình Swagger để hỗ trợ JWT Bearer Authentication
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
         Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer", // ← Quan trọng: viết thường!
+        BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Description = "Nhập token JWT vào đây. Không cần thêm chữ 'Bearer ' phía trước."
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -137,7 +138,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+    });
 }
 
 app.UseHttpsRedirection();
@@ -152,7 +156,7 @@ app.UseCors(MyAllowSpecificOrigins);
 // UseAuthorization should be after UseCors (and UseRouting)
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers();   
 app.MapHub<ReminderHub>("/reminderHub");
 
 app.Run();
