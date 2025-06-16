@@ -96,5 +96,9 @@ namespace ServiceLayer.Implements
                 return (schedules, "tim lich thanh cong.");
             }
         }
+        public async Task<List<DoctorSchedule?>> GetTodayDoctorScheduleByDoctorIdAsync(Guid doctorId)
+        {
+            return await _doctorScheduleRepository.GetTodayDoctorSchedulesByDoctorIdAsync(doctorId);
+        }
     }
 }

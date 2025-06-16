@@ -64,7 +64,14 @@ namespace RepoLayer.Implements
                 .Include(ds => ds.Doctor)
                 .FirstOrDefaultAsync(ds => ds.AppointmentId == appointmentId);
         }
-
+        public async Task<List<DoctorSchedule?>> GetTodayDoctorSchedulesByDoctorIdAsync(Guid doctorId)
+        {
+            var today = DateTime.Today;
+            return await _context.DoctorSchedules
+                .Include(ds => ds.Appointment)
+                .Where(ds => ds.DoctorId == doctorId && (ds.StartTime >= today && ds.StartTime <= today.AddHours(24)))
+                .ToListAsync();
+        }
         public Task UpdateDoctorSchedule(DoctorSchedule doctorSchedule)
         {
             _context.Update(doctorSchedule);

@@ -57,6 +57,14 @@ namespace SWPSU25.Controllers
             return Ok(new { Message = message, Schedules = schedules });
         }
 
+        [HttpGet("get-today-list-doctor-schedule-by-doctor-id")]
+        public async Task<IActionResult> ViewTodayDoctorSchedule([FromQuery] Guid doctorId)
+        {
+            var doctorSchedules = await _doctorScheduleService.GetTodayDoctorScheduleByDoctorIdAsync(doctorId);
+
+            return Ok(doctorSchedules);
+        }
+
         [HttpPost("create-doctor-schedule")]
         public async Task<IActionResult> CreateDoctorSchedule([FromBody] CreateDoctorScheduleRequest request)
         {
