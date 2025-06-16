@@ -36,5 +36,14 @@ namespace DataLayer.Entities
         public string? OnlineLink { get; set; }
 
         public bool IsAnonymousAppointment { get; set; }
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal Price { get; set; } // Giá của cuộc hẹn
+
+        [Required]
+        public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
+
+        // **ĐIỂM SỬA ĐỔI: Mối quan hệ một-một với PaymentTransaction**
+        public Guid? PaymentTransactionId { get; set; } // Khóa ngoại tới PaymentTransaction
+        public virtual PaymentTransaction? PaymentTransaction { get; set; } // Thuộc tính điều hướng
     }
 }

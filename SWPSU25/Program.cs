@@ -11,6 +11,8 @@ using RepoLayer.Interfaces;
 using System.Security.Claims;
 using ServiceLayer.Implements.Reminder;
 using SWPSU25.SignalRHubs;
+using ServiceLayer.DTOs.Payment;
+using ServiceLayer.PaymentGateways;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +46,12 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<SWPSU25Context>(options =>
     options.UseSqlServer(connectionString));
 
+// Cấu hình VNPAY Settings
+builder.Services.Configure<VnPaySettings>(builder.Configuration.GetSection("VnPaySettings"));
+
+// Đăng ký IHttpContextAccessor (cần để lấy IP client trong service)
+builder.Services.AddHttpContextAccessor();
+
 // Register Repositories
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IARVProtocolRepository, ARVProtocolRepository>();
@@ -71,6 +79,8 @@ builder.Services.AddScoped<IDoctorScheduleService, DoctorScheduleService>();
 builder.Services.AddScoped<IMedicalRecordService, MedicalRecordService>();
 builder.Services.AddScoped<IPatientTreatmentProtocolService, PatientTreatmentProtocolService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<VnPayService>();
+builder.Services.AddScoped<VnPayPaymentClient>();
 
 // add signalR
 builder.Services.AddScoped<ReminderService>();

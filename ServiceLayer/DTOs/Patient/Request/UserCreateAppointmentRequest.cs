@@ -18,6 +18,7 @@ namespace ServiceLayer.DTOs.Patient.Request
 
         [Required(ErrorMessage = "Appointment start date and time are required.")]
         public DateTime AppointmentStartDate { get; set; }
+        public DateTime? AppointmentEndDate { get; set; } // Có thể để trống nếu không có thời gian kết thúc cụ thể
 
         [Required(ErrorMessage = "Appointment type is required.")]
         [EnumDataType(typeof(AppointmentType), ErrorMessage = "Invalid Appointment Type.")]

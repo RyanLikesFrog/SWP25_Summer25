@@ -26,6 +26,7 @@ namespace DataLayer.DbContext
         public DbSet<PatientTreatmentProtocol> PatientTreatmentProtocols { get; set; }
         public DbSet<TreatmentStage> TreatmentStages { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -207,7 +208,15 @@ namespace DataLayer.DbContext
                 .HasForeignKey(lr => lr.TreatmentStageId)
                 .IsRequired(false) // LabResult có thể không gắn với Stage cụ thể (nếu cần)
                 .OnDelete(DeleteBehavior.SetNull); // Khi TreatmentStage bị xóa, LabResult.TreatmentStageId thành null
-
+            // --- PaymentTransaction Entity ---
+            modelBuilder.Entity<Appointment>()
+            .HasOne(a => a.PaymentTransaction)        // Một Appointment có một PaymentTransaction
+            .WithOne()                                // Một PaymentTransaction có một Appointment (ngược lại)
+            .HasForeignKey<Appointment>(a => a.PaymentTransactionId) // Khóa ngoại nằm ở Appointment
+            .IsRequired(false)                        // Có thể có cuộc hẹn chưa có giao dịch (PaymentTransactionId nullable)
+            .OnDelete(DeleteBehavior.Restrict);       // Không xóa PaymentTransaction khi xóa Appointment
+                                                      // Hoặc .OnDelete(DeleteBehavior.SetNull); để gán null cho PaymentTransactionId
+                                                      // nếu PaymentTransaction vẫn có thể tồn tại độc lập
             base.OnModelCreating(modelBuilder);
         }
     }    

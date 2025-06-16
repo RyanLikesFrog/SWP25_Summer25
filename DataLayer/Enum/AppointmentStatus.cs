@@ -8,9 +8,9 @@ namespace DataLayer.Enum
 {
     public enum AppointmentStatus
     {
-        Pending,
-        Confirmed,
-        Completed,
-        Cancelled
+        Pending = 0,             
+        Confirmed = 1,           // Đã xác nhận và thanh toán xong
+        Cancelled = 2,
+        Completed = 3,
     }
 }
