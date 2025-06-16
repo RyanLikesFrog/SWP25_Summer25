@@ -27,20 +27,14 @@ namespace ServiceLayer.Implements
 
         public async Task<DoctorScheduleDetailResponse> CreateDoctorScheduleAsync(CreateDoctorScheduleRequest request)
         {
-            if (request.AppointmentId == null)
-            {
-                throw new ArgumentException("AppointmentId is required.");
-            }
 
-            var appointment = await _appointmentRepository.GetAppointmentByIdAsync(request.AppointmentId.Value);
-            if (appointment == null)
+            if (request.DoctorId != Guid.Empty) 
             {
-                throw new ArgumentException($"Appointment with ID {request.AppointmentId} not found.");
-            }
-
-            if (request.DoctorId != appointment.DoctorId)
-            {
-                throw new ArgumentException($"Doctor ID {request.DoctorId} does not match the Appointment's Doctor ID {appointment.DoctorId}.");
+                var doctor = await _doctorRepository.GetDoctorByIdAsync(request.DoctorId);
+                if (doctor == null)
+                {
+                    throw new ArgumentException("Doctor not found with the provided Doctor ID");
+                }
             }
 
             var newDoctorSchedule = new DoctorSchedule
