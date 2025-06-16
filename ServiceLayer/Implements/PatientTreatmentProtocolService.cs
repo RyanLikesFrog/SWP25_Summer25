@@ -18,6 +18,7 @@ namespace ServiceLayer.Implements
         private readonly IDoctorRepository _doctorRepository;
         private readonly IARVProtocolRepository _aRVProtocolRepository;
         private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IDoctorScheduleRepository _doctorScheduleRepository;
 
         public PatientTreatmentProtocolService(
             IPatientTreatmentProtocolRepository patientTreatmentProtocolRepository,
@@ -25,7 +26,8 @@ namespace ServiceLayer.Implements
             IPatientRepository patientRepository,
             IDoctorRepository doctorRepository,
             IARVProtocolRepository aRVProtocolRepository,
-            IAppointmentRepository appointmentRepository)
+            IAppointmentRepository appointmentRepository,
+            IDoctorScheduleRepository doctorScheduleRepository)
         {
             _patientTreatmentProtocolRepository = patientTreatmentProtocolRepository;
             _repository = repository;
@@ -33,6 +35,7 @@ namespace ServiceLayer.Implements
             _doctorRepository = doctorRepository;
             _aRVProtocolRepository = aRVProtocolRepository;
             _appointmentRepository = appointmentRepository;
+            _doctorScheduleRepository = doctorScheduleRepository;
         }
 
         public async Task<PatientTreatmentProtocolDetailResponse> CreatePatientTreatmentProtocolAsync(CreatePatientTreatmentProtocolRequest request)
@@ -81,8 +84,15 @@ namespace ServiceLayer.Implements
                 EndDate = request.EndDate,
                 Status = request.Status
             };
+            
+            var doctorSchedule = await _doctorScheduleRepository.GetDoctorScheduleByAppointmentIdAsync(request.AppointmentId);
+            if(doctorSchedule == null)
+            {
+                throw new ArgumentException("Doctor schedule not found for the provided Appointment ID");
+            }
+            doctorSchedule.IsAvailable = false;
+            await _doctorScheduleRepository.UpdateDoctorSchedule(doctorSchedule);
 
-            await _patientTreatmentProtocolRepository.CreatePatientTreatmentProtocol(newPatientTreatmentProtocol);
             await _repository.SaveChangesAsync();
 
             return new PatientTreatmentProtocolDetailResponse

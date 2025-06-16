@@ -58,5 +58,17 @@ namespace RepoLayer.Implements
                                  .ToListAsync(); 
         }
 
+        public async Task<DoctorSchedule?> GetDoctorScheduleByAppointmentIdAsync(Guid? appointmentId)
+        {
+            return await _context.DoctorSchedules
+                .Include(ds => ds.Doctor)
+                .FirstOrDefaultAsync(ds => ds.AppointmentId == appointmentId);
+        }
+
+        public Task UpdateDoctorSchedule(DoctorSchedule doctorSchedule)
+        {
+            _context.Update(doctorSchedule);
+            return Task.CompletedTask;
+        }
     }
 }

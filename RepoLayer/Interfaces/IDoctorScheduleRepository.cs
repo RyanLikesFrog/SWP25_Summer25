@@ -14,5 +14,8 @@ namespace RepoLayer.Interfaces
         public Task<DoctorSchedule?> GetDuplicatedDoctorScheduleByStartDateEndDateAsync(Guid? doctorId, DateTime startDate, DateTime? endDate);
         public Task<List<DoctorSchedule?>> GetDoctorSchedulesByDoctorIdAsync(Guid doctorId);
         public Task<DoctorSchedule?> CreateDoctorScheduleAsync(DoctorSchedule doctorSchedule);
+        public Task<DoctorSchedule?> GetDoctorScheduleByAppointmentIdAsync(Guid? appointmentId);
+        public Task UpdateDoctorSchedule(DoctorSchedule doctorSchedule);
+
     }
 }

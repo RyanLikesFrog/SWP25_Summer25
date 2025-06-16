@@ -24,8 +24,7 @@ namespace DataLayer.Entities
 
         public DateTime StartTime { get; set; } 
         public DateTime EndTime { get; set; }
-        public string? Notes { get; set; }  
-        public bool IsAvailable { get; set; }
-
+        public string? Notes { get; set; }
+        public bool IsAvailable { get; set; } = true; // update = false sau khi tao PatientTreatmentProtocol
     }
 }
