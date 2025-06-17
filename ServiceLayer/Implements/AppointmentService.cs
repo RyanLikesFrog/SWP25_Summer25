@@ -387,6 +387,5 @@ namespace ServiceLayer.Implements
 
             return (appointments, "Tim lich hen thanh cong.");
         }
-        
     }
 }

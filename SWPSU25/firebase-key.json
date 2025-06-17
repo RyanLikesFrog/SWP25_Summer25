@@ -1,0 +1,16 @@
+{
+  {
+    "type": "service_account",
+    "project_id": "hiv-treatment-and-medical",
+    "private_key_id": "c56f56df67d91ca140521d2a82e182813eb5c0c1",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC2NtZsMkhE7ZJL\n7wIbooVYgIqy0FlOcRvkS89cJ5mXLp2XyhN9IoCDM0TsctCB8rJb5FCN0XJ3gf6B\n5IvDAmL4I1qoa7wcIJyhaMlC22Mu6MDCpCxvrVrX3PDIIaaDqLBDieBT14j5r0jy\nbSp8RL/rh9iH0A+Xmy5WR3yAdKHWF/ISoLw1M0HKjZaamAQlecJz6SpEI41RJXUe\nE8c8sTLAQDBsdDnN0fFO2FTVo1BeXBo9Upo2Ua29iBNzjxFxv17BjWhaXRoeR9G0\nj1beHIOsimWt12AGSvbSzSU4XkUbY1B7eO2ngzTPO8CT/SA4xbLmZRrQnKc/KqXj\nBMnJXGfjAgMBAAECggEAAnH+86nDFYW4qmM1PIi0UGk9M0QfhrF25dvslviDE6fQ\n/pn8I/hEED6uZJvv12aZ5SjNufF/H0Jz12tpQr8z88+Jpmv3tMrtPy9IUCjgjl8a\nQyJv5DnH19DDvHPTJ74qS2W8yHNCh9NF39b+NHe5uZ/zlHMC2o5/EzJXZePqzhQz\nWonEZs3bY0AVGoyGF7XdiPbvRfdQsEY4bp/pMM7kdAypxAta40mCY9fMCrrdod1R\nKBLETX+CbSQgABa8P3H7rktmQSCH4ncWG7gjRgZxnrUdPl2nMhPD2R87fykwr3uR\nLyABAW5szXn4ULtfXGEf//qIn3/uETwTFJk2czjHUQKBgQDxsvCK/XcWSQ2Lpe2G\njwwxs2CA3OhyW8PFy2hvu5BUCI4BQysqSWJQvsI1e53IcCMqloM9uyoMaUTGRaAL\n8SdgdiHn5L6cgdWcieMfX8YUG8Say5t41v6qiuuE/QbkQ4GVc3EXKR7DsvgPMSEK\nkgawq4JVh2uepAXiUcfS4JdLMQKBgQDA/t7tYGkDKSryLRjpghCkKHTMpvNPeK7C\nbvL/+QbjZETwhRWPZzaGaLymjEJClnpr+OpSXKWKuh+/zO/xOFcMCjIlWG27dzJw\n5L5D9le0EcvGFjiJrszUPtWoRHStDfK1vHErNxlsC5gFAuVfOEmYZO+xoO9gdm1L\nmCN7OL+3UwKBgQDlBQwed0unJzOZlnE6JkOEuJaBpFDxQ3h+7F2aOdzpc22zToUR\nPZXWMtrtOKPqcC8yRIo5LScLuZe8U+7yQeBw6573D215+SCCgrleWi7jkOg7USCR\nYQ7QZHAEhIlKM5kPFuMa8hC/mM6p/oBzdqi2MN1/06CrInqc16cDb2KMkQKBgQCH\nxAPg6zyUa6Z5fP4Ubln0kT0xJpTtKBGQV+p75ZxR5JyWsphrLAlwXkevxeVq4F64\ni/+S9vfBcpOZIrr8b0zU/GswWFfBU+XZAyFRv/8MfqRh8gnN2XjgKl+1IosNnk1K\nSYk3BGjO2A0WIWZoKLmlCgSQaY1bx5O1ZQ44xcAgXwKBgAlLS5NdHuPmuXe7MpH4\nX0wsxnUPg3pAPPOpwzp9veepfcnqseNvrn0wsMMJvcKj2Mc6fbRJgPDJQsxVltlZ\nPYPj4OL6NhsowWwSG3BUbLkltszXKGKRyDK2KCapH18/WN4zFD/ovtB14feHF5lT\npi5UEWunLCmQAm9rCxH0gh4F\n-----END PRIVATE KEY-----\n",
+    "client_email": "firebase-adminsdk-fbsvc@hiv-treatment-and-medical.iam.gserviceaccount.com",
+    "client_id": "114809270912167084017",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40hiv-treatment-and-medical.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+  }
+
+}

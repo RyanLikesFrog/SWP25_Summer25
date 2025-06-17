@@ -1,28 +1,63 @@
-﻿using Microsoft.EntityFrameworkCore;
-using DataLayer.DbContext;
+﻿using DataLayer.DbContext;
+using FirebaseAdmin;
+using FirebaseAdmin.Auth;
+using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Storage.V1;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using ServiceLayer.Implements;
-using ServiceLayer.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 using RepoLayer.Implements;
 using RepoLayer.Interfaces;
-using System.Security.Claims;
-using ServiceLayer.Implements.Reminder;
-using SWPSU25.SignalRHubs;
 using ServiceLayer.DTOs.Payment;
+using ServiceLayer.Implements;
+using ServiceLayer.Implements.Reminder;
+using ServiceLayer.Interfaces;
 using ServiceLayer.PaymentGateways;
+using SWPSU25.SignalRHubs;
+using System.Security.Claims;
+using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Tên policy tùy ý đặt
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
+// Đọc đường dẫn file key từ appsettings.json
+var firebaseCredentialPath = builder.Configuration["Firebase:CredentialPath"];
+var bucketName = builder.Configuration["Firebase:BucketName"];
+
+// Tạo FirebaseApp nếu chưa tồn tại
+if (FirebaseApp.DefaultInstance == null)
+{
+    FirebaseApp.Create(new AppOptions
+    {
+        Credential = GoogleCredential.FromFile(firebaseCredentialPath)
+    });
+}
+
+// Tạo storage client để thao tác với Firebase Storage
+var credential = GoogleCredential.FromFile(firebaseCredentialPath);
+var storageClient = StorageClient.Create(credential);
+
+// Duyệt file trong bucket (ví dụ thôi)
+var files = storageClient.ListObjects(bucketName, "");
+foreach (var file in files)
+{
+    Console.WriteLine(file.Name);
+}
+
+// Đăng ký FirebaseStorageService để dùng DI
+builder.Services.AddSingleton(new FirebaseStorageService(firebaseCredentialPath, bucketName));
+
+
+builder.Services.AddSingleton(new FirebaseStorageService(firebaseCredentialPath, bucketName));
+
 // 1. Đăng ký CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
+    options.AddPolicy(name: "MyAllowSpecificOrigins",
         policy =>
         {
             policy.WithOrigins("*") // hoặc "*" để cho tất cả (cẩn thận)
@@ -30,7 +65,6 @@ builder.Services.AddCors(options =>
                   .AllowAnyMethod();
         });
 });
-
 
 // Add services to the container.
 builder.Services.AddControllers()
@@ -88,6 +122,8 @@ builder.Services.AddScoped<IMomoClient, MomoClient>();
 builder.Services.AddScoped<ReminderService>();
 builder.Services.AddSignalR();
 builder.Services.AddHostedService<ReminderBackgroundService>();
+
+
 
 builder.Services.AddAuthentication(options =>
 {
