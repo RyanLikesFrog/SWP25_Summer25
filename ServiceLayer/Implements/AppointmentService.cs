@@ -176,6 +176,18 @@ namespace ServiceLayer.Implements
                 throw new ArgumentException("Patient not found with the provided Patient ID.");
             }
 
+
+            return (appointments, "Tim lich hen thanh cong.");
+        }
+
+        public async Task<AppointmentDetailResponse> CreateAppointmentAndInitiatePaymentAsync(UserCreateAppointmentRequest request)
+        {
+            var patient = await _userRepository.GetUserByIdAsync(request.PatientId);
+            if (patient == null)
+            {
+                throw new ArgumentException("Patient not found with the provided Patient ID.");
+            }
+
             if (request.DoctorId.HasValue)
             {
                 var doctor = await _doctorRepository.GetDoctorByIdAsync(request.DoctorId.Value);
@@ -201,7 +213,7 @@ namespace ServiceLayer.Implements
             var appointment = new Appointment
             {
                 Id = Guid.NewGuid(),
-                PatientId = request.PatientId,
+                PatientId = user.Patient.Id,
                 DoctorId = request.DoctorId,
                 AppointmentStartDate = request.AppointmentStartDate,
                 AppointmentEndDate = request.AppointmentEndDate,
