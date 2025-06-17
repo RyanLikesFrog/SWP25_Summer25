@@ -26,6 +26,7 @@ namespace ServiceLayer.Implements
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IDoctorScheduleRepository _doctorScheduleRepository;
         private readonly IDoctorRepository _doctorRepository;
+        private readonly IPaymentTransactionRepository _paymentTransactionRepository;
         private readonly IRepository _repository;
         private readonly VnPayPaymentClient _vnPayClient;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -37,6 +38,7 @@ namespace ServiceLayer.Implements
             IAppointmentRepository appointmentRepository,
             IRepository repository,
             IDoctorScheduleRepository doctorScheduleRepository,
+            IPaymentTransactionRepository paymentTransactionRepository,
             IDoctorRepository doctorRepository,
             VnPayPaymentClient vnPayClient,
             IHttpContextAccessor httpContextAccessor,
@@ -47,6 +49,7 @@ namespace ServiceLayer.Implements
             _appointmentRepository = appointmentRepository;
             _repository = repository;
             _doctorScheduleRepository = doctorScheduleRepository;
+            _paymentTransactionRepository = paymentTransactionRepository;
             _doctorRepository = doctorRepository;
             _vnPayClient = vnPayClient;
             _httpContextAccessor = httpContextAccessor;
@@ -249,7 +252,7 @@ namespace ServiceLayer.Implements
 
             var vnPayRequest = new VnPayCreatePaymentRequest
             {
-                Amount = (long)200000 * 100, // VNPAY yêu cầu số tiền * 100
+                Amount = (long)200 * 1000, // VNPAY yêu cầu số tiền * 100
                 OrderId = newTransaction.TransactionCode,
                 OrderInfo = $"Thanh toan lich hen {appointment.Id}",
                 ReturnUrl = _vnPayClient.GetReturnUrl(),
@@ -273,10 +276,10 @@ namespace ServiceLayer.Implements
             // Cập nhật PaymentUrl vào transaction
             newTransaction.PaymentUrl = paymentRedirectUrl;
 
+
             // Bước 5: Lưu Appointment và PaymentTransaction vào Database
-            // Cả hai nên được lưu trong cùng một transaction để đảm bảo tính nhất quán
+            await _paymentTransactionRepository.AddPaymentTransactionAsync(newTransaction); // Thêm PaymentTransaction
             await _appointmentRepository.CreateAppointmentAsync(appointment); // Thêm Appointment
-                                                                              // _context.PaymentTransactions.Add(newTransaction); // PaymentTransaction đã được thêm qua navigation property của Appointment
 
             await _repository.SaveChangesAsync(); // Lưu cả hai cùng lúc
 

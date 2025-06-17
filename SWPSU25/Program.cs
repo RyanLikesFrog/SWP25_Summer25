@@ -65,6 +65,7 @@ builder.Services.AddScoped<IPatientTreatmentProtocolRepository, PatientTreatment
 builder.Services.AddScoped<ITreatmentStageRepository, TreatmentStageRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRepository, BaseRepository>();
+builder.Services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
 
 // Register Service
 builder.Services.AddScoped<IAuthService, AuthService>();
