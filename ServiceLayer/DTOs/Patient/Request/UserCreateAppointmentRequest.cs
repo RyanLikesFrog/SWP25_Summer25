@@ -10,8 +10,8 @@ namespace ServiceLayer.DTOs.Patient.Request
 {
     public class UserCreateAppointmentRequest
     {
-        [Required(ErrorMessage = "Patient ID is required.")]
-        public Guid PatientId { get; set; }
+        [Required(ErrorMessage = "userId is required.")]
+        public Guid UserId { get; set; }
 
         // DoctorID có thể là tùy chọn nếu bệnh nhân không yêu cầu bác sĩ cụ thể
         public Guid? DoctorId { get; set; }

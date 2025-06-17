@@ -209,14 +209,27 @@ namespace DataLayer.DbContext
                 .IsRequired(false) // LabResult có thể không gắn với Stage cụ thể (nếu cần)
                 .OnDelete(DeleteBehavior.SetNull); // Khi TreatmentStage bị xóa, LabResult.TreatmentStageId thành null
             // --- PaymentTransaction Entity ---
+            modelBuilder.Entity<PaymentTransaction>()
+            .HasOne(pt => pt.Appointment) // Một PaymentTransaction có một Appointment
+            .WithOne(a => a.PaymentTransaction) // Một Appointment có một PaymentTransaction
+            .HasForeignKey<PaymentTransaction>(pt => pt.AppointmentId) // Khóa ngoại nằm trong PaymentTransaction
+            .IsRequired(); // Bắt buộc phải có Appointment liên quan
+
+            // Cấu hình khóa ngoại từ Appointment tới PaymentTransaction (cũng 1:1)
             modelBuilder.Entity<Appointment>()
-            .HasOne(a => a.PaymentTransaction)        // Một Appointment có một PaymentTransaction
-            .WithOne()                                // Một PaymentTransaction có một Appointment (ngược lại)
-            .HasForeignKey<Appointment>(a => a.PaymentTransactionId) // Khóa ngoại nằm ở Appointment
-            .IsRequired(false)                        // Có thể có cuộc hẹn chưa có giao dịch (PaymentTransactionId nullable)
-            .OnDelete(DeleteBehavior.Restrict);       // Không xóa PaymentTransaction khi xóa Appointment
-                                                      // Hoặc .OnDelete(DeleteBehavior.SetNull); để gán null cho PaymentTransactionId
-                                                      // nếu PaymentTransaction vẫn có thể tồn tại độc lập
+                .HasOne(a => a.PaymentTransaction)
+                .WithOne() // Không cần WithOne(pt => pt.Appointment) ở đây nữa vì đã định nghĩa ở trên
+                .HasForeignKey<Appointment>(a => a.PaymentTransactionId);
+
+            // Đảm bảo không có hành động Cascade Delete nếu bạn không muốn
+            // (ví dụ: khi xóa PaymentTransaction thì không xóa Appointment)
+            // Nếu không có dòng này, mặc định có thể là Cascade Delete
+            modelBuilder.Entity<PaymentTransaction>()
+                .HasOne(pt => pt.Appointment)
+                .WithOne(a => a.PaymentTransaction)
+                .HasForeignKey<PaymentTransaction>(pt => pt.AppointmentId)
+                .OnDelete(DeleteBehavior.Restrict); // Hoặc DeleteBehavior.NoAction
+
             base.OnModelCreating(modelBuilder);
         }
     }    

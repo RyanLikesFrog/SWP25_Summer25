@@ -6,35 +6,66 @@ using System.Threading.Tasks;
 
 namespace ServiceLayer.DTOs.Payment
 {
-    public class VnPaySettings
+    public class MomoSettings
     {
-        public string TmnCode { get; set; } = string.Empty;
-        public string HashSecret { get; set; } = string.Empty;
-        public string PaymentGatewayUrl { get; set; } = string.Empty;
-        public string ReturnUrl { get; set; } = string.Empty;
-        public string NotifyUrl { get; set; } = string.Empty;
+        public string PartnerCode { get; set; }
+        public string AccessKey { get; set; }
+        public string SecretKey { get; set; }
+        public string ApiEndpoint { get; set; }
+        public string ReturnUrl { get; set; }
+        public string IpnUrl { get; set; }
     }
 
-    public class VnPayCreatePaymentRequest
+// Models/Momo/MomoCreatePaymentRequest.cs
+    public class MomoCreatePaymentRequest
     {
-        public long Amount { get; set; } // Số tiền (đã nhân 100 theo yêu cầu VNPAY)
-        public string OrderId { get; set; } // Mã đơn hàng của bạn (vnp_TxnRef)
-        public string OrderInfo { get; set; } // Mô tả đơn hàng (vnp_OrderInfo)
-        public string ReturnUrl { get; set; } // vnp_ReturnUrl
-        public string Locale { get; set; } = "vn"; // "vn" hoặc "en" (vnp_Locale)
-        // Bạn có thể thêm các trường VNPAY khác như vnp_BankCode nếu muốn cho phép chọn ngân hàng từ đầu
+        public string PartnerCode { get; set; }
+        public string AccessKey { get; set; }
+        public string RequestId { get; set; }
+        public string Amount { get; set; }
+        public string OrderId { get; set; }
+        public string OrderInfo { get; set; }
+        public string ReturnUrl { get; set; }
+        public string IpnUrl { get; set; }
+        public string RequestType { get; set; }
+        public string ExtraData { get; set; }
+        public string Signature { get; set; }
+
+        public string GetSignatureRawData()
+        {
+            return $"partnerCode={PartnerCode}&accessKey={AccessKey}&requestId={RequestId}&amount={Amount}&orderId={OrderId}&orderInfo={OrderInfo}&returnUrl={ReturnUrl}&ipnUrl={IpnUrl}&requestType={RequestType}&extraData={ExtraData}";
+        }
     }
 
-    public class VnPayPaymentResult
+    // Models/Momo/MomoCreatePaymentResponse.cs
+    public class MomoCreatePaymentResponse
     {
-        public string? OrderId { get; set; } // vnp_TxnRef (Mã đơn hàng của bạn)
-        public string? TransactionNo { get; set; } // vnp_TransactionNo (ID giao dịch của VNPAY)
-        public string? ResponseCode { get; set; } // vnp_ResponseCode (mã phản hồi của VNPAY, "00" là thành công)
-        public string? Message { get; set; } // Tin nhắn tương ứng với ResponseCode
-        public long Amount { get; set; } // Số tiền
-        public string? BankCode { get; set; } // vnp_BankCode
-        public string? PayDate { get; set; } // vnp_PayDate
-        public bool SecureHashValid { get; set; } // Kết quả kiểm tra chữ ký Hash
-        public Dictionary<string, string> RawData { get; set; } = new Dictionary<string, string>(); // Lưu toàn bộ data để debug
+        public string PartnerCode { get; set; }
+        public string RequestId { get; set; }
+        public string OrderId { get; set; }
+        public string Message { get; set; }
+        public int ResultCode { get; set; }
+        public string PayUrl { get; set; }
+        public string QrCodeUrl { get; set; }
+        public string Signature { get; set; }
+        public string ErrorCode { get; set; }
+        public string LocalMessage { get; set; }
+        public string TransId { get; set; }
+        public long ResponseTime { get; set; }
+        public string? ExtraData { get; set; }
+    }
+    // Models/Momo/MomoCallbackRequest.cs (Giữ nguyên)
+    public class MomoCallbackRequest
+    {
+        public string PartnerCode { get; set; }
+        public string OrderId { get; set; }
+        public string RequestId { get; set; }
+        public string Amount { get; set; }
+        public int ResultCode { get; set; }
+        public string Message { get; set; }
+        public long ResponseTime { get; set; }
+        public string? ExtraData { get; set; }
+        public string Signature { get; set; }
+        public string TransId { get; set; }
     }
 }
