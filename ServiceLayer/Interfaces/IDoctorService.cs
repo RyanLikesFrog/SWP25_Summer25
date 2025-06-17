@@ -1,4 +1,5 @@
 ﻿using DataLayer.Entities;
+using ServiceLayer.DTOs.User.Request;
 using ServiceLayer.Implements;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace ServiceLayer.Interfaces
     {
         public Task<Doctor?> GetDoctorByIdAsync(Guid doctorId);
         public Task<List<Doctor>>? GetAllDoctorsAsync();
+        public Task<Doctor?> UpdateDoctorAsync(UpdateDoctorRequest request);
 
     }
 }

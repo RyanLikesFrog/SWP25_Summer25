@@ -40,5 +40,10 @@ namespace RepoLayer.Implements
         {
             return await _context.ARVProtocols.Where(p => p.IsDefault).ToListAsync();
         }
+
+        public async Task<ARVProtocol?> UpdateARVProtocolAsync(ARVProtocol arvProto)
+        {
+            return await Task.FromResult(_context.ARVProtocols.Update(arvProto).Entity);    
+        }
     }
 }

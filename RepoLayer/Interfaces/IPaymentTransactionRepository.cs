@@ -10,6 +10,6 @@ namespace RepoLayer.Interfaces
     public interface IPaymentTransactionRepository
     {
         public Task AddPaymentTransactionAsync(PaymentTransaction payment);
-
+        public Task<PaymentTransaction?> GetPaymentTransactionByTransactionCodeAsync(string transactionCode);
     }
 }

@@ -26,6 +26,7 @@ namespace ServiceLayer.DTOs.Patient.Response
         public PaymentStatus PaymentStatus { get; set; } // Trạng thái thanh toán
         // Quan trọng: Thêm trường này để trả về URL thanh toán cho Front-end
         public string? PaymentRedirectUrl { get; set; }
+        public string? QrCodeImageUrl { get; set; }
     }
 }
 

@@ -46,8 +46,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<SWPSU25Context>(options =>
     options.UseSqlServer(connectionString));
 
-// Cấu hình VNPAY Settings
-builder.Services.Configure<VnPaySettings>(builder.Configuration.GetSection("VnPaySettings"));
+// Cấu hình MomoSettings
+builder.Services.Configure<MomoSettings>(builder.Configuration.GetSection("MomoSettings"));
+// Đăng ký HttpClient và MomoClient
+builder.Services.AddHttpClient<IMomoClient, MomoClient>();
 
 // Đăng ký IHttpContextAccessor (cần để lấy IP client trong service)
 builder.Services.AddHttpContextAccessor();
@@ -80,8 +82,7 @@ builder.Services.AddScoped<IDoctorScheduleService, DoctorScheduleService>();
 builder.Services.AddScoped<IMedicalRecordService, MedicalRecordService>();
 builder.Services.AddScoped<IPatientTreatmentProtocolService, PatientTreatmentProtocolService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<VnPayService>();
-builder.Services.AddScoped<VnPayPaymentClient>();
+builder.Services.AddScoped<IMomoClient, MomoClient>();
 
 // add signalR
 builder.Services.AddScoped<ReminderService>();

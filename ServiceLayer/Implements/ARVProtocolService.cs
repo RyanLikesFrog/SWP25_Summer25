@@ -1,9 +1,11 @@
 ﻿using Azure.Core;
 using DataLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using RepoLayer.Interfaces;
 using ServiceLayer.DTOs.User.Request;
 using ServiceLayer.DTOs.User.Response;
 using ServiceLayer.Interfaces;
+using ServiceLayer.Requests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,6 +72,58 @@ namespace ServiceLayer.Implements
             return await _aRVProtocolRepository.GetDefaultProtocolAsync();
         }
 
+        public async Task<ARVProtocol?> UpdateARVProtocolAsync(UpdateARVProtocolRequest request)
+        {
+            if (request.ProtocolId == Guid.Empty)
+            {
+                throw new ArgumentException("ProtocolId is required.");
+            }
 
+            var protocol = await _aRVProtocolRepository.GetARVProtocolByIdAsync(request.ProtocolId);
+
+            if (protocol == null)
+            {
+                throw new ArgumentException($"ARV Protocol with ID {request.ProtocolId} not found.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.ProtocolName))
+            {
+                protocol.ProtocolName = request.ProtocolName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Description))
+            {
+                protocol.Description = request.Description;
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Indications))
+            {
+                protocol.Indications = request.Indications;
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Dosage))
+            {
+                protocol.Dosage = request.Dosage;
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.SideEffects))
+            {
+                protocol.SideEffects = request.SideEffects;
+            }
+
+            if (request.ProtocolType.HasValue)
+            {
+                protocol.ProtocolType = request.ProtocolType.Value;
+            }
+
+            if (request.IsDefault.HasValue)
+            {
+                protocol.IsDefault = request.IsDefault.Value;
+            }
+
+            await _repository.SaveChangesAsync();
+
+            return protocol;
+        }
     }
 }
