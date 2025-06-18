@@ -233,7 +233,7 @@ namespace ServiceLayer.Implements
             // Bước 3: Khởi tạo yêu cầu thanh toán MOMO
             var momoRequest = new MomoCreatePaymentRequest
             {
-                Amount = 200000.ToString(),
+                Amount = 200000,
                 OrderId = newTransaction.TransactionCode, // Sử dụng TransactionCode làm OrderId cho Momo
                 OrderInfo = $"Thanh toan lich hen {appointment.Id}",
                 ExtraData = ""
