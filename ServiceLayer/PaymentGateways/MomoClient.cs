@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ServiceLayer.DTOs.Payment;
 using System;
@@ -8,6 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ServiceLayer.PaymentGateways
 {
@@ -29,19 +31,22 @@ namespace ServiceLayer.PaymentGateways
         {
             request.PartnerCode = _settings.PartnerCode;
             request.AccessKey = _settings.AccessKey;
-            request.ReturnUrl = _settings.ReturnUrl;
+            request.RedirectUrl = _settings.ReturnUrl;
             request.IpnUrl = _settings.IpnUrl;
-            request.RequestType = "captureMoMoWallet";
-
+            request.RequestType = _settings.RequestType;
             request.RequestId = Guid.NewGuid().ToString("N");
+            request.Lang = "vi"; // Mặc định là tiếng Việt
 
             string rawData = request.GetSignatureRawData();
             request.Signature = GenerateSignature(rawData, _settings.SecretKey);
-
+            // <-- THÊM DÒNG NÀY ĐỂ DEBUG -->
+            var jsonPayloadToSend = JsonSerializer.Serialize(request, new JsonSerializerOptions { WriteIndented = true }); // Thêm WriteIndented để dễ đọc
+            _logger.LogInformation("Momo Request Payload (DEBUG - to be sent): {Payload}", jsonPayloadToSend);
+            // <--------------------------->
             _logger.LogInformation("Momo Request Payload (to be sent): {Payload}", JsonSerializer.Serialize(request));
 
-            var content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync("", content);
+            var content = new StringContent(JsonSerializer.Serialize(request), System.Text.Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(_settings.ApiEndpoint, content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -61,11 +66,19 @@ namespace ServiceLayer.PaymentGateways
 
         public string GenerateSignature(string rawData, string secretKey)
         {
-            using (HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secretKey)))
-            {
-                byte[] hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(rawData));
-                return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-            }
+            // change according to your needs, an UTF8Encoding
+            // could be more suitable in certain situations
+            ASCIIEncoding encoding = new ASCIIEncoding();
+
+            Byte[] textBytes = encoding.GetBytes(rawData);
+            Byte[] keyBytes = encoding.GetBytes(secretKey);
+
+            Byte[] hashBytes;
+
+            using (HMACSHA256 hash = new HMACSHA256(keyBytes))
+                hashBytes = hash.ComputeHash(textBytes);
+
+            return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
         }
     }
 }

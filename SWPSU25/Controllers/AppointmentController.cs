@@ -1,6 +1,7 @@
 ﻿using DataLayer.Enum;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using ServiceLayer.DTOs.Patient.Request;
 using ServiceLayer.DTOs.Patient.Response;
 using ServiceLayer.DTOs.Payment;
@@ -19,10 +20,10 @@ namespace SWPSU25.Controllers
     public class AppointmentController : ControllerBase
     {
         private readonly IAppointmentService _appointmentService;
-        private readonly MomoSettings _momoSettings; // Cần thiết để xác thực chữ ký Momo Callback
+        private readonly IOptions<MomoSettings> _momoSettings; // Cần thiết để xác thực chữ ký Momo Callback
         private readonly ILogger<AppointmentController> _logger;
 
-        public AppointmentController(IAppointmentService appointmentService, MomoSettings momoSettings, ILogger<AppointmentController> logger)
+        public AppointmentController(IAppointmentService appointmentService, IOptions<MomoSettings> momoSettings, ILogger<AppointmentController> logger)
         {
             _appointmentService = appointmentService;
             _momoSettings = momoSettings;
@@ -185,9 +186,9 @@ namespace SWPSU25.Controllers
                 // Chuỗi raw data cần phải TUÂN THỦ CHÍNH XÁC TÀI LIỆU MOMO cho callback verification
                 // Các tham số cần được nối theo thứ tự alphabet hoặc thứ tự quy định của Momo.
                 // Đảm bảo thứ tự và tên các trường khớp với quy tắc băm của Momo cho IPN.
-                string rawDataForSignatureVerification = $"partnerCode={momoCallbackRequest.PartnerCode}&accessKey={_momoSettings.AccessKey}&requestId={momoCallbackRequest.RequestId}&orderId={momoCallbackRequest.OrderId}&amount={momoCallbackRequest.Amount}&message={momoCallbackRequest.Message}&resultCode={momoCallbackRequest.ResultCode}&responseTime={momoCallbackRequest.ResponseTime}&extraData={momoCallbackRequest.ExtraData}";
+                string rawDataForSignatureVerification = $"partnerCode={momoCallbackRequest.PartnerCode}&accessKey={_momoSettings.Value.AccessKey}&requestId={momoCallbackRequest.RequestId}&orderId={momoCallbackRequest.OrderId}&amount={momoCallbackRequest.Amount}&message={momoCallbackRequest.Message}&resultCode={momoCallbackRequest.ResultCode}&responseTime={momoCallbackRequest.ResponseTime}&extraData={momoCallbackRequest.ExtraData}";
 
-                using (HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_momoSettings.SecretKey)))
+                using (HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_momoSettings.Value.SecretKey)))
                 {
                     byte[] hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(rawDataForSignatureVerification));
                     string calculatedSignature = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
