@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.DTOs.User.Request;
 using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
+using ServiceLayer.Requests;
 
 namespace SWPSU25.Controllers
 {
@@ -82,5 +83,44 @@ namespace SWPSU25.Controllers
             var defaultProtocols = await _aRVProtocolService.GetDefaultARVProtocolsAsync();
             return Ok(defaultProtocols);
         }
+
+        [HttpPut("update-arv-protocol")]
+        public async Task<IActionResult> UpdateARVProtocol([FromBody] UpdateARVProtocolRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var updatedProtocol = await _aRVProtocolService.UpdateARVProtocolAsync(request);
+
+                if (updatedProtocol == null)
+                {
+                    return NotFound(new { message = $"Không tìm thấy ARV Protocol với ID {request.ProtocolId}" });
+                }
+
+                return Ok(updatedProtocol);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi không mong muốn khi cập nhật ARV Protocol: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "Đã xảy ra lỗi không mong muốn khi cập nhật ARV Protocol.",
+                    error = ex.Message
+                });
+            }
+        }
+
     }
 }
