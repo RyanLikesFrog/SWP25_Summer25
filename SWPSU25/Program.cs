@@ -167,8 +167,7 @@ app.UseCors(MyAllowSpecificOrigins);
 
 // UseAuthorization should be after UseCors (and UseRouting)
 app.UseAuthorization();
-
-app.MapControllers();   
+app.MapControllers();
 app.MapHub<ReminderHub>("/reminderHub");
 
 app.Run();
