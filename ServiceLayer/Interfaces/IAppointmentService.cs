@@ -19,7 +19,8 @@ namespace ServiceLayer.Interfaces
         //Task<AppointmentDetailResponse> StaffUpdateAppointmentAsync(StaffManageAppointmentRequest request);
         public Task<(List<Appointment?> appointments, string Message)> ViewAppointmentAsync(Guid doctorId);
         public Task<AppointmentDetailResponse> CreateAppointmentAndInitiatePaymentAsyncV2(UserCreateAppointmentRequest request);
-        public Task UpdatePaymentStatusAsync(string orderId, // Đây là TransactionCode nội bộ của bạn
+        public Task UpdatePaymentStatusAsync(
+            string orderId, // Đây là TransactionCode nội bộ của bạn
             PaymentTransactionStatus transactionStatus,
             PaymentStatus appointmentPaymentStatus,
             int? momoResultCode,
