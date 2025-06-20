@@ -160,55 +160,81 @@ namespace SWPSU25.Controllers
             }
         }
 
-        /// <summary>
-        /// Endpoint xử lý Callback (IPN) từ Momo khi giao dịch hoàn tất hoặc thất bại.
-        /// </summary>
-        /// <param name="momoCallbackRequest">Dữ liệu callback từ Momo.</param>
-        /// <returns>HTTP 200 OK nếu xử lý thành công, lỗi nếu xác thực hoặc xử lý thất bại.</returns>
         [HttpPost("momo-callback")]
-        [ProducesResponseType(200)] // Momo mong đợi response 200 OK
-        [ProducesResponseType(400)] // Lỗi nếu request không hợp lệ
-        [ProducesResponseType(500)] // Lỗi nội bộ server
+        [ProducesResponseType(200)] // Momo mong đợi response 200 OK trong mọi trường hợp
         public async Task<IActionResult> MomoCallback([FromBody] MomoCallbackRequest momoCallbackRequest)
         {
-            _logger.LogInformation("Momo Callback received. Request: {Request}", JsonSerializer.Serialize(momoCallbackRequest));
+            _logger.LogInformation("Momo IPN Callback received. Request: {Request}", JsonSerializer.Serialize(momoCallbackRequest));
 
-            // Kiểm tra xem dữ liệu callback có hợp lệ không (ví dụ: null)
             if (momoCallbackRequest == null || string.IsNullOrEmpty(momoCallbackRequest.OrderId) || string.IsNullOrEmpty(momoCallbackRequest.Signature))
             {
-                _logger.LogError("Momo Callback: Invalid or incomplete request received.");
-                return BadRequest("Invalid callback request.");
+                _logger.LogError("Momo IPN Callback: Invalid or incomplete request received. OrderId: {OrderId}, Signature present: {SigPresent}",
+                                 momoCallbackRequest?.OrderId, !string.IsNullOrEmpty(momoCallbackRequest?.Signature));
+                return Ok(new { status = "error", message = "Invalid callback request data." });
             }
 
             try
             {
-                // 1. Xác thực chữ ký (Signature) của Momo callback
-                // Chuỗi raw data cần phải TUÂN THỦ CHÍNH XÁC TÀI LIỆU MOMO cho callback verification
-                // Các tham số cần được nối theo thứ tự alphabet hoặc thứ tự quy định của Momo.
-                // Đảm bảo thứ tự và tên các trường khớp với quy tắc băm của Momo cho IPN.
-                string rawDataForSignatureVerification = $"partnerCode={momoCallbackRequest.PartnerCode}&accessKey={_momoSettings.Value.AccessKey}&requestId={momoCallbackRequest.RequestId}&orderId={momoCallbackRequest.OrderId}&amount={momoCallbackRequest.Amount}&message={momoCallbackRequest.Message}&resultCode={momoCallbackRequest.ResultCode}&responseTime={momoCallbackRequest.ResponseTime}&extraData={momoCallbackRequest.ExtraData}";
+                var secretKey = _momoSettings.Value.SecretKey;
+                var accessKey = _momoSettings.Value.AccessKey; // Lấy AccessKey từ cấu hình để xác thực
 
-                using (HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_momoSettings.Value.SecretKey)))
+                if (string.IsNullOrEmpty(secretKey) || string.IsNullOrEmpty(accessKey))
+                {
+                    _logger.LogError("Momo IPN Callback: SecretKey or AccessKey is not configured.");
+                    return Ok(new { status = "error", message = "Server configuration error." });
+                }
+
+                // Chuẩn bị chuỗi raw data để xác thực chữ ký (TUÂN THỦ CHÍNH XÁC TÀI LIỆU)
+                // Lấy các giá trị từ request và xử lý null cho extraData và payType
+                string extraDataValue = momoCallbackRequest.ExtraData ?? "";
+                string payTypeValue = momoCallbackRequest.PayType ?? "";
+
+                // Tạo danh sách các cặp key-value và sắp xếp theo alphabet
+                // Dựa chính xác vào chuỗi mẫu trong tài liệu IPN Signature
+                var signatureParams = new List<string>
+            {
+                $"accessKey={accessKey}",
+                $"amount={momoCallbackRequest.Amount}",
+                $"extraData={extraDataValue}",
+                $"message={momoCallbackRequest.Message}",
+                $"orderId={momoCallbackRequest.OrderId}",
+                $"orderInfo={momoCallbackRequest.OrderInfo}",
+                $"orderType={momoCallbackRequest.OrderType}",
+                $"partnerCode={momoCallbackRequest.PartnerCode}",
+                $"payType={payTypeValue}",
+                $"requestId={momoCallbackRequest.RequestId}",
+                $"responseTime={momoCallbackRequest.ResponseTime}",
+                $"resultCode={momoCallbackRequest.ResultCode}",
+                $"transId={momoCallbackRequest.TransId}"
+            };
+
+                // Sắp xếp các tham số theo thứ tự alphabet
+                signatureParams.Sort();
+
+                // Nối các tham số thành chuỗi rawData
+                string rawDataForSignatureVerification = String.Join("&", signatureParams);
+
+                _logger.LogDebug("Momo IPN Callback - Raw data for signature verification: {RawData}", rawDataForSignatureVerification);
+
+                using (HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secretKey)))
                 {
                     byte[] hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(rawDataForSignatureVerification));
                     string calculatedSignature = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
 
                     if (calculatedSignature != momoCallbackRequest.Signature.ToLower())
                     {
-                        _logger.LogError("Momo Callback: Signature verification failed for OrderId: {OrderId}. Calculated: {CalculatedSig}, Received: {ReceivedSig}",
+                        _logger.LogError("Momo IPN Callback: Signature verification failed for OrderId: {OrderId}. Calculated: {CalculatedSig}, Received: {ReceivedSig}",
                                          momoCallbackRequest.OrderId, calculatedSignature, momoCallbackRequest.Signature);
-                        return BadRequest("Signature verification failed.");
+                        return Ok(new { status = "error", message = "Signature verification failed." });
                     }
                 }
 
-                // Chuyển đổi ResponseTime từ long epoch milliseconds sang DateTime (UTC)
                 DateTime? momoResponseDateTime = momoCallbackRequest.ResponseTime != 0 ?
-                                                DateTimeOffset.FromUnixTimeMilliseconds(momoCallbackRequest.ResponseTime).UtcDateTime : (DateTime?)null;
+                                                 DateTimeOffset.FromUnixTimeMilliseconds(momoCallbackRequest.ResponseTime).UtcDateTime : (DateTime?)null;
 
-                // 2. Xử lý kết quả giao dịch dựa trên ResultCode
-                if (momoCallbackRequest.ResultCode == 0) // ResultCode = 0 thường là thành công
+                if (momoCallbackRequest.ResultCode == 0)
                 {
-                    _logger.LogInformation("Momo Callback: Payment successful for OrderId: {OrderId}. TransId: {TransId}",
+                    _logger.LogInformation("Momo IPN Callback: Payment successful for OrderId: {OrderId}. TransId: {TransId}",
                                            momoCallbackRequest.OrderId, momoCallbackRequest.TransId);
 
                     await _appointmentService.UpdatePaymentStatusAsync(
@@ -217,16 +243,16 @@ namespace SWPSU25.Controllers
                         PaymentStatus.Paid,
                         momoCallbackRequest.ResultCode,
                         momoCallbackRequest.Message,
-                        momoCallbackRequest.TransId,
+                        momoCallbackRequest.TransId.ToString(),
                         momoCallbackRequest.RequestId,
                         momoCallbackRequest.Signature,
-                        momoResponseDateTime,
+                        momoResponseDateTime.Value,
                         momoCallbackRequest.ExtraData
                     );
                 }
                 else
                 {
-                    _logger.LogWarning("Momo Callback: Payment failed for OrderId: {OrderId}. ResultCode: {ResultCode}, Message: {Message}",
+                    _logger.LogWarning("Momo IPN Callback: Payment failed for OrderId: {OrderId}. ResultCode: {ResultCode}, Message: {Message}",
                                        momoCallbackRequest.OrderId, momoCallbackRequest.ResultCode, momoCallbackRequest.Message);
 
                     await _appointmentService.UpdatePaymentStatusAsync(
@@ -235,22 +261,20 @@ namespace SWPSU25.Controllers
                         PaymentStatus.Failed,
                         momoCallbackRequest.ResultCode,
                         momoCallbackRequest.Message,
-                        momoCallbackRequest.TransId,
+                        momoCallbackRequest.TransId.ToString(),
                         momoCallbackRequest.RequestId,
                         momoCallbackRequest.Signature,
-                        momoResponseDateTime,
+                        momoResponseDateTime.Value,
                         momoCallbackRequest.ExtraData
                     );
                 }
 
-                // Momo mong đợi HTTP 200 OK để xác nhận đã nhận và xử lý callback
-                return Ok();
+                return Ok(new { status = "success", message = "IPN received and processed successfully." });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected error occurred while processing Momo callback for OrderId: {OrderId}", momoCallbackRequest.OrderId);
-                // Trả về lỗi 500 hoặc 400 nếu có lỗi trong quá trình xử lý để Momo có thể thử lại (nếu cấu hình)
-                return StatusCode(500, "Internal server error during callback processing.");
+                _logger.LogError(ex, "An unexpected error occurred while processing Momo IPN callback for OrderId: {OrderId}", momoCallbackRequest.OrderId);
+                return Ok(new { status = "error", message = $"Internal server error: {ex.Message}" });
             }
         }
     }
