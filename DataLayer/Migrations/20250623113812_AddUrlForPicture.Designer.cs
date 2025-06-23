@@ -4,6 +4,7 @@ using DataLayer.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(SWPSU25Context))]
-    partial class SWPSU25ContextModelSnapshot : ModelSnapshot
+    [Migration("20250623113812_AddUrlForPicture")]
+    partial class AddUrlForPicture
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -174,7 +177,7 @@ namespace DataLayer.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("isActive")
+                    b.Property<bool>("isActive")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
@@ -218,25 +221,6 @@ namespace DataLayer.Migrations
                     b.ToTable("DoctorSchedules");
                 });
 
-            modelBuilder.Entity("DataLayer.Entities.LabPicture", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("LabPictureUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("LabResultId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LabResultId");
-
-                    b.ToTable("LabPictures");
-                });
-
             modelBuilder.Entity("DataLayer.Entities.LabResult", b =>
                 {
                     b.Property<Guid>("Id")
@@ -249,8 +233,8 @@ namespace DataLayer.Migrations
                     b.Property<Guid?>("DoctorId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("LabPictureId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("LabPicture")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
@@ -358,10 +342,10 @@ namespace DataLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsActive")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("IsAnonymous")
+                    b.Property<bool>("IsAnonymous")
                         .HasColumnType("bit");
 
                     b.Property<Guid>("UserId")
@@ -651,17 +635,6 @@ namespace DataLayer.Migrations
                     b.Navigation("Doctor");
                 });
 
-            modelBuilder.Entity("DataLayer.Entities.LabPicture", b =>
-                {
-                    b.HasOne("DataLayer.Entities.LabResult", "LabResult")
-                        .WithMany("LabPictures")
-                        .HasForeignKey("LabResultId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LabResult");
-                });
-
             modelBuilder.Entity("DataLayer.Entities.LabResult", b =>
                 {
                     b.HasOne("DataLayer.Entities.Doctor", "Doctor")
@@ -790,11 +763,6 @@ namespace DataLayer.Migrations
                     b.Navigation("MedicalRecords");
 
                     b.Navigation("PatientTreatmentProtocols");
-                });
-
-            modelBuilder.Entity("DataLayer.Entities.LabResult", b =>
-                {
-                    b.Navigation("LabPictures");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Patient", b =>

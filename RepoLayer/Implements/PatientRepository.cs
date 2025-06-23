@@ -30,7 +30,7 @@ namespace RepoLayer.Implements
 
         public async Task<Patient?> GetPatientByIdAsync(Guid patientId)
         {
-            return await _context.Patients
+            return await _context.Patients.Include(p => p.User)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == patientId);
         }

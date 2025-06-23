@@ -27,6 +27,7 @@ namespace DataLayer.DbContext
         public DbSet<TreatmentStage> TreatmentStages { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
+        public DbSet<LabPicture> LabPictures { get; set; } // Thêm DbSet cho LabPicture
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -208,6 +209,11 @@ namespace DataLayer.DbContext
                 .HasForeignKey(lr => lr.TreatmentStageId)
                 .IsRequired(false) // LabResult có thể không gắn với Stage cụ thể (nếu cần)
                 .OnDelete(DeleteBehavior.SetNull); // Khi TreatmentStage bị xóa, LabResult.TreatmentStageId thành null
+            modelBuilder.Entity<LabResult>()
+            .HasMany(lr => lr.LabPictures) // LabResult có nhiều LabPictures
+            .WithOne(lp => lp.LabResult)  // LabPicture thuộc về một LabResult
+            .HasForeignKey(lp => lp.LabResultId) // Khóa ngoại là LabResultId trong LabPicture
+            .OnDelete(DeleteBehavior.Cascade); // Khi LabResult bị xóa, LabPictures liên quan cũng bị xóa
             // --- PaymentTransaction Entity ---
             modelBuilder.Entity<PaymentTransaction>()
             .HasOne(pt => pt.Appointment) // Một PaymentTransaction có một Appointment
@@ -229,8 +235,6 @@ namespace DataLayer.DbContext
                 .WithOne(a => a.PaymentTransaction)
                 .HasForeignKey<PaymentTransaction>(pt => pt.AppointmentId)
                 .OnDelete(DeleteBehavior.Restrict); // Hoặc DeleteBehavior.NoAction
-
-            base.OnModelCreating(modelBuilder);
         }
     }    
 }

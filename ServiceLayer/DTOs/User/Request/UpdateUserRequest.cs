@@ -1,4 +1,5 @@
 ﻿using DataLayer.Enum;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -32,8 +33,6 @@ namespace ServiceLayer.DTOs.User.Request
         public string? Qualifications { get; set; } // TEXT
         public string? Experience { get; set; } // TEXT
         public string? Bio { get; set; } // TEXT
-
-        [MaxLength(255)]
-        public string? ProfilePictureURL { get; set; }
+        public IFormFile? AvatarPicture { get; set; }
     }
 }

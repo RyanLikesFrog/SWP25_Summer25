@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -17,7 +18,6 @@ namespace ServiceLayer.DTOs.User.Request
         public string? Qualifications { get; set; }
         public string? Experience { get; set; }
         public string? Bio { get; set; }
-        public string? ProfilePictureURL { get; set; }
         public bool? IsActive { get; set; }
     }
 }

@@ -39,6 +39,7 @@ namespace DataLayer.Entities
         public virtual Doctor? Doctor { get; set; }
 
         public bool isActive { get; set; } = true; 
+        public string? ProfilePictureURL { get; set; } // URL của ảnh đại diện người dùng
 
         // Navigation property cho mối quan hệ 1-N với BlogPosts
         public virtual ICollection<Blog>? Blog { get; set; }

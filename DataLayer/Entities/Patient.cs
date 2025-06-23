@@ -20,13 +20,13 @@ namespace DataLayer.Entities
 
         [Required]
         [MaxLength(100)]
-        public string FullName { get; set; }
+        public string? FullName { get; set; }
 
         [Required]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
         [Required]
-        public Gender Gender { get; set; } // Sử dụng Enum cho giới tính
+        public Gender? Gender { get; set; } // Sử dụng Enum cho giới tính
 
         [MaxLength(255)]
         public string? Address { get; set; }
@@ -36,8 +36,8 @@ namespace DataLayer.Entities
 
         [MaxLength(20)]
         public string? ContactPersonPhone { get; set; }
-        public bool IsActive { get; set; } = true; // Trạng thái hoạt động của bệnh nhân
-        public bool IsAnonymous { get; set; } // Cờ ẩn danh
+        public bool? IsActive { get; set; } = true; // Trạng thái hoạt động của bệnh nhân
+        public bool? IsAnonymous { get; set; } // Cờ ẩn danh
 
         // Navigation properties cho mối quan hệ 1-N
         public virtual ICollection<Appointment>? Appointments { get; set; }
