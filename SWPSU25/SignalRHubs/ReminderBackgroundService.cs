@@ -36,10 +36,12 @@ namespace SWPSU25.SignalRHubs
                     using (var scope = _scopeFactory.CreateScope()) // Tạo scope mới cho mỗi lần chạy
                     {
                         var reminderService = scope.ServiceProvider.GetRequiredService<ReminderService>();
+
                         var dbContext = scope.ServiceProvider.GetRequiredService<SWPSU25Context>();
 
                         // Lấy các reminders trong khoảng thời gian rất gần (ví dụ: trong 1 ngày tới, bao gồm cả những cái vừa trôi qua)
                         var potentialReminders = await reminderService.GetCalculatedRemindersAsync(1, true);
+
 
                         foreach (var reminder in potentialReminders)
                         {
@@ -66,7 +68,33 @@ namespace SWPSU25.SignalRHubs
                                 _logger.LogInformation($"Reminder for Stage '{reminder.StageName}' marked as sent for {reminder.ReminderDateTime.Date.ToShortDateString()}.");
                             }
                         }
+                        var dueAppointments = await reminderService.GetDueAppointmentRemindersAsync();
+
+                        foreach (var appointmentReminder in dueAppointments)
+                        {
+                            // Lấy lại entity Appointment để cập nhật trạng thái
+                            var appointment = await dbContext.Appointments.FindAsync(appointmentReminder.AppointmentId);
+
+                            // Kiểm tra:
+                            // 1. Cuộc hẹn tồn tại
+                            // 2. Trạng thái là Scheduled hoặc Pending
+                            // 3. Thanh toán Pending hoặc AwaitingPayment
+                            // 4. CHƯA được gửi reminder cho ngày hôm nay (tránh gửi trùng mỗi 30s)
+                            if (appointment != null &&
+                                appointment.Status == AppointmentStatus.Confirmed &&
+                                appointment.PaymentStatus == PaymentStatus.Paid)
+                            {
+                                _logger.LogInformation($"--- Sending Appointment Reminder for: '{appointment.AppointmentTitle}' (ID: {appointment.Id}) for {appointment.AppointmentStartDate.ToShortDateString()} ---");
+
+                                appointmentReminder.ReminderSentTime = DateTime.Now; // Cập nhật thời gian gửi thực tế
+                                await _hubContext.Clients.All.SendAsync("ReceiveAppointmentReminder", appointmentReminder, stoppingToken);
+
+                                await dbContext.SaveChangesAsync(stoppingToken);
+                                _logger.LogInformation($"Appointment Reminder for '{appointment.AppointmentTitle}' marked as sent for {DateTime.Now.Date.ToShortDateString()}.");
+                            }
+                        }
                     }
+
                 }
                 catch (Exception ex)
                 {
