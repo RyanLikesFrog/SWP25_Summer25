@@ -19,10 +19,10 @@ namespace SWPSU25.Controllers
         /// </summary>
         /// <param name="futureDays">Số ngày trong tương lai muốn lấy reminder (mặc định 7 ngày).</param>
         /// <returns>Danh sách các ReminderDetailDto đã sắp xếp theo thời gian.</returns>
-        [HttpGet("upcoming")]
+        [HttpGet("upcomingReminderForDrinkMedicine")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<List<ReminderDetailDto>>> GetUpcomingReminders([FromQuery] int futureDays = 7)
+        public async Task<ActionResult<List<ReminderDetailDto>>> GetUpcomingTreatmentStageMedicineReminders([FromQuery] int futureDays = 7)
         {
             if (futureDays <= 0 || futureDays > 365)
             {
@@ -32,5 +32,18 @@ namespace SWPSU25.Controllers
             var reminders = await _reminderService.GetCalculatedRemindersAsync(futureDays, false);
             return Ok(reminders);
         }
+        /// <summary>
+        /// </summary>
+        /// <param name="futureDays">Số ngày trong tương lai muốn lấy reminder (mặc định 7 ngày).</param>
+        /// <returns>Danh sách các ReminderDetailDto đã sắp xếp theo thời gian.</returns>
+        [HttpGet("upcomingAppointment")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<List<AppointmentReminderDto>>> GetUpcomingAppointmentReminders()
+        {
+            var reminders = await _reminderService.GetDueAppointmentRemindersAsync();
+            return Ok(reminders);
+        }
+
     }
 }
