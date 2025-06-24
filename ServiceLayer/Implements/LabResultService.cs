@@ -1,8 +1,11 @@
 ﻿using DataLayer.Entities;
+using Firebase.Storage;
+using Microsoft.Extensions.Configuration;
 using RepoLayer.Implements;
 using RepoLayer.Interfaces;
 using ServiceLayer.DTOs;
 using ServiceLayer.Interfaces;
+using ServiceLayer.Validator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +21,7 @@ namespace ServiceLayer.Implements
         private readonly IDoctorRepository _doctorRepository;
         private readonly IRepository _repository;
         private readonly ITreatmentStageRepository _treatmentStageRepository;
+        private readonly IConfiguration _config;
 
         public LabResultService
             (
@@ -25,14 +29,15 @@ namespace ServiceLayer.Implements
             IPatientRepository patientRepository,
             IDoctorRepository doctorRepository,
             IRepository repository,
-            ITreatmentStageRepository treatmentStageRepository
-            )
+            ITreatmentStageRepository treatmentStageRepository,
+            IConfiguration config)
         {
             _labResultRepository = labResultRepository;
             _patientRepository = patientRepository;
             _doctorRepository = doctorRepository;
             _repository = repository;
             _treatmentStageRepository = treatmentStageRepository;
+            _config = config;
         }
 
         public async Task<LabResultDetailResponse> CreateLabResultAsync(CreateLabResultRequest request)
@@ -63,7 +68,6 @@ namespace ServiceLayer.Implements
                 throw new ArgumentException($"Doctor ID {request.DoctorId} does not match the TreatmentStage's Doctor ID {treatmentStage.PatientTreatmentProtocol.DoctorId}.");
             }
 
-
             var newLabResult = new LabResult
             {
                 Id = Guid.NewGuid(),
@@ -75,9 +79,52 @@ namespace ServiceLayer.Implements
                 Notes = request.Notes,
                 Conclusion = request.Conclusion,
                 DoctorId = request.DoctorId,
-                TestName = request.TestName
-
+                TestName = request.TestName,
             };
+
+            var listpic = new List<LabPicture>();
+            if (request.LabPictures != null && request.LabPictures.Count > 0)
+            {
+                foreach (var labPic in request.LabPictures)
+                {
+                    if (labPic.FileName.HasImageExtension())
+                    {
+                        string firebaseBucket = _config["Firebase:StorageBucket"];
+
+                        // Initialize FirebaseStorage instance
+                        var firebaseStorage = new FirebaseStorage(firebaseBucket);
+
+                        // Generate a unique file name
+                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + labPic.FileName;
+
+                        // Get reference to the file in Firebase Storage
+                        var fileReference = firebaseStorage.Child("LabResults").Child(request.TestName).Child(uniqueFileName);
+
+                        // Upload the file to Firebase Storage
+                        using (var stream = labPic.OpenReadStream())
+                        {
+                            await fileReference.PutAsync(stream);
+                        }
+
+                        // Get the download URL of the uploaded file
+                        string downloadUrl = await fileReference.GetDownloadUrlAsync();
+                        listpic.Add(new LabPicture
+                        {
+                            Id = Guid.NewGuid(),
+                            LabResultId = newLabResult.Id,
+                            LabPictureUrl = downloadUrl,
+                            LabPictureName = uniqueFileName
+                        });
+                    }
+                    else
+                    {
+                        throw new Exception("Not support file type" + nameof(labPic.FileName).ToString());
+                    }
+
+                }
+                newLabResult.LabPictures = listpic;
+            }
+
 
             await _labResultRepository.CreateLabResultAsync(newLabResult);
             await _repository.SaveChangesAsync();

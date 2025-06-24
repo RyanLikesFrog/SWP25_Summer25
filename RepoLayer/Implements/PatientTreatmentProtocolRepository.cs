@@ -29,6 +29,7 @@ namespace RepoLayer.Implements
             return await _context.PatientTreatmentProtocols
                 .Include(ptp => ptp.Patient)
                 .Include(ptp => ptp.Doctor)
+                .Include(ptp => ptp.TreatmentStages)
                 .ToListAsync();
         }
 
@@ -37,6 +38,7 @@ namespace RepoLayer.Implements
             return await _context.PatientTreatmentProtocols
                 .Include(ptp => ptp.Patient)
                 .Include(ptp => ptp.Doctor)
+                .Include(ptp => ptp.TreatmentStages)
                 .FirstOrDefaultAsync(ptp => ptp.Id == patientTreatmentProtocolId);
         }
     }

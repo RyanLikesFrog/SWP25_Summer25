@@ -28,6 +28,9 @@ namespace RepoLayer.Implements
         {
             return await _context.LabResults
                 .Include(lr => lr.Patient)
+                .Include(lr => lr.TreatmentStage)
+                .Include(lr => lr.Doctor)
+                .Include(lr => lr.LabPictures)
                 .ToListAsync();
         }
 
@@ -35,6 +38,9 @@ namespace RepoLayer.Implements
         {
             return _context.LabResults
                 .Include(lr => lr.Patient)
+                .Include(lr => lr.TreatmentStage)
+                .Include(lr => lr.Doctor)
+                .Include(lr => lr.LabPictures)
                 .FirstOrDefaultAsync(lr => lr.Id == labResultId);
         }
     }

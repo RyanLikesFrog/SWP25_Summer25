@@ -24,6 +24,7 @@ namespace RepoLayer.Implements
         {
             return await _context.DoctorSchedules
                 .Include(ds => ds.Doctor)
+                .Include(ds => ds.Appointment)
                 .ToListAsync();
         }
 

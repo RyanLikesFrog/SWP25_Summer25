@@ -29,6 +29,7 @@ namespace RepoLayer.Implements
             return _context.MedicalRecords
                 .Include(mr => mr.Patient)
                 .Include(mr => mr.Doctor)
+                .Include(mr => mr.TreatmentStage)
                 .ToListAsync();
         }
 
@@ -37,6 +38,7 @@ namespace RepoLayer.Implements
             return await _context.MedicalRecords
                 .Include(mr => mr.Patient)
                 .Include(mr => mr.Doctor)
+                .Include(mr => mr.TreatmentStage)
                 .FirstOrDefaultAsync(mr => mr.Id == medicalRecordId);
         }
     }

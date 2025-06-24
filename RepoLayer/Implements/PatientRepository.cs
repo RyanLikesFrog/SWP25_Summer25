@@ -25,20 +25,31 @@ namespace RepoLayer.Implements
 
         public async Task<List<Patient?>> GetAllPatientsAsync() 
         {
-            return await _context.Patients.ToListAsync();
+            return await _context.Patients
+                .Include(x => x.User)
+                .Include(x => x.PatientTreatmentProtocols)
+                .Include(x => x.LabResults)
+                .Include(x => x.MedicalRecords)
+                .ToListAsync();
         }
 
         public async Task<Patient?> GetPatientByIdAsync(Guid patientId)
         {
             return await _context.Patients.Include(p => p.User)
-                .AsNoTracking()
+                .Include(x => x.User)
+                .Include(x => x.PatientTreatmentProtocols)
+                .Include(x => x.LabResults)
+                .Include(x => x.MedicalRecords)
                 .FirstOrDefaultAsync(p => p.Id == patientId);
         }
 
         public async Task<Patient?> GetPatientByUserIdAsync(Guid userId)
         {
             return await _context.Patients
-                .AsNoTracking()
+                .Include(x => x.User)
+                .Include(x => x.PatientTreatmentProtocols)
+                .Include(x => x.LabResults)
+                .Include(x => x.MedicalRecords)
                 .FirstOrDefaultAsync(p => p.UserId == userId);
         }
 

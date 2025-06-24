@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace ServiceLayer.DTOs
@@ -27,5 +28,7 @@ namespace ServiceLayer.DTOs
         public string? Conclusion { get; set; }
 
         public string? Notes { get; set; }
+
+        public List<IFormFile?>? LabPictures { get; set; }
     }
 }

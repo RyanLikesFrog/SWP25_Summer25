@@ -13,7 +13,8 @@ namespace DataLayer.Entities
         [Key]
         public Guid Id { get; set; }
         public string? LabPictureUrl { get; set; } // Tên tệp hình ảnh
-        
+        public string? LabPictureName { get; set; } // Tên hiển thị của hình ảnh
+
         [ForeignKey("LabResult")]
         public Guid LabResultId { get; set; } // Khóa ngoại tới LabResult
         public virtual LabResult? LabResult { get; set; } // Navigation property
