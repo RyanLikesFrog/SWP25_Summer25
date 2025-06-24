@@ -27,9 +27,6 @@ namespace RepoLayer.Implements
         public async Task<List<LabResult?>> GetAllLabResultsAsync()
         {
             return await _context.LabResults
-                .Include(lr => lr.Patient)
-                .Include(lr => lr.TreatmentStage)
-                .Include(lr => lr.Doctor)
                 .Include(lr => lr.LabPictures)
                 .ToListAsync();
         }
@@ -37,9 +34,6 @@ namespace RepoLayer.Implements
         public Task<LabResult?> GetLabResultByIdAsync(Guid labResultId)
         {
             return _context.LabResults
-                .Include(lr => lr.Patient)
-                .Include(lr => lr.TreatmentStage)
-                .Include(lr => lr.Doctor)
                 .Include(lr => lr.LabPictures)
                 .FirstOrDefaultAsync(lr => lr.Id == labResultId);
         }

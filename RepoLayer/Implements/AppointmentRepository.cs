@@ -27,8 +27,6 @@ namespace RepoLayer.Implements
         public async Task<List<Appointment?>> GetAllAppointmentsAsync()
         {
             return await _context.Appointments
-                .Include(u => u.Patient)
-                .Include(u => u.Doctor)
                 .Include(u => u.PaymentTransaction)
                 .ToListAsync();
         }
@@ -36,8 +34,6 @@ namespace RepoLayer.Implements
         public async Task<Appointment?> GetAppointmentByIdAsync(Guid appointmentId)
         {
             return await _context.Appointments
-                .Include(a => a.Patient)
-                .Include(a => a.Doctor)
                 .Include(a => a.PaymentTransaction)
                 .FirstOrDefaultAsync(a => a.Id == appointmentId);
         }
@@ -52,9 +48,7 @@ namespace RepoLayer.Implements
         {
             return await _context.Appointments
                 .Where(a => a.DoctorId == doctorId)
-                .Include(a => a.Patient)
                 .Include(a => a.PaymentTransaction)
-                .Include(a => a.Doctor)
                 .ToListAsync();
         }
     }

@@ -27,21 +27,18 @@ namespace RepoLayer.Implements
         public async Task<List<ARVProtocol?>> GetAllARVProtocolsAsync()
         {
             return await _context.ARVProtocols
-                .Include(u => u.PatientTreatmentProtocols)
                 .ToListAsync();
         }
 
         public async Task<ARVProtocol?> GetARVProtocolByIdAsync(Guid protocolId)
         {
             return await _context.ARVProtocols
-                .Include(u => u.PatientTreatmentProtocols)
                 .FirstOrDefaultAsync(u => u.ProtocolId == protocolId);
         }
 
         public async Task<List<ARVProtocol?>> GetDefaultProtocolAsync()
         {
             return await _context.ARVProtocols
-                .Include(u => u.PatientTreatmentProtocols)
                 .Where(p => p.IsDefault)
                 .ToListAsync();
         }

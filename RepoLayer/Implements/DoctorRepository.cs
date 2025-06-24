@@ -26,7 +26,6 @@ namespace RepoLayer.Implements
         public async Task<Doctor?> GetDoctorByUserIdAsync(Guid userId)
         {
             return await _context.Doctors
-                                        .Include(x => x.User)
                                         .Include(x => x.DoctorSchedules)
                                         .Include(x => x.PatientTreatmentProtocols)
                                         .FirstOrDefaultAsync(p => p.UserId == userId);
@@ -35,7 +34,6 @@ namespace RepoLayer.Implements
         public async Task<List<Doctor?>> GetAllDoctorsAsync()
         {
             return await _context.Doctors
-                                        .Include(x => x.User)
                                         .Include(x => x.DoctorSchedules)
                                         .Include(x => x.PatientTreatmentProtocols)
                                         .ToListAsync();
@@ -57,7 +55,6 @@ namespace RepoLayer.Implements
         public async Task<Doctor?> GetDoctorByIdAsync(Guid doctorId)
         {
             return await _context.Doctors
-                                        .Include(x => x.User)
                                         .Include(x => x.DoctorSchedules)
                                         .Include(x => x.PatientTreatmentProtocols)
                                         .FirstOrDefaultAsync(p => p.Id == doctorId);
