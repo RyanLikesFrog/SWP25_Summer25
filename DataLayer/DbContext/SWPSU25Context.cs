@@ -159,7 +159,7 @@ namespace DataLayer.DbContext
             modelBuilder.Entity<PatientTreatmentProtocol>()
                 .HasOne(ptp => ptp.ARVProtocol)
                 .WithMany(ap => ap.PatientTreatmentProtocols)
-                .HasForeignKey(ptp => ptp.ProtocolId)
+                .HasForeignKey(ptp => ptp.ARVProtocolId)
                 .IsRequired(false) // ProtocolId có thể null
                 .OnDelete(DeleteBehavior.SetNull); // Khi ARVProtocol bị xóa, ProtocolId trong PTP thành null
 

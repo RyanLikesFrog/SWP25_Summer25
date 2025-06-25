@@ -55,9 +55,9 @@ namespace ServiceLayer.Implements
                 }
             }
 
-            if (request.ProtocolId.HasValue)
+            if (request.ARVProtocolId.HasValue)
             {
-                var protocol = await _aRVProtocolRepository.GetARVProtocolByIdAsync(request.ProtocolId.Value);
+                var protocol = await _aRVProtocolRepository.GetARVProtocolByIdAsync(request.ARVProtocolId.Value);
                 if (protocol == null)
                 {
                     throw new ArgumentException("ARVPRotocol not found with the provided PRotocol ID");
@@ -78,7 +78,7 @@ namespace ServiceLayer.Implements
                 Id = Guid.NewGuid(),
                 PatientId = request.PatientId,
                 DoctorId = request.DoctorId,
-                ProtocolId = request.ProtocolId,
+                ARVProtocolId = request.ARVProtocolId,
                 AppointmentId = request.AppointmentId,
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
@@ -93,6 +93,7 @@ namespace ServiceLayer.Implements
             doctorSchedule.IsAvailable = false;
             await _doctorScheduleRepository.UpdateDoctorSchedule(doctorSchedule);
 
+            await _patientTreatmentProtocolRepository.CreatePatientTreatmentProtocol(newPatientTreatmentProtocol);
             await _repository.SaveChangesAsync();
 
             return new PatientTreatmentProtocolDetailResponse
@@ -100,7 +101,7 @@ namespace ServiceLayer.Implements
                 Id = newPatientTreatmentProtocol.Id,
                 PatientId = newPatientTreatmentProtocol.PatientId,
                 DoctorId = newPatientTreatmentProtocol.DoctorId,
-                ProtocolId = newPatientTreatmentProtocol.ProtocolId,
+                ProtocolId = newPatientTreatmentProtocol.ARVProtocolId,
                 AppointmentId = newPatientTreatmentProtocol.AppointmentId,
                 StartDate = newPatientTreatmentProtocol.StartDate,
                 EndDate = newPatientTreatmentProtocol.EndDate,
