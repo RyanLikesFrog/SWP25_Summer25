@@ -20,7 +20,10 @@ namespace RepoLayer.Implements
 
         public async Task<User?> GetUserByEmailAsync(string email) // <-- Triển khai
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            return await _context.Users
+                .Include(x => x.Patient)
+                .Include(x => x.Doctor)
+                .FirstOrDefaultAsync(u => u.Email == email);
         }
 
         public async Task AddUserAsync(User user)
@@ -31,7 +34,9 @@ namespace RepoLayer.Implements
         public async Task<User?> GetUserByUsernameAsync(string username)
         {
             return await _context.Users
-                 .FirstOrDefaultAsync(u => u.Username == username);
+                .Include(x => x.Patient)
+                .Include(x => x.Doctor)
+                .FirstOrDefaultAsync(u => u.Username == username);
         }
 
         public Task UpdateUserAsync(User user)

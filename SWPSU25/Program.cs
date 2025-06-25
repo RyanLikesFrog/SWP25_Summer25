@@ -117,9 +117,9 @@ builder.Services.AddScoped<IMedicalRecordService, MedicalRecordService>();
 builder.Services.AddScoped<IPatientTreatmentProtocolService, PatientTreatmentProtocolService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMomoClient, MomoClient>();
-
-// add signalR
 builder.Services.AddScoped<ReminderService>();
+ 
+// add signalR
 builder.Services.AddSignalR();
 builder.Services.AddHostedService<ReminderBackgroundService>();
 

@@ -36,7 +36,7 @@ namespace SWPSU25.Controllers
         }
 
         [HttpPost("create-lab-result")]
-        public async Task<IActionResult> CreateLabResult([FromBody] CreateLabResultRequest request)
+        public async Task<IActionResult> CreateLabResult([FromForm] CreateLabResultRequest request)
         {
             try
             {

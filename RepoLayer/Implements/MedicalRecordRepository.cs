@@ -27,16 +27,12 @@ namespace RepoLayer.Implements
         public Task<List<MedicalRecord?>> GetAllMedicalRecordsAsync()
         {
             return _context.MedicalRecords
-                .Include(mr => mr.Patient)
-                .Include(mr => mr.Doctor)
                 .ToListAsync();
         }
 
         public async Task<MedicalRecord?> GetMedicalRecordByIdAsync(Guid medicalRecordId)
         {
             return await _context.MedicalRecords
-                .Include(mr => mr.Patient)
-                .Include(mr => mr.Doctor)
                 .FirstOrDefaultAsync(mr => mr.Id == medicalRecordId);
         }
     }

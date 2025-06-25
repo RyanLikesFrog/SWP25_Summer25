@@ -1,11 +1,14 @@
 ﻿using DataLayer.DbContext;
 using DataLayer.Entities;
 using DataLayer.Enum;
+using Firebase.Storage;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using RepoLayer.Interfaces;
 using ServiceLayer.DTOs.User.Request;
 using ServiceLayer.DTOs.User.Response;
 using ServiceLayer.Interfaces;
+using ServiceLayer.Validator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,17 +23,20 @@ namespace ServiceLayer.Implements
         private readonly IDoctorRepository _doctorRepository; // Cần inject DoctorRepository
         private readonly IRepository _repository; // Inject DbContext trực tiếp để quản lý transaction
         private readonly IPatientRepository _patientRepository; // Cần inject PatientRepository nếu cần
+        private readonly IConfiguration _config; // Để lấy cấu hình Firebase Storage
 
         public UserService(
             IUserRepository userRepository,
             IDoctorRepository doctorRepository,
             IRepository repository,
-            IPatientRepository patientRepository)
+            IPatientRepository patientRepository,
+            IConfiguration configuration)
         {
             _userRepository = userRepository;
             _doctorRepository = doctorRepository;
             _repository = repository;
             _patientRepository = patientRepository;
+            _config = configuration;
         }
 
         public async Task<CreateUserResponse> CreateUserAccountByAdminAsync(CreateAccountByAdminRequest request)
@@ -53,6 +59,39 @@ namespace ServiceLayer.Implements
             {
                 return new CreateUserResponse { Success = false, Message = "Cannot create Patient accounts via this endpoint. Please use the patient registration endpoint." };
             }
+
+            string? profilePictureUrl = null;
+
+            if (request.AvatarPicture != null && request.AvatarPicture.Length > 0)
+            {
+                if (request.AvatarPicture.FileName.HasImageExtension())
+                {
+                    string firebaseBucket = _config["Firebase:StorageBucket"];
+
+                    // Initialize FirebaseStorage instance
+                    var firebaseStorage = new FirebaseStorage(firebaseBucket);
+
+                    // Generate a unique file name
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + request.AvatarPicture.FileName;
+
+                    // Get reference to the file in Firebase Storage
+                    var fileReference = firebaseStorage.Child("StaffImages").Child(uniqueFileName);
+
+                    // Upload the file to Firebase Storage
+                    using (var stream = request.AvatarPicture.OpenReadStream())
+                    {
+                        await fileReference.PutAsync(stream);
+                    }
+
+                    // Get the download URL of the uploaded file
+                    string downloadUrl = await fileReference.GetDownloadUrlAsync();
+                    profilePictureUrl = downloadUrl; // Lưu URL vào biến
+                }
+                else
+                {
+                    throw new Exception("Not support file type" + nameof(request.AvatarPicture.FileName).ToString());
+                }
+            }
             // 3. Tạo đối tượng User
             var newUser = new User
             {
@@ -63,7 +102,9 @@ namespace ServiceLayer.Implements
                 PhoneNumber = request.PhoneNumber,
                 Role = request.Role,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
+                ProfilePictureURL = profilePictureUrl, // Lưu URL ảnh đại diện nếu có
+
             };
 
             // 4. Lưu User vào database (chỉ đánh dấu là thêm)
@@ -83,7 +124,6 @@ namespace ServiceLayer.Implements
                     Qualifications = request.Qualifications,
                     Experience = request.Experience,
                     Bio = request.Bio,
-                    ProfilePictureURL = request.ProfilePictureURL
                 };
                 await _doctorRepository.AddDoctorAsync(newDoctor);
                 associatedEntityId = newDoctor.Id;
@@ -147,6 +187,38 @@ namespace ServiceLayer.Implements
                 user.PhoneNumber = request.PhoneNumber;
             }
 
+            // Update avatar moi 
+            if (request.AvatarPicture != null && request.AvatarPicture.Length > 0)
+            {
+                if (request.AvatarPicture.FileName.HasImageExtension())
+                {
+                    string firebaseBucket = _config["Firebase:StorageBucket"];
+
+                    // Initialize FirebaseStorage instance
+                    var firebaseStorage = new FirebaseStorage(firebaseBucket);
+
+                    // Generate a unique file name
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + request.AvatarPicture.FileName;
+
+                    // Get reference to the file in Firebase Storage
+                    var fileReference = firebaseStorage.Child("StaffImages").Child(uniqueFileName);
+
+                    // Upload the file to Firebase Storage
+                    using (var stream = request.AvatarPicture.OpenReadStream())
+                    {
+                        await fileReference.PutAsync(stream);
+                    }
+
+                    // Get the download URL of the uploaded file
+                    string downloadUrl = await fileReference.GetDownloadUrlAsync();
+                    user.ProfilePictureURL = downloadUrl; // Lưu URL vào biến
+                }
+                else
+                {
+                    throw new Exception("Not support file type" + nameof(request.AvatarPicture.FileName).ToString());
+                }
+            }
+
             // --- Xử lý thay đổi Role và thông tin Doctor ---
             bool roleChanged = false;
             UserRole? oldRole = user.Role;
@@ -179,7 +251,6 @@ namespace ServiceLayer.Implements
                         Qualifications = request.Qualifications,
                         Experience = request.Experience,
                         Bio = request.Bio,
-                        ProfilePictureURL = request.ProfilePictureURL
                     };
                     await _doctorRepository.AddDoctorAsync(doctor);
                 }
@@ -191,7 +262,6 @@ namespace ServiceLayer.Implements
                     if (!string.IsNullOrEmpty(request.Qualifications)) user.Doctor.Qualifications = request.Qualifications;
                     if (!string.IsNullOrEmpty(request.Experience)) user.Doctor.Experience = request.Experience;
                     if (!string.IsNullOrEmpty(request.Bio)) user.Doctor.Bio = request.Bio;
-                    if (!string.IsNullOrEmpty(request.ProfilePictureURL)) user.Doctor.ProfilePictureURL = request.ProfilePictureURL;
                 }
                 // Nếu doctor vẫn là null ở đây, có thể do lỗi logic hoặc dữ liệu không nhất quán
                 // Có thể thêm log hoặc throw exception

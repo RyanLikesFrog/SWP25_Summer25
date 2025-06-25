@@ -26,14 +26,16 @@ namespace RepoLayer.Implements
 
         public async Task<List<TreatmentStage?>> GetAllTreatmentStagesAsync()
         {
-            return await _Context.TreatmentStages.Include(u => u.PatientTreatmentProtocol)
-                                                  .ToListAsync();
+            return await _Context.TreatmentStages
+                .Include(u => u.LabResults)
+                .ToListAsync();
         }
 
         public async Task<TreatmentStage?> GetTreatmentStageByIdAsync(Guid treatmentStageId)
         {
-            return await _Context.TreatmentStages.Include(u => u.PatientTreatmentProtocol)
-                                                  .FirstOrDefaultAsync(u => u.Id == treatmentStageId);
+            return await _Context.TreatmentStages
+                                .Include(u => u.LabResults)
+                                .FirstOrDefaultAsync(u => u.Id == treatmentStageId);
         }
     }
 }

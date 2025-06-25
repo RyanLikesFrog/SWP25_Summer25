@@ -1,4 +1,5 @@
 ﻿using DataLayer.Enum;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -39,8 +40,6 @@ namespace ServiceLayer.DTOs.User.Request
         public string? Qualifications { get; set; }
         public string? Experience { get; set; }
         public string? Bio { get; set; }
-
-        [StringLength(255, ErrorMessage = "Profile Picture URL cannot exceed 255 characters.")]
-        public string? ProfilePictureURL { get; set; }
+        public IFormFile? AvatarPicture { get; set; }
     }
 }

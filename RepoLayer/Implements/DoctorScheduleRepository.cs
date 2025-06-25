@@ -23,14 +23,12 @@ namespace RepoLayer.Implements
         public async Task<List<DoctorSchedule?>> GetAllDoctorSchedulesAsync()
         {
             return await _context.DoctorSchedules
-                .Include(ds => ds.Doctor)
                 .ToListAsync();
         }
 
         public async Task<DoctorSchedule?> GetDoctorScheduleByIdAsync(Guid scheduleId)
         {
             return await _context.DoctorSchedules
-                .Include(ds => ds.Doctor)
                 .FirstOrDefaultAsync(ds => ds.Id == scheduleId);    
         }
 
@@ -61,14 +59,12 @@ namespace RepoLayer.Implements
         public async Task<DoctorSchedule?> GetDoctorScheduleByAppointmentIdAsync(Guid? appointmentId)
         {
             return await _context.DoctorSchedules
-                .Include(ds => ds.Doctor)
                 .FirstOrDefaultAsync(ds => ds.AppointmentId == appointmentId);
         }
         public async Task<List<DoctorSchedule?>> GetTodayDoctorSchedulesByDoctorIdAsync(Guid doctorId)
         {
             var today = DateTime.Today;
             return await _context.DoctorSchedules
-                .Include(ds => ds.Appointment)
                 .Where(ds => ds.DoctorId == doctorId && (ds.StartTime >= today && ds.StartTime <= today.AddHours(24)))
                 .ToListAsync();
         }

@@ -43,7 +43,7 @@ namespace SWPSU25.Controllers
         // API chung cho Admin tạo tài khoản Doctor, Staff hoặc Manager
         [HttpPost("admin/create-account")]
         [Authorize(Roles = nameof(UserRole.Admin))] // Chỉ Admin mới có thể truy cập
-        public async Task<IActionResult> CreateAccount([FromBody] CreateAccountByAdminRequest request)
+        public async Task<IActionResult> CreateAccount([FromForm] CreateAccountByAdminRequest request)
         {
             // Thêm validation cấp controller nếu cần thiết,
             // nhưng phần lớn logic validation đã có trong service.
@@ -62,7 +62,7 @@ namespace SWPSU25.Controllers
 
         [HttpPut("admin/update-account")]
         [Authorize(Roles = nameof(UserRole.Admin))] // Chỉ Admin mới có thể truy cập
-        public async Task<IActionResult> UpdateUserUnified([FromBody] UpdateUserRequest request)
+        public async Task<IActionResult> UpdateUserUnified([FromForm] UpdateUserRequest request)
         {
             if (!ModelState.IsValid) // Kiểm tra Data Annotations validation
             {

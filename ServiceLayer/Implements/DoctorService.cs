@@ -65,9 +65,6 @@ namespace ServiceLayer.Implements
             if (!string.IsNullOrWhiteSpace(request.Bio))
                 doctor.Bio = request.Bio;
 
-            if (!string.IsNullOrWhiteSpace(request.ProfilePictureURL))
-                doctor.ProfilePictureURL = request.ProfilePictureURL;
-
             if (request.IsActive.HasValue)
                 doctor.isActive = request.IsActive.Value;
 

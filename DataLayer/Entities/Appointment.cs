@@ -16,12 +16,12 @@ namespace DataLayer.Entities
 
         [ForeignKey("Patient")]
         public Guid? PatientId { get; set; }
-        public virtual Patient? Patient { get; set; }
+        public  Patient? Patient { get; set; }
         public string? AppointmentTitle { get; set; }
 
         [ForeignKey("Doctor")]
         public Guid? DoctorId { get; set; }
-        public virtual Doctor? Doctor { get; set; }
+        public Doctor? Doctor { get; set; }
 
         [Required]
         public DateTime AppointmentStartDate { get; set; }
@@ -44,6 +44,6 @@ namespace DataLayer.Entities
 
         // **ĐIỂM SỬA ĐỔI: Mối quan hệ một-một với PaymentTransaction**
         public Guid? PaymentTransactionId { get; set; } // Khóa ngoại tới PaymentTransaction
-        public virtual PaymentTransaction? PaymentTransaction { get; set; } // Thuộc tính điều hướng
+        public PaymentTransaction? PaymentTransaction { get; set; } // Thuộc tính điều hướng
     }
 }

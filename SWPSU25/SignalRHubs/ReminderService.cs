@@ -115,5 +115,46 @@ namespace ServiceLayer.Implements.Reminder
             }
             return calculatedReminders.OrderBy(r => r.ReminderDateTime).ToList();
         }
+        /// <summary>
+        /// Lấy các cuộc hẹn cần nhắc nhở (trước 1 ngày so với AppointmentStartDate).
+        /// </summary>
+        /// <returns>Danh sách AppointmentReminderDto.</returns>
+        public async Task<List<AppointmentReminderDto>> GetDueAppointmentRemindersAsync()
+        {
+            DateTime now = DateTime.Now;
+            DateTime tomorrow = now.Date.AddDays(1); // Ngày mai, đầu ngày
+
+            // Lấy các cuộc hẹn có AppointmentStartDate là ngày mai
+            // và chưa được thanh toán hoặc thanh toán đang chờ xử lý
+            var appointments = await _context.Appointments
+                .AsNoTracking()
+                .Where(a => a.AppointmentStartDate.Date == tomorrow &&
+                            (a.Status == AppointmentStatus.Confirmed || a.PaymentStatus == PaymentStatus.Paid)) // Chỉ nhắc nhở các cuộc hẹn đã lên lịch
+                .Select(a => new AppointmentReminderDto
+                {
+                    AppointmentId = a.Id,
+                    AppointmentTitle = a.AppointmentTitle,
+                    AppointmentStartDate = a.AppointmentStartDate,
+                    PatientName = a.Patient != null ? a.Patient.FullName : "Anonymous Patient", // Lấy tên bệnh nhân nếu có
+                    DoctorName = a.Doctor != null ? a.Doctor.FullName : "N/A", // Lấy tên bác sĩ nếu có
+                    OnlineLink = a.OnlineLink,
+                    ReminderSentTime = DateTime.MinValue, // Sẽ được cập nhật khi gửi
+                    ReminderMessage = $"Reminder: Your appointment '{a.AppointmentTitle}' is scheduled for tomorrow at {a.AppointmentStartDate.ToShortTimeString()}." // Tin nhắn nhắc nhở
+                })
+                .ToListAsync();
+
+            // Bạn có thể thêm logic kiểm tra xem reminder đã được gửi cho ngày này chưa
+            // Hiện tại, tôi sẽ giả định rằng chúng ta gửi một lần vào ngày trước đó.
+            // Để tránh gửi trùng, bạn cần thêm một trường LastAppointmentReminderSentDate vào Appointment entity
+            // và kiểm tra nó ở đây.
+
+            // Để đơn giản, giả sử nhắc nhở sẽ gửi vào một giờ cố định trong ngày (ví dụ: 9 AM ngày hôm trước)
+            // Hoặc bạn có thể thiết lập nhiều giờ nhắc nhở cho cuộc hẹn nếu cần.
+            // Tuy nhiên, yêu cầu là "trước 1 ngày", nên việc kiểm tra `AppointmentStartDate.Date == tomorrow`
+            // là đủ cho logic lấy cuộc hẹn.
+            // Việc kiểm tra "đã gửi chưa" sẽ được xử lý trong BackgroundService.
+
+            return appointments;
+        }
     }
 }

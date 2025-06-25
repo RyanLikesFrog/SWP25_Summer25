@@ -35,5 +35,7 @@ namespace DataLayer.Entities
         public string? ResultSummary { get; set; }  
         public string? Conclusion { get; set; } // Kết luận từ bác sĩ
         public string? Notes { get; set; } // TEXT
+        public Guid? LabPictureId { get; set; } // ID của hình ảnh kết quả xét nghiệm, nếu có
+        public ICollection<LabPicture>? LabPictures { get; set; } // Danh sách hình ảnh kết quả xét nghiệm
     }
 }
