@@ -171,11 +171,8 @@ namespace ServiceLayer.Implements
 
         public async Task<AppointmentDetailResponse> CreateAppointmentAndInitiatePaymentAsyncV2(UserCreateAppointmentRequest request)
         {
-<<<<<<< HEAD
-            var patient = await _userRepository.GetUserByIdAsync(request.PatientId.Value);
-=======
+
             var patient = await _patientRepository.GetPatientByIdAsync(request.PatientId.Value);
->>>>>>> bc891851724e6ad2ab5ede9003a890238d90332e
             if (patient == null)
             {
                 throw new ArgumentException("Patient not found with the provided Patient ID.");
