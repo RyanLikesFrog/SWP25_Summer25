@@ -14,6 +14,7 @@ namespace DataLayer.Entities
         public Guid Id { get; set; }
         public string? LabPictureUrl { get; set; } // Tên tệp hình ảnh
         public string? LabPictureName { get; set; } // Tên hiển thị của hình ảnh
+        public bool isActive { get; set; } = true; // Mô tả hình ảnh
 
         [ForeignKey("LabResult")]
         public Guid LabResultId { get; set; } // Khóa ngoại tới LabResult

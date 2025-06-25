@@ -14,7 +14,7 @@ namespace ServiceLayer.DTOs
         [Required]
         public Guid DoctorId { get; set; }
 
-        public Guid? ProtocolId { get; set; } // Optional: null if it's a custom protocol
+        public Guid? ARVProtocolId { get; set; } // Optional: null if it's a custom protocol
 
         public Guid? AppointmentId { get; set; }
 

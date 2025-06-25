@@ -23,7 +23,7 @@ namespace DataLayer.Entities
         public virtual Doctor? Doctor { get; set; }
 
         [ForeignKey("ARVProtocol")]
-        public Guid? ProtocolId { get; set; } 
+        public Guid? ARVProtocolId { get; set; } 
         public virtual ARVProtocol? ARVProtocol { get; set; }
 
         [ForeignKey("Appointment")]
