@@ -1,5 +1,7 @@
 ﻿using DataLayer.Entities;
 using ServiceLayer.DTOs;
+using ServiceLayer.DTOs.LabResult.Request;
+using ServiceLayer.DTOs.User.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +15,6 @@ namespace ServiceLayer.Interfaces
         public Task<LabResult?> GetLabResultByIdAsync(Guid labResultId);
         public Task<List<LabResult?>> GetAllLabResultsAsync();
         public Task<LabResultDetailResponse> CreateLabResultAsync(CreateLabResultRequest request);
+        public Task<LabResultDetailResponse> UpdateLabResultAsync(UpdateLabResultRequest request);
     }
 }

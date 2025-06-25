@@ -28,7 +28,7 @@ namespace ServiceLayer.DTOs
         public string? Conclusion { get; set; }
 
         public string? Notes { get; set; }
+        public IFormFile[] LabResultPictures { get; set; }
 
-        public List<IFormFile?>? LabPictures { get; set; }
     }
 }

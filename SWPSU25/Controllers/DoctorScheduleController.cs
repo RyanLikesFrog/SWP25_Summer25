@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.DTOs;
+using ServiceLayer.DTOs.User.Request;
 using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
 
@@ -90,5 +91,41 @@ namespace SWPSU25.Controllers
                 });
             }
         }
+        [HttpPut("update-doctor-schedule")]
+        public async Task<IActionResult> UpdateDoctorSchedule([FromBody] UpdateDoctorScheduleRequest request)
+        {
+            try
+            {
+                var updatedSchedule = await _doctorScheduleService.UpdateDoctorScheduleAsync(request);
+
+                if (updatedSchedule == null)
+                {
+                    return NotFound(new { Message = $"Không tìm thấy lịch làm việc với ID {request.Id}." });
+                }
+
+                return Ok(new
+                {
+                    Message = "Cập nhật lịch làm việc bác sĩ thành công.",
+                    Data = updatedSchedule
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Message = "Đã xảy ra lỗi trong quá trình cập nhật lịch làm việc bác sĩ.",
+                    Details = ex.Message
+                });
+            }
+        }
+
     }
 }

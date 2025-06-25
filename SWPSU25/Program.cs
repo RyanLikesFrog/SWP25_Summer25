@@ -68,6 +68,7 @@ builder.Services.AddScoped<ITreatmentStageRepository, TreatmentStageRepository>(
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRepository, BaseRepository>();
 builder.Services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
+builder.Services.AddScoped<ILabPictureRepository, LabPictureRepository>();
 
 // Register Service
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -109,6 +110,7 @@ builder.Services.AddAuthentication(options =>
         RoleClaimType = ClaimTypes.Role
     };
 });
+
 
 builder.Services.AddAuthorization(); // Thêm dịch vụ ủy quyền
 

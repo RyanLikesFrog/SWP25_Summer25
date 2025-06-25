@@ -43,9 +43,5 @@ namespace RepoLayer.Implements
                 .ToListAsync();
         }
 
-        public async Task<ARVProtocol?> UpdateARVProtocolAsync(ARVProtocol arvProto)
-        {
-            return await Task.FromResult(_context.ARVProtocols.Update(arvProto).Entity);    
-        }
     }
 }

@@ -2,19 +2,25 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace ServiceLayer.DTOs
+namespace ServiceLayer.DTOs.User.Request
 {
-    public class CreateMedicalRecordRequest
+    public class UpdateMedicalRecord
     {
+        // --- Medical Record Fields ---
+        [Required]
+        public Guid MedicalRecordId { get; set; }
+
         [Required]
         public Guid PatientId { get; set; }
 
         [Required]
         public Guid DoctorId { get; set; }
 
-        [Required]
-        public Guid TreatmentStageId { get; set; }
+        public Guid? TreatmentStageId { get; set; }
 
         [Required]
         public DateTime ExaminationDate { get; set; }

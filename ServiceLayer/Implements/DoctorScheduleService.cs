@@ -1,6 +1,8 @@
 ﻿using DataLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using RepoLayer.Interfaces;
 using ServiceLayer.DTOs;
+using ServiceLayer.DTOs.User.Request;
 using ServiceLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -99,6 +101,33 @@ namespace ServiceLayer.Implements
         public async Task<List<DoctorSchedule?>> GetTodayDoctorScheduleByDoctorIdAsync(Guid doctorId)
         {
             return await _doctorScheduleRepository.GetTodayDoctorSchedulesByDoctorIdAsync(doctorId);
+        }
+
+        public async Task<DoctorSchedule?> UpdateDoctorScheduleAsync(UpdateDoctorScheduleRequest request)
+        {
+            var existingSchedule = await _doctorScheduleRepository.GetDoctorScheduleByIdAsync(request.Id);
+            if (existingSchedule == null)
+            {
+                throw new ArgumentException($"Lịch làm việc với ID {request.Id} không tồn tại.");
+            }
+            var doctor = await _doctorRepository.GetDoctorByIdAsync(request.DoctorId);
+            if (doctor == null)
+            {
+                throw new ArgumentException($"Bác sĩ với ID {request.DoctorId} không tồn tại.");
+            }
+
+            // Update fields
+            existingSchedule.DoctorId = request.DoctorId;
+            existingSchedule.AppointmentId = request.AppointmentId;
+            existingSchedule.StartTime = request.StartTime;
+            existingSchedule.EndTime = request.EndTime;
+            existingSchedule.Notes = request.Notes;
+            existingSchedule.IsAvailable = request.IsAvailable;
+
+            await _doctorScheduleRepository.UpdateDoctorScheduleAsync(existingSchedule);
+            await _repository.SaveChangesAsync();
+
+            return existingSchedule;
         }
     }
 }

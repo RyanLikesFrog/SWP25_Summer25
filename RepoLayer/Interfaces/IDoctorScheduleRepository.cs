@@ -16,7 +16,7 @@ namespace RepoLayer.Interfaces
         public Task<DoctorSchedule?> CreateDoctorScheduleAsync(DoctorSchedule doctorSchedule);
         public Task<DoctorSchedule?> GetDoctorScheduleByAppointmentIdAsync(Guid? appointmentId);
         public Task<List<DoctorSchedule?>> GetTodayDoctorSchedulesByDoctorIdAsync(Guid doctorId);
-        public Task UpdateDoctorSchedule(DoctorSchedule doctorSchedule);
+        public Task<DoctorSchedule?> UpdateDoctorScheduleAsync(DoctorSchedule doctorSchedule);
 
     }
 }

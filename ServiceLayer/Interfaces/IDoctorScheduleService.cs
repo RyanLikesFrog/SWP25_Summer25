@@ -1,5 +1,6 @@
 ﻿using DataLayer.Entities;
 using ServiceLayer.DTOs;
+using ServiceLayer.DTOs.User.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace ServiceLayer.Interfaces
         public Task<(List<DoctorSchedule?> schedules, string Message)> ViewDoctorScheduleAsync(Guid doctorId);
         public Task<DoctorScheduleDetailResponse> CreateDoctorScheduleAsync(CreateDoctorScheduleRequest request);
         public Task<List<DoctorSchedule?>> GetTodayDoctorScheduleByDoctorIdAsync(Guid doctorId);
+        public Task<DoctorSchedule?> UpdateDoctorScheduleAsync(UpdateDoctorScheduleRequest request);
 
 
     }

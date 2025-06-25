@@ -35,5 +35,10 @@ namespace RepoLayer.Implements
             return await _context.MedicalRecords
                 .FirstOrDefaultAsync(mr => mr.Id == medicalRecordId);
         }
+        public async Task<MedicalRecord?> UpdateMedicalRecordAsync(MedicalRecord medicalRecord)
+        {
+            _context.MedicalRecords.Update(medicalRecord);
+            return await Task.FromResult(medicalRecord);
+        }
     }
 }

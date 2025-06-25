@@ -68,10 +68,10 @@ namespace RepoLayer.Implements
                 .Where(ds => ds.DoctorId == doctorId && (ds.StartTime >= today && ds.StartTime <= today.AddHours(24)))
                 .ToListAsync();
         }
-        public Task UpdateDoctorSchedule(DoctorSchedule doctorSchedule)
+
+        public async Task<DoctorSchedule?> UpdateDoctorScheduleAsync(DoctorSchedule doctorSchedule)
         {
-            _context.Update(doctorSchedule);
-            return Task.CompletedTask;
+            return await Task.FromResult(_context.DoctorSchedules.Update(doctorSchedule).Entity);
         }
     }
 }

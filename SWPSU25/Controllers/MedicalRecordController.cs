@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ServiceLayer.Implements;
+using ServiceLayer.DTOs;
+using ServiceLayer.DTOs.User.Request;
 using ServiceLayer.Interfaces;
 
 namespace SWPSU25.Controllers
@@ -11,20 +12,20 @@ namespace SWPSU25.Controllers
     {
         private readonly IMedicalRecordService _medicalRecordService;
 
-        public MedicalRecordController(IMedicalRecordService medicalRecord)
+        public MedicalRecordController(IMedicalRecordService medicalRecordService)
         {
-            _medicalRecordService = medicalRecord;
+            _medicalRecordService = medicalRecordService;
         }
 
         [HttpGet("get-by-id")]
-        public async Task<IActionResult> GetMedicalRecordById(Guid medicalRecordId)
+        public async Task<IActionResult> GetMedicalRecordById([FromQuery] Guid medicalRecordId)
         {
-            var user = await _medicalRecordService.GetMedicalRecordByIdAsync(medicalRecordId);
-            if (user == null)
+            var record = await _medicalRecordService.GetMedicalRecordByIdAsync(medicalRecordId);
+            if (record == null)
             {
-                return NotFound(new { Message = $"Hồ sơ bệnh án với ID {medicalRecordId} không tìm thấy." });
+                return NotFound(new { Message = $"Medical record with ID {medicalRecordId} not found." });
             }
-            return Ok(user);
+            return Ok(record);
         }
 
         [HttpGet("get-list-medical-record")]
@@ -32,6 +33,52 @@ namespace SWPSU25.Controllers
         {
             var medicalRecords = await _medicalRecordService.GetAllMedicalRecordsAsync();
             return Ok(medicalRecords);
+        }
+
+        [HttpPost("create-medical-record")]
+        public async Task<IActionResult> CreateMedicalRecord([FromForm] CreateMedicalRecordRequest request)
+        {
+            try
+            {
+                var result = await _medicalRecordService.CreateMedicalRecordAsync(request);
+                if (result == null)
+                {
+                    return BadRequest("Failed to create medical record.");
+                }
+
+                return CreatedAtAction(nameof(GetMedicalRecordById), new { id = result.Id }, result);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpPut("update-medical-record")]
+        public async Task<IActionResult> UpdateMedicalRecord([FromForm] UpdateMedicalRecord request)
+        {
+            try
+            {
+                var updatedRecord = await _medicalRecordService.UpdateMedicalRecordAsync(request);
+                if (updatedRecord == null)
+                {
+                    return NotFound($"Medical record with ID {request.MedicalRecordId} not found.");
+                }
+
+                return Ok(updatedRecord);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
     }
 }

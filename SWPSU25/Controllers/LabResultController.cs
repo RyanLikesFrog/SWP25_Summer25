@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.DTOs;
+using ServiceLayer.DTOs.LabResult.Request;
 using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
 
@@ -42,6 +43,19 @@ namespace SWPSU25.Controllers
             {
                 var result = await _labResultService.CreateLabResultAsync(request);
                 return CreatedAtAction(nameof(GetLabResultById), new { labResultId = result.Id }, result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+        [HttpPut("update-lab-result")]
+        public async Task<IActionResult> UpdateLabResult([FromForm] UpdateLabResultRequest request)
+        {
+            try
+            {
+                var updated = await _labResultService.UpdateLabResultAsync(request);
+                return Ok(updated);
             }
             catch (ArgumentException ex)
             {

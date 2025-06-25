@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ServiceLayer.DTOs
 {
     public class MedicalRecordDetailResponse
     {
+        // --- Medical Record ---
         public Guid Id { get; set; }
 
         public Guid? PatientId { get; set; }
@@ -18,11 +20,8 @@ namespace ServiceLayer.DTOs
         public DateTime ExaminationDate { get; set; }
 
         public string? Diagnosis { get; set; }
-
         public string? Symptoms { get; set; }
-
         public string? Prescription { get; set; }
-
         public string? Notes { get; set; }
     }
 }

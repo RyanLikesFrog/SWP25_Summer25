@@ -37,5 +37,11 @@ namespace RepoLayer.Implements
                 .Include(lr => lr.LabPictures)
                 .FirstOrDefaultAsync(lr => lr.Id == labResultId);
         }
+
+        public async Task<LabResult?> UpdateLabResultAsync(LabResult labResult)
+        {
+            _context.LabResults.Update(labResult);
+            return await Task.FromResult(labResult);
+        }
     }
 }

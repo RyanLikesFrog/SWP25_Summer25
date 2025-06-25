@@ -12,5 +12,6 @@ namespace RepoLayer.Interfaces
         public Task<MedicalRecord?> GetMedicalRecordByIdAsync(Guid medicalRecordId);
         public Task<List<MedicalRecord?>> GetAllMedicalRecordsAsync();
         public Task<MedicalRecord?> CreateMedicalRecordAsync(MedicalRecord medicalRecord);
+        public Task<MedicalRecord?> UpdateMedicalRecordAsync(MedicalRecord medicalRecord);
     }
 }

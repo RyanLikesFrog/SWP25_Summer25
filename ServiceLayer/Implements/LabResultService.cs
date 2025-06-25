@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using RepoLayer.Implements;
 using RepoLayer.Interfaces;
 using ServiceLayer.DTOs;
+using ServiceLayer.DTOs.LabResult.Request;
+using ServiceLayer.DTOs.User.Request;
 using ServiceLayer.Interfaces;
 using ServiceLayer.Validator;
 using System;
@@ -22,6 +24,7 @@ namespace ServiceLayer.Implements
         private readonly IRepository _repository;
         private readonly ITreatmentStageRepository _treatmentStageRepository;
         private readonly IConfiguration _config;
+        private readonly ILabPictureRepository _labPictureRepository;
 
         public LabResultService
             (
@@ -83,9 +86,9 @@ namespace ServiceLayer.Implements
             };
 
             var listpic = new List<LabPicture>();
-            if (request.LabPictures != null && request.LabPictures.Count > 0)
+            if (request.LabResultPictures != null && request.LabResultPictures.Length > 0)
             {
-                foreach (var labPic in request.LabPictures)
+                foreach (var labPic in request.LabResultPictures)
                 {
                     if (labPic.FileName.HasImageExtension())
                     {
@@ -132,14 +135,14 @@ namespace ServiceLayer.Implements
             return new LabResultDetailResponse
             {
                 Id = newLabResult.Id,
-                PatientId = newLabResult.PatientId,
+                PatientId = newLabResult.PatientId.Value,
+                DoctorId = newLabResult.DoctorId.Value,
                 TreatmentStageId = newLabResult.TreatmentStageId,
                 TestType = newLabResult.TestType,
                 TestDate = newLabResult.TestDate,
                 ResultSummary = newLabResult.ResultSummary,
                 Notes = newLabResult.Notes,
                 Conclusion = newLabResult.Conclusion,
-                DoctorId = newLabResult.DoctorId,
                 TestName = newLabResult.TestName
             };
         }
@@ -153,5 +156,102 @@ namespace ServiceLayer.Implements
         {
             return await _labResultRepository.GetLabResultByIdAsync(labResultId);
         }
+
+        public async Task<LabResultDetailResponse> UpdateLabResultAsync(UpdateLabResultRequest request)
+        {
+            // Step 1: Get existing LabResult
+            var labResult = await _labResultRepository.GetLabResultByIdAsync(request.LabResultId);
+            if (labResult == null)
+                throw new ArgumentException($"❌ LabResult with ID {request.LabResultId} not found.");
+
+            // Step 2: Validate foreign keys
+            var patient = await _patientRepository.GetPatientByIdAsync(request.PatientId);
+            if (patient == null)
+                throw new ArgumentException($"❌ Patient with ID {request.PatientId} not found.");
+
+            var doctor = await _doctorRepository.GetDoctorByIdAsync(request.DoctorId);
+            if (doctor == null)
+                throw new ArgumentException($"❌ Doctor with ID {request.DoctorId} not found.");
+
+            if (request.TreatmentStageId.HasValue)
+            {
+                var stage = await _treatmentStageRepository.GetTreatmentStageByIdAsync(request.TreatmentStageId.Value);
+                if (stage == null)
+                    throw new ArgumentException($"❌ TreatmentStage with ID {request.TreatmentStageId.Value} not found.");
+            }
+
+            // Step 3: Update LabResult fields
+            labResult.PatientId = request.PatientId;
+            labResult.DoctorId = request.DoctorId;
+            labResult.TreatmentStageId = request.TreatmentStageId;
+            labResult.TestName = request.TestName?.Trim();
+            labResult.TestType = request.TestType?.Trim();
+            labResult.TestDate = request.TestDate;
+            labResult.ResultSummary = request.ResultSummary?.Trim();
+            labResult.Conclusion = request.Conclusion?.Trim();
+            labResult.Notes = request.Notes?.Trim();
+
+            // Step 4: Upload new lab pictures if provided
+            if (request.LabResultPictures != null && request.LabResultPictures.Count > 0)
+            {
+                string firebaseBucket = _config["Firebase:StorageBucket"];
+                var firebaseStorage = new FirebaseStorage(firebaseBucket);
+
+                for (int i = 0; i < request.LabResultPictures.Count; i++)
+                {
+                    var file = request.LabResultPictures[i];
+                    if (file != null && file.FileName.HasImageExtension())
+                    {
+                        string uniqueFileName = $"{Guid.NewGuid()}_{file.FileName}";
+                        var fileRef = firebaseStorage.Child("LabResults").Child(uniqueFileName);
+
+                        using (var stream = file.OpenReadStream())
+                        {
+                            await fileRef.PutAsync(stream);
+                        }
+
+                        string downloadUrl = await fileRef.GetDownloadUrlAsync();
+
+                        var labPicture = new LabPicture
+                        {
+                            Id = Guid.NewGuid(),
+                            LabResultId = labResult.Id,
+                            LabPictureName = request.LabPictureNames?.ElementAtOrDefault(i) ?? file.FileName,
+                            LabPictureUrl = downloadUrl,
+                            isActive = request.LabPictureIsActiveFlags?.ElementAtOrDefault(i) ?? true
+                        };
+
+                        labResult.LabPictures.Add(labPicture);
+                        await _labPictureRepository.AddLabPictureAsync(labPicture);
+                    }
+                    else
+                    {
+                        throw new Exception($"❌ Unsupported or missing file: {file?.FileName ?? "null"}");
+                    }
+                }
+            }
+
+            // Step 5: Save changes
+            await _labResultRepository.UpdateLabResultAsync(labResult);
+            await _repository.SaveChangesAsync();
+
+            // Step 6: Return detailed response
+            return new LabResultDetailResponse
+            {
+                Id = labResult.Id,
+                PatientId = labResult.PatientId.Value,
+                DoctorId = labResult.DoctorId.Value,
+                TreatmentStageId = labResult.TreatmentStageId,
+                TestName = labResult.TestName,
+                TestType = labResult.TestType,
+                TestDate = labResult.TestDate,
+                ResultSummary = labResult.ResultSummary,
+                Conclusion = labResult.Conclusion,
+                Notes = labResult.Notes,
+                LabPictures = labResult.LabPictures.ToList()
+            };
+        }
+
+
     }
 }

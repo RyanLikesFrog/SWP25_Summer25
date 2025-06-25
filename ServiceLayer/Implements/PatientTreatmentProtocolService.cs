@@ -91,7 +91,7 @@ namespace ServiceLayer.Implements
                 throw new ArgumentException("Doctor schedule not found for the provided Appointment ID");
             }
             doctorSchedule.IsAvailable = false;
-            await _doctorScheduleRepository.UpdateDoctorSchedule(doctorSchedule);
+            await _doctorScheduleRepository.UpdateDoctorScheduleAsync(doctorSchedule);
 
             await _patientTreatmentProtocolRepository.CreatePatientTreatmentProtocol(newPatientTreatmentProtocol);
             await _repository.SaveChangesAsync();
