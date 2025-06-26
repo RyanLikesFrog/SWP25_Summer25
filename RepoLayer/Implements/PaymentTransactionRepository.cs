@@ -27,6 +27,7 @@ namespace RepoLayer.Implements
             // Sử dụng FirstOrDefaultAsync để lấy một bản ghi duy nhất hoặc null nếu không tìm thấy
             // Bao gồm (Include) Appointment nếu bạn muốn truy cập nó ngay sau khi lấy transaction
             return await _context.PaymentTransactions
+                                 .Include(x => x.Appointment) // Bao gồm Appointment nếu cần
                                  .FirstOrDefaultAsync(t => t.TransactionCode == transactionCode);
         }
     }

@@ -35,6 +35,7 @@ namespace RepoLayer.Implements
         {
             return await _Context.TreatmentStages
                                 .Include(u => u.LabResults)
+                                .Include(u => u.PatientTreatmentProtocol)
                                 .FirstOrDefaultAsync(u => u.Id == treatmentStageId);
         }
     }
