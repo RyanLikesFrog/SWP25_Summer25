@@ -49,7 +49,7 @@ namespace RepoLayer.Implements
             return await _context.Appointments
                 .Where(a => a.DoctorId == doctorId)
                 .Include(a => a.PaymentTransaction)
-                .ToListAsync();
+                .ToListAsync(); 
         }
     }
 }
