@@ -36,11 +36,11 @@ namespace RepoLayer.Implements
         {
             if (endDate != null)
             {
-                return _context.DoctorSchedules.Where(x => x.DoctorId == doctorId && (x.StartTime >= startDate && x.StartTime <= endDate)).FirstOrDefaultAsync();
+                return _context.DoctorSchedules.Include(x => x.Appointment).Where(x => x.DoctorId == doctorId && (x.StartTime >= startDate && x.StartTime <= endDate) && x.Appointment.PaymentStatus == DataLayer.Enum.PaymentStatus.Paid).FirstOrDefaultAsync();
             }
             else
             {
-                return _context.DoctorSchedules.Where(x => x.DoctorId == doctorId && x.StartTime >= startDate && x.StartTime <= startDate.AddHours(1)).FirstOrDefaultAsync();
+                return _context.DoctorSchedules.Include(x => x.Appointment).Where(x => x.DoctorId == doctorId && x.StartTime >= startDate && x.StartTime <= startDate.AddHours(1) && x.Appointment.PaymentStatus == DataLayer.Enum.PaymentStatus.Paid).FirstOrDefaultAsync();
             }
         }
         public async Task<DoctorSchedule?> CreateDoctorScheduleAsync(DoctorSchedule doctorSchedule)
