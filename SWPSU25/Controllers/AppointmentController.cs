@@ -41,75 +41,25 @@ namespace SWPSU25.Controllers
             return Ok(user);
         }
 
-        [HttpGet("get-list-appointment")]
-        public async Task<IActionResult> GetListAppointment()
+        [HttpGet("get-list-appointments")]
+        public async Task<IActionResult> GetListAppointments()
         {
             var appointments = await _appointmentService.GetAllAppointmentsAsync();
             return Ok(appointments);
         }
 
-        //[HttpPost("patient-create-appointment")]
-        //public async Task<IActionResult> RegisterAppointment(Guid patientId, [FromBody] UserCreateAppointmentRequest request)
-        //{
-        //    if (patientId != request.PatientId)
-        //    {
-        //        return BadRequest("Patient ID in URL does not match Patient ID in request body.");
-        //    }
+        [HttpGet("get-paid-appointments")]
+        public async Task<IActionResult> GetPaidAppointments()
+        {
+            var appointments = await _appointmentService.GetAllAppointmentsAsync();
 
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
+            var paidAppointments = appointments
+                .Where(static a => a.PaymentStatus == PaymentStatus.Paid) 
+                .ToList();
 
-        //    try
-        //    {
-        //        var response = await _appointmentService.RegisterAppointmentAsync(request);
-        //        return Ok(response);
-        //    }
-        //    catch (ArgumentException ex)
-        //    {
-        //        // Patient not found or Doctor not found
-        //        return NotFound(new { message = ex.Message });
-        //    }
-        //    catch (InvalidOperationException ex)
-        //    {
-        //        // Doctor not available or other business logic errors
-        //        return BadRequest(new { message = ex.Message });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log exception
-        //        return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while registering the appointment.", error = ex.Message });
-        //    }
-        //}
-        //[HttpPost("staff-manages-appointment")]
-        //public async Task<IActionResult> StaffManagesAppointment([FromBody] StaffManageAppointmentRequest request)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-        //    try
-        //    {
-        //        var response = await _appointmentService.StaffUpdateAppointmentAsync(request);
-        //        return Ok(response);
-        //    }
-        //    catch (ArgumentException ex)
-        //    {
-        //        // Patient not found or Doctor not found
-        //        return NotFound(new { message = ex.Message });
-        //    }
-        //    catch (InvalidOperationException ex)
-        //    {
-        //        // Doctor not available or other business logic errors
-        //        return BadRequest(new { message = ex.Message });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log exception
-        //        return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while registering the appointment.", error = ex.Message });
-        //    }
-        //}
+            return Ok(paidAppointments);
+        }
+
 
         [HttpGet("doctor-get-appointments")]
         public async Task<IActionResult> ViewAppointments([FromQuery] Guid doctorId)
@@ -123,7 +73,7 @@ namespace SWPSU25.Controllers
 
             return Ok(new { Message = message, Appointments = appointments });
         }
-        
+
         /// <summary>
         /// Tạo một cuộc hẹn mới và khởi tạo quá trình thanh toán Momo.
         /// </summary>
