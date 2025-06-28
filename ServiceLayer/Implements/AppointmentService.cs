@@ -390,5 +390,12 @@ namespace ServiceLayer.Implements
             return (appointments, "Tim lich hen thanh cong.");
         }
 
+        public async Task<List<Appointment>>? GetPaidAppointmentsAsync()
+        {
+            var appointments = await GetAllAppointmentsAsync();
+            return appointments
+                .Where(a => a.PaymentStatus == PaymentStatus.Paid)
+                .ToList();
+        }
     }
 }

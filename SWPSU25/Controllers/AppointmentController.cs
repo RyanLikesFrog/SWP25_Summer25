@@ -51,15 +51,9 @@ namespace SWPSU25.Controllers
         [HttpGet("get-paid-appointments")]
         public async Task<IActionResult> GetPaidAppointments()
         {
-            var appointments = await _appointmentService.GetAllAppointmentsAsync();
-
-            var paidAppointments = appointments
-                .Where(static a => a.PaymentStatus == PaymentStatus.Paid) 
-                .ToList();
-
+            var paidAppointments = await _appointmentService.GetPaidAppointmentsAsync();
             return Ok(paidAppointments);
         }
-
 
         [HttpGet("doctor-get-appointments")]
         public async Task<IActionResult> ViewAppointments([FromQuery] Guid doctorId)
