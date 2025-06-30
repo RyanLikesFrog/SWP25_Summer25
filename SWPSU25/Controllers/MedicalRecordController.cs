@@ -35,29 +35,6 @@ namespace SWPSU25.Controllers
             return Ok(medicalRecords);
         }
 
-        [HttpPost("create-medical-record")]
-        public async Task<IActionResult> CreateMedicalRecord([FromForm] CreateMedicalRecordRequest request)
-        {
-            try
-            {
-                var result = await _medicalRecordService.CreateMedicalRecordAsync(request);
-                if (result == null)
-                {
-                    return BadRequest("Failed to create medical record.");
-                }
-
-                return CreatedAtAction(nameof(GetMedicalRecordById), new { id = result.Id }, result);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
-        }
-
         [HttpPut("update-medical-record")]
         public async Task<IActionResult> UpdateMedicalRecord([FromForm] UpdateMedicalRecord request)
         {
