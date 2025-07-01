@@ -397,5 +397,22 @@ namespace ServiceLayer.Implements
                 .Where(a => a.PaymentStatus == PaymentStatus.Paid)
                 .ToList();
         }
+
+        public async Task<Appointment?> UpdateAppointmentAsync(UpdateAppointmentRequest request)
+        {
+            var appointment = await _appointmentRepository.GetAppointmentByIdAsync(request.AppointmentId);
+
+            if (appointment == null)
+            {
+                throw new ArgumentException($"Không tìm thấy Appointment với ID {request.AppointmentId}.");
+            }
+
+            appointment.OnlineLink = request.OnlineLink;
+
+            await _appointmentRepository.UpdateAppointmentAsync(appointment);
+            await _repository.SaveChangesAsync();
+
+            return appointment;
+        }
     }
 }

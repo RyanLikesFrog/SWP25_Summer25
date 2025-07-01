@@ -20,6 +20,7 @@ namespace ServiceLayer.Interfaces
         public Task<List<Appointment>>? GetPaidAppointmentsAsync();
         public Task<(List<Appointment?> appointments, string Message)> ViewAppointmentAsync(Guid doctorId);
         public Task<AppointmentDetailResponse> CreateAppointmentAndInitiatePaymentAsyncV2(UserCreateAppointmentRequest request);
+        public Task<Appointment?> UpdateAppointmentAsync(UpdateAppointmentRequest request);
         public Task UpdatePaymentStatusAsync(
             string orderId, // Đây là TransactionCode nội bộ của bạn
             PaymentTransactionStatus transactionStatus,

@@ -38,18 +38,18 @@ namespace RepoLayer.Implements
                 .FirstOrDefaultAsync(a => a.Id == appointmentId);
         }
 
-        public Task UpdateAppointmentAsync(Appointment appointment)
-        {
-            _context.Appointments.Update(appointment);
-            return Task.CompletedTask;
-        }
-
         public async Task<List<Appointment?>> GetAppointmentsByDoctorIdAsync(Guid doctorId)
         {
             return await _context.Appointments
                 .Where(a => a.DoctorId == doctorId)
                 .Include(a => a.PaymentTransaction)
                 .ToListAsync(); 
+        }
+
+        public async Task<Appointment?> UpdateAppointmentAsync(Appointment appointment)
+        {
+            _context.Appointments.Update(appointment);
+            return appointment;
         }
     }
 }

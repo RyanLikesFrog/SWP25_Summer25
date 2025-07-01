@@ -221,5 +221,39 @@ namespace SWPSU25.Controllers
                 return Ok(new { status = "error", message = $"Internal server error: {ex.Message}" });
             }
         }
+        [HttpPut("update-appointment-online-link")]
+        public async Task<IActionResult> UpdateOnlineLink([FromBody] UpdateAppointmentRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var updatedAppointment = await _appointmentService.UpdateAppointmentAsync(request);
+
+                if (updatedAppointment == null)
+                {
+                    return NotFound($"Không tìm thấy Appointment với ID {request.AppointmentId}.");
+                }
+
+                return Ok(new
+                {
+                    Message = "Cập nhật OnlineLink thành công.",
+                    Data = updatedAppointment
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần
+                return StatusCode(500, "Đã xảy ra lỗi khi cập nhật lịch hẹn.");
+            }
+        }
+
     }
 }

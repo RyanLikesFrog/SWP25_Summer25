@@ -10,6 +10,6 @@ namespace DataLayer.Enum
     {
         Male,
         Female,
-        Other //LGBT dogshit
+        Other 
     }
 }
