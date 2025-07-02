@@ -46,11 +46,10 @@ namespace ServiceLayer.Implements
             var patient = await _patientRepository.GetPatientByIdAsync(request.PatientId);
             if (patient == null)
             {
-                return (false, $"Người dùng với ID {patient.UserId} không tìm thấy.", null);
+                return (false, $"Người dùng với ID {request.PatientId} không tìm thấy.", null);
             }
 
             // --- Cập nhật thông tin User ---
-         
             if (!string.IsNullOrEmpty(request.Email))
             {
                 var existingUserWithEmail = await _userRepository.GetUserByEmailAsync(request.Email);
@@ -66,7 +65,7 @@ namespace ServiceLayer.Implements
                 patient.User.PhoneNumber = request.PhoneNumber;
             }
 
-            // Update avatar moi 
+            // Update avatar moi
             if (request.AvatarPicture != null && request.AvatarPicture.Length > 0)
             {
                 if (request.AvatarPicture.FileName.HasImageExtension())
@@ -97,11 +96,14 @@ namespace ServiceLayer.Implements
                     throw new Exception("Not support file type" + nameof(request.AvatarPicture.FileName).ToString());
                 }
             }
-            patient.FullName = request.FullName;
 
-            
-            
-            // Không làm gì nếu không phải Doctor và không chuyển sang Doctor
+            // --- Cập nhật thông tin Patient và User liên quan ---
+            patient.FullName = request.FullName;
+            patient.DateOfBirth = request.DateOfBirth; 
+            patient.Gender = request.Gender;           
+            patient.Address = request.Address;         
+            patient.ContactPersonName = request.ContactPersonName;
+            patient.ContactPersonPhone = request.ContactPersonPhone;
 
             patient.User.UpdatedAt = DateTime.UtcNow;
 

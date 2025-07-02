@@ -23,7 +23,6 @@ namespace DataLayer.Entities
         [ForeignKey("PatientTreatmentProtocol")]
         public Guid? PatientTreatmentProtocolId { get; set; }
         public virtual PatientTreatmentProtocol? PatientTreatmentProtocol { get; set; } // Navigation property
-
         [Required]
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; } // Nullable nếu đang điều trị

@@ -1,5 +1,6 @@
 ﻿using DataLayer.Entities;
 using ServiceLayer.DTOs;
+using ServiceLayer.DTOs.User.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,6 @@ namespace ServiceLayer.Interfaces
         public Task<TreatmentStage?> GetTreatmentStagebyIdAsync(Guid treatmentStageId);
         public Task<List<TreatmentStage?>> GetAllTreatmentStagesAsync();
         public Task<TreatmentStageDetailResponse?> CreateTreatmentStageAsync(CreateTreatmentStageRequest request);
+        public Task<TreatmentStage?> UpdateTreatmentStageAsync(UpdateTreatmentStateMedicineRequest request);
     }
 }

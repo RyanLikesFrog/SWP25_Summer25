@@ -1,6 +1,8 @@
 ﻿using DataLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using RepoLayer.Interfaces;
 using ServiceLayer.DTOs;
+using ServiceLayer.DTOs.User.Request;
 using ServiceLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -91,6 +93,27 @@ namespace ServiceLayer.Implements
         public async Task<TreatmentStage?> GetTreatmentStagebyIdAsync(Guid treatmentStageId)
         {
             return await _treatmentStageRepository.GetTreatmentStageByIdAsync(treatmentStageId);
+        }
+
+        public async Task<TreatmentStage?> UpdateTreatmentStageAsync(UpdateTreatmentStateMedicineRequest request)
+        {
+            var treatmentStage = await _treatmentStageRepository.GetTreatmentStageByIdAsync(request.Id);
+
+            if (treatmentStage == null)
+            {
+                throw new ArgumentException($"Không tìm thấy TreatmentStage với ID: {request.Id}");
+            }
+
+            // ✅ Update medicine info (only if you have such a field)
+            if (!string.IsNullOrWhiteSpace(request.Medicine))
+            {
+                treatmentStage.Medicine = request.Medicine;
+            }
+
+            await _treatmentStageRepository.UpdateTreatmentStageAsync(treatmentStage);
+            await _repository.SaveChangesAsync();
+
+            return treatmentStage;
         }
     }
 }
