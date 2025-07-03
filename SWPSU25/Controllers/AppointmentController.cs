@@ -221,6 +221,13 @@ namespace SWPSU25.Controllers
                 return Ok(new { status = "error", message = $"Internal server error: {ex.Message}" });
             }
         }
+
+        [HttpGet("favicon.ico")]
+        public IActionResult Favicon()
+        {
+            return NoContent(); // Trả về HTTP 204 No Content
+        }
+
         [HttpPut("update-appointment-online-link")]
         public async Task<IActionResult> UpdateOnlineLink([FromBody] UpdateAppointmentRequest request)
         {

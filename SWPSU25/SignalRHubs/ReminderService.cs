@@ -143,7 +143,7 @@ namespace ServiceLayer.Implements.Reminder
                 })
                 .ToListAsync();
 
-            // Bạn có thể thêm logic kiểm tra xem reminder đã được gửi cho ngày này chưa
+            // Có thể thêm logic kiểm tra xem reminder đã được gửi cho ngày này chưa
             // Hiện tại, tôi sẽ giả định rằng chúng ta gửi một lần vào ngày trước đó.
             // Để tránh gửi trùng, bạn cần thêm một trường LastAppointmentReminderSentDate vào Appointment entity
             // và kiểm tra nó ở đây.
