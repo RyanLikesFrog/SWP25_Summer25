@@ -62,113 +62,6 @@ namespace ServiceLayer.Implements
             return await _appointmentRepository.GetAppointmentByIdAsync(appointmentId);
         }
 
-        //public async Task<AppointmentDetailResponse> RegisterAppointmentAsync(UserCreateAppointmentRequest request)
-        //{
-        //    // Sử dụng các Repository để lấy dữ liệu
-        //    var patient = await _patientRepository.GetPatientByIdAsync(request.PatientId);
-        //    if (patient == null)
-        //    {
-        //        throw new ArgumentException("Patient not found with the provided Patient ID.");
-        //    }
-
-        //    if (request.DoctorId.HasValue)
-        //    {
-        //        var doctor = await _doctorRepository.GetDoctorByIdAsync(request.DoctorId.Value);
-        //        if(doctor == null)
-        //        {
-        //            throw new ArgumentException("Doctor not found with the provided Doctor ID");
-        //        }
-        //    }
-
-        //    // Tạo Entity
-        //    var newAppointment = new Appointment
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        PatientId = request.PatientId,
-        //        DoctorId = request.DoctorId, // Có thể null nếu không có bác sĩ
-        //        AppointmentTitle = request.ApointmentTitle,
-        //        AppointmentStartDate = request.AppointmentStartDate,
-        //        AppointmentType = request.AppointmentType,
-        //        Status = AppointmentStatus.Pending,
-        //        Notes = request.Notes,
-        //        IsAnonymousAppointment = request.IsAnonymousAppointment,
-        //    };
-        //    await _appointmentRepository.CreateAppointmentAsync(newAppointment);
-        //    await _repository.SaveChangesAsync();
-        //    // Map Entity sang DTO
-        //    return new AppointmentDetailResponse
-        //    {
-        //        Id = newAppointment.Id,
-        //        PatientId = newAppointment.PatientId.Value,
-        //        PatientFullName = patient.FullName,
-        //        AppointmentStartDate = newAppointment.AppointmentStartDate,
-        //        AppointmentType = newAppointment.AppointmentType,
-        //        Status = newAppointment.Status,
-        //        Notes = newAppointment.Notes,
-        //        IsAnonymousAppointment = newAppointment.IsAnonymousAppointment,
-        //        ApointmentTitle = newAppointment.AppointmentTitle
-        //    };
-        //}
-
-        //public async Task<AppointmentDetailResponse> StaffUpdateAppointmentAsync(StaffManageAppointmentRequest request)
-        //{
-        //    var appointment = await _appointmentRepository.GetAppointmentByIdAsync(request.AppointmentId);
-        //    if (appointment == null)
-        //    {
-        //        throw new ArgumentException("Appointment not found.");
-        //    }
-        //    // Cập nhật thông tin cuộc hẹn
-        //    appointment.Status = request.NewStatus;
-        //    appointment.AppointmentType = request.AppointmentType;
-        //    appointment.DoctorId = request.DoctorId;
-        //    appointment.AppointmentStartDate = request.AppointmentStartDate;
-        //    appointment.AppointmentEndDate = request.AppointmentEndDate;
-        //    appointment.AppointmentTitle = request.AppointmentTitle;
-        //    appointment.Notes = request.Notes;
-        //    appointment.OnlineLink = request.OnlineLink;
-        //    // Lưu thay đổi
-        //    await _appointmentRepository.UpdateAppointmentAsync(appointment);
-
-        //    // Nếu có thay đổi về bác sĩ, cần cập nhật schedule cho bác sĩ
-        //    var dupDoctorSchedule = await _doctorScheduleRepository.GetDuplicatedDoctorScheduleByStartDateEndDateAsync(appointment.DoctorId, appointment.AppointmentStartDate, appointment.AppointmentEndDate);
-        //    if (dupDoctorSchedule != null)
-        //    {
-        //        throw new ArgumentException("Duplicated schedule");
-        //    }
-        //    else
-        //    {
-        //        var doctorSchedule = new DoctorSchedule
-        //        {
-        //            Id = Guid.NewGuid(),
-        //            AppointmentId = appointment.Id,
-        //            DoctorId = appointment.DoctorId.Value,
-        //            StartTime = request.AppointmentStartDate,
-        //            EndTime = request.AppointmentEndDate.Value,
-        //            IsAvailable = true,
-        //        };
-        //        await _doctorScheduleRepository.CreateDoctorScheduleAsync(doctorSchedule);
-        //    }
-
-        //    await _repository.SaveChangesAsync();
-        //    return new AppointmentDetailResponse
-        //    {
-        //        Id = appointment.Id,
-        //        PatientId = appointment.PatientId.Value,
-        //        DoctorId = appointment.DoctorId,
-        //        PatientFullName = appointment.Patient?.FullName, // Lấy tên bệnh nhân nếu có
-        //        //DoctorFullName = appointment.Doctor?.FullName, // Lấy tên bác sĩ nếu có
-        //        AppointmentStartDate = appointment.AppointmentStartDate,
-        //        AppointmentEndDate = appointment.AppointmentEndDate,
-        //        AppointmentType = appointment.AppointmentType,
-        //        Status = appointment.Status,
-        //        Notes = appointment.Notes,
-        //        IsAnonymousAppointment = appointment.IsAnonymousAppointment,
-        //        OnlineLink = appointment.OnlineLink,
-        //        ApointmentTitle = appointment.AppointmentTitle
-        //    };
-        //}
-
-
         public async Task<AppointmentDetailResponse> CreateAppointmentAndInitiatePaymentAsyncV2(UserCreateAppointmentRequest request)
         {
 
@@ -413,6 +306,57 @@ namespace ServiceLayer.Implements
             await _repository.SaveChangesAsync();
 
             return appointment;
+        }
+
+        public async Task<Appointment> ReArrangeDateAppointmentAsync(UpdateReArrangeDateAppointmentRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "Yêu cầu dời lịch không được để trống.");
+            }
+
+            var existingAppointment = await _appointmentRepository.GetAppointmentByIdAsync(request.Id);
+
+            if (existingAppointment == null)
+            {
+                throw new ArgumentException($"Không tìm thấy lịch hẹn với ID {request.Id}.");
+            }
+
+            if (request.NewAppointmentStartDate < DateTime.UtcNow)
+            {
+                throw new InvalidOperationException("Không thể dời lịch hẹn sang thời gian đã qua.");
+            }
+
+            if (request.NewAppointmentEndDate.HasValue && request.NewAppointmentEndDate < request.NewAppointmentStartDate)
+            {
+                throw new InvalidOperationException("Ngày kết thúc cuộc hẹn không thể trước ngày bắt đầu.");
+            }
+
+            bool isTimeSlotAvailable = await _appointmentRepository.IsTimeSlotAvailableAsync(
+                existingAppointment.DoctorId,
+                request.NewAppointmentStartDate,
+                request.NewAppointmentEndDate,
+                request.Id
+            );
+
+            if (!isTimeSlotAvailable)
+            {
+                throw new InvalidOperationException("Khung thời gian đã chọn không khả dụng hoặc trùng với lịch hẹn khác.");
+            }
+
+            existingAppointment.AppointmentStartDate = request.NewAppointmentStartDate;
+            existingAppointment.AppointmentEndDate = request.NewAppointmentEndDate;
+
+            existingAppointment.Status = AppointmentStatus.ReArranged;
+
+            try
+            {
+                return await _appointmentRepository.ReArrangeDateAppointmentAsync(existingAppointment);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Đã xảy ra lỗi khi dời lịch hẹn với ID {request.Id}.", ex);
+            }
         }
     }
 }

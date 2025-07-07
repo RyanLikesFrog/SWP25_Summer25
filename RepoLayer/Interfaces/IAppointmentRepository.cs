@@ -14,6 +14,8 @@ namespace RepoLayer.Interfaces
         public Task CreateAppointmentAsync(Appointment appointment);
         public Task<Appointment?> UpdateAppointmentAsync(Appointment appointment);
         public Task<List<Appointment?>> GetAppointmentsByDoctorIdAsync(Guid doctorId);
+        public Task<Appointment?> ReArrangeDateAppointmentAsync (Appointment appointment);
+        public Task<bool> IsTimeSlotAvailableAsync(Guid? doctorId, DateTime startDate, DateTime? endDate, Guid excludeAppointmentId);
 
     }
 }   
