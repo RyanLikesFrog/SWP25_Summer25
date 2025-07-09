@@ -44,5 +44,6 @@ namespace DataLayer.Entities
         public virtual ICollection<MedicalRecord>? MedicalRecords { get; set; }
         public virtual ICollection<LabResult>? LabResults { get; set; }
         public virtual ICollection<PatientTreatmentProtocol>? PatientTreatmentProtocols { get; set; }
+        public virtual ICollection<Notification> Notifications { get; set; }
     }
 }

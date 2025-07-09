@@ -45,5 +45,6 @@ namespace DataLayer.Entities
         // **ĐIỂM SỬA ĐỔI: Mối quan hệ một-một với PaymentTransaction**
         public Guid? PaymentTransactionId { get; set; } // Khóa ngoại tới PaymentTransaction
         public PaymentTransaction? PaymentTransaction { get; set; } // Thuộc tính điều hướng
+        public virtual ICollection<Notification> Notifications { get; set; }
     }
 }

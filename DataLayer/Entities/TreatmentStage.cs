@@ -30,6 +30,7 @@ namespace DataLayer.Entities
         public PatientTreatmentStatus Status { get; set; } // Sử dụng Enum cho trạng thái phác đồ\
         public string? Medicine { get; set; } // Danh sách thuốc, có thể là JSON hoặc chuỗi phân tách bằng dấu phẩy
         public ICollection<LabResult>? LabResults { get; set; }
+        public virtual ICollection<Notification> Notifications { get; set; }
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DataLayer.DbContext;
+using DataLayer.Entities;
 using DataLayer.Enum;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -47,8 +48,11 @@ namespace SWPSU25.SignalRHubs
                         {
                             // Lấy TreatmentStage từ DB để kiểm tra và cập nhật `LastDailyReminderSentDate`
                             // Sử dụng FindAsync để lấy theo khóa chính một cách hiệu quả
-                            var stage = await dbContext.TreatmentStages.FindAsync(reminder.StageId);
-
+                            var stage = await dbContext.TreatmentStages
+                                                                        .Include(s => s.PatientTreatmentProtocol)
+                                                                        .ThenInclude(ptp => ptp.Patient) 
+                                                                        .FirstOrDefaultAsync(s => s.Id == reminder.StageId);
+                            var patientId = stage.PatientTreatmentProtocol?.PatientId;
                             // Điều kiện để gửi reminder:
                             // 1. Giai đoạn phải tồn tại và đang ở trạng thái Active
                             // 2. Thời điểm nhắc nhở nằm trong "cửa sổ gửi" (ví dụ: từ 30 giây trước đến 30 giây sau thời điểm hiện tại)
@@ -56,13 +60,42 @@ namespace SWPSU25.SignalRHubs
                             if (stage != null &&
                                 stage.Status == PatientTreatmentStatus.Active && // Chỉ gửi nhắc nhở cho giai đoạn đang hoạt động
                                 reminder.ReminderDateTime > DateTime.Now.AddSeconds(-30) && // Đã đến hạn hoặc vừa trôi qua trong 30s
-                                reminder.ReminderDateTime <= DateTime.Now.AddSeconds(30)) // Đến hạn trong 30s tới
+                                reminder.ReminderDateTime <= DateTime.Now.AddSeconds(30) &&
+                                patientId != null) // Đến hạn trong 30s tới
                             {
                                 _logger.LogInformation($"--- Sending reminder for Stage: '{reminder.StageName}' (ID: {reminder.StageId}) at {reminder.ReminderDateTime} ---");
 
                                 // Gửi thông báo qua SignalR đến TẤT CẢ các client đang kết nối
                                 // "ReceiveReminder" là tên phương thức/event mà client sẽ lắng nghe
-                                await _hubContext.Clients.All.SendAsync("ReceiveReminder", reminder, stoppingToken);
+                                //
+
+                                // 1. Tạo Notification trước khi gửi
+                                var notification = new Notification
+                                {
+                                    NotificationId = Guid.NewGuid(),
+                                    PatientId = patientId.Value,
+                                    TreatmentStageId = stage.Id,
+                                    CreatedAt = DateTime.Now,
+                                    IsSeen = false,
+                                    Message = $"Nhắc nhở uống thuốc: {stage.Medicine}"
+                                };
+
+                                dbContext.Notifications.Add(notification);
+                                await dbContext.SaveChangesAsync(stoppingToken);
+
+                                // 2. Gửi SignalR riêng cho bệnh nhân đó
+                                await _hubContext.Clients
+                                    .User(patientId.ToString()) // Bệnh nhân nhận riêng
+                                    .SendAsync("ReceiveReminder", new
+                                    {
+                                        notificationId = notification.NotificationId,
+                                        message = notification.Message,
+                                        reminder // thông tin bổ sung từ ReminderDetailDto
+                                    }, stoppingToken);
+
+                                _logger.LogInformation($"Reminder sent to patient {patientId}, notificationId = {notification.NotificationId}");
+
+                                //
 
                                 await dbContext.SaveChangesAsync(stoppingToken); // Lưu thay đổi vào DB
                                 _logger.LogInformation($"Reminder for Stage '{reminder.StageName}' marked as sent for {reminder.ReminderDateTime.Date.ToShortDateString()}.");

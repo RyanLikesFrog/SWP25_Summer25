@@ -4,6 +4,7 @@ using DataLayer.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(SWPSU25Context))]
-    partial class SWPSU25ContextModelSnapshot : ModelSnapshot
+    [Migration("20250709163913_AddNotification")]
+    partial class AddNotification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -364,11 +367,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("NotificationId");
 
-                    b.HasIndex("AppointmentId");
-
                     b.HasIndex("PatientId");
-
-                    b.HasIndex("TreatmentStageId");
 
                     b.ToTable("Notifications");
                 });
@@ -756,27 +755,13 @@ namespace DataLayer.Migrations
 
             modelBuilder.Entity("DataLayer.Entities.Notification", b =>
                 {
-                    b.HasOne("DataLayer.Entities.Appointment", "Appointment")
-                        .WithMany("Notifications")
-                        .HasForeignKey("AppointmentId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("DataLayer.Entities.Patient", "Patient")
-                        .WithMany("Notifications")
+                        .WithMany()
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DataLayer.Entities.TreatmentStage", "TreatmentStage")
-                        .WithMany("Notifications")
-                        .HasForeignKey("TreatmentStageId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Appointment");
-
                     b.Navigation("Patient");
-
-                    b.Navigation("TreatmentStage");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Patient", b =>
@@ -850,8 +835,6 @@ namespace DataLayer.Migrations
 
             modelBuilder.Entity("DataLayer.Entities.Appointment", b =>
                 {
-                    b.Navigation("Notifications");
-
                     b.Navigation("PaymentTransaction");
                 });
 
@@ -877,8 +860,6 @@ namespace DataLayer.Migrations
 
                     b.Navigation("MedicalRecords");
 
-                    b.Navigation("Notifications");
-
                     b.Navigation("PatientTreatmentProtocols");
                 });
 
@@ -890,8 +871,6 @@ namespace DataLayer.Migrations
             modelBuilder.Entity("DataLayer.Entities.TreatmentStage", b =>
                 {
                     b.Navigation("LabResults");
-
-                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.User", b =>

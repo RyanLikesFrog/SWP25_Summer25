@@ -28,6 +28,8 @@ namespace DataLayer.DbContext
         public DbSet<User> Users { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<LabPicture> LabPictures { get; set; } // Thêm DbSet cho LabPicture
+        public DbSet<Notification> Notifications { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -235,6 +237,25 @@ namespace DataLayer.DbContext
                 .WithOne(a => a.PaymentTransaction)
                 .HasForeignKey<PaymentTransaction>(pt => pt.AppointmentId)
                 .OnDelete(DeleteBehavior.Restrict); // Hoặc DeleteBehavior.NoAction
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Patient)
+                .WithMany(p => p.Notifications)
+                .HasForeignKey(n => n.PatientId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.TreatmentStage)
+                .WithMany(t => t.Notifications)
+                .HasForeignKey(n => n.TreatmentStageId)
+                .OnDelete(DeleteBehavior.NoAction); // tránh xóa thông báo khi xoá TreatmentStage
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Appointment)
+                .WithMany(a => a.Notifications)
+                .HasForeignKey(n => n.AppointmentId)
+                .OnDelete(DeleteBehavior.NoAction);
+
         }
     }    
 }

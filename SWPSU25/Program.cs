@@ -44,7 +44,8 @@ builder.Services.AddSwaggerGen();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<SWPSU25Context>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString,
+        b => b.MigrationsAssembly("DataLayer")));
 
 // Cấu hình MomoSettings
 builder.Services.Configure<MomoSettings>(builder.Configuration.GetSection("MomoSettings"));
