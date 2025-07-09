@@ -90,6 +90,7 @@ namespace ServiceLayer.Implements.Reminder
                                     StageName = stage.StageName,
                                     StageNumber = stage.StageNumber,
                                     Description = stage.Description,
+                                    Medicine = stage.Medicine,
                                     ReminderDateTime = reminderDateTime,
                                     PatientTreatmentProtocolId = stage.PatientTreatmentProtocolId,
                                 });
@@ -105,6 +106,7 @@ namespace ServiceLayer.Implements.Reminder
                                     StageName = stage.StageName,
                                     StageNumber = stage.StageNumber,
                                     Description = stage.Description,
+                                    Medicine = stage.Medicine,
                                     ReminderDateTime = reminderDateTime,
                                     PatientTreatmentProtocolId = stage.PatientTreatmentProtocolId,
                                 });

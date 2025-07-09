@@ -14,5 +14,6 @@ namespace ServiceLayer.DTOs.Patient.Response
         public string? Description { get; set; } // Mô tả của giai đoạn điều trị
         public DateTime ReminderDateTime { get; set; } // Thời điểm nhắc nhở cụ thể
         public Guid? PatientTreatmentProtocolId { get; set; } // Để Front-end có thể liên kết với bệnh nhân
+        public string? Medicine { get; set; }
     }
 }
