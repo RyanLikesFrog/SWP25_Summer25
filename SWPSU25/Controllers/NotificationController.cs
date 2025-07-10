@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DataLayer.DbContext;
+using DataLayer.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using ServiceLayer.DTOs.User.Request;
+using ServiceLayer.Interfaces;
 using SWPSU25.SignalRHubs;
-using DataLayer.DbContext;
 
 namespace SWPSU25.Controllers
 {
@@ -10,26 +13,63 @@ namespace SWPSU25.Controllers
     [Route("api/[controller]")]
     public class NotificationController : ControllerBase
     {
-        private readonly SWPSU25Context _context;
+        private readonly INotificationService _notificationService;
         private readonly IHubContext<ReminderHub> _hubContext;
 
-        public NotificationController(SWPSU25Context context, IHubContext<ReminderHub> hubContext)
+        public NotificationController(INotificationService notificationService, IHubContext<ReminderHub> hubContext)
         {
-            _context = context;
+            _notificationService = notificationService;
             _hubContext = hubContext;
         }
 
-        [HttpPost("mark-as-seen")]
-        public async Task<IActionResult> MarkAsSeen(Guid notificationId)
+        [HttpGet("get-notification-by-patientId")]
+        public async Task<IActionResult> GetAllByPatientId(Guid patientId)
         {
-            var notification = await _context.Notifications.FindAsync(notificationId);
+            var notifications = await _notificationService.GetAllByPatientIdAsync(patientId);
+            return Ok(notifications);
+        }
+
+        [HttpGet("get-notification-by-id")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var notification = await _notificationService.GetNotificationByIdAsync(id);
+            if (notification == null) return NotFound();
+            return Ok(notification);
+        }
+
+        [HttpPost("create-notification")]
+        public async Task<IActionResult> Create([FromBody] CreateNotificationRequest request)
+        {
+            try
+            {
+                var created = await _notificationService.CreateNotificationAsync(request);
+
+                // Gửi signalR nếu cần
+                await _hubContext.Clients.User(request.PatientId.ToString()).SendAsync("ReceiveReminder", new
+                {
+                    notificationId = created.NotificationId,
+                    message = created.Message
+                });
+
+                return Ok(created);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
+        [HttpPost("mark-as-seen")]
+        public async Task<IActionResult> MarkAsSeen([FromQuery] Guid notificationId)
+        {
+            var success = await _notificationService.MarkAsSeenAsync(notificationId);
+            if (!success) return NotFound();
+
+            // Lấy lại notification để truy cập PatientId
+            var notification = await _notificationService.GetNotificationByIdAsync(notificationId);
             if (notification == null) return NotFound();
 
-            notification.IsSeen = true;
-            notification.SeenAt = DateTime.Now;
-            await _context.SaveChangesAsync();
-
-            // Gửi thông báo cho Staff biết rằng bệnh nhân đã đọc
             await _hubContext.Clients.All.SendAsync("NotificationSeen", new
             {
                 notificationId,
@@ -38,5 +78,6 @@ namespace SWPSU25.Controllers
 
             return Ok(new { message = "Notification marked as seen." });
         }
+
     }
 }
