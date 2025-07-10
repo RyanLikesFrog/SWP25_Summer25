@@ -20,6 +20,6 @@ namespace DataLayer.Entities
         //Navigation properties
         public virtual Patient? Patient { get; set; }
         public virtual TreatmentStage? TreatmentStage { get; set; }
-        public virtual Appointment Appointment { get; set; }
+        public virtual Appointment? Appointment { get; set; }
     }
 }

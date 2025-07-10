@@ -28,7 +28,7 @@ namespace SWPSU25.Controllers
             var notifications = await _notificationService.GetAllByPatientIdAsync(patientId);
             return Ok(notifications);
         }
-
+        //
         [HttpGet("get-notification-by-id")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -36,7 +36,7 @@ namespace SWPSU25.Controllers
             if (notification == null) return NotFound();
             return Ok(notification);
         }
-
+        //
         [HttpPost("create-notification")]
         public async Task<IActionResult> Create([FromBody] CreateNotificationRequest request)
         {

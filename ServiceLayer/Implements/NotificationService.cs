@@ -37,19 +37,28 @@ namespace ServiceLayer.Implements
 
         public async Task<NotificationDetailResponse?> CreateNotificationAsync(CreateNotificationRequest request)
         {
+            // Bắt buộc kiểm tra Patient
             var patient = await _patientRepository.GetPatientByIdAsync(request.PatientId);
             if (patient == null)
                 throw new ArgumentException($"Patient ID {request.PatientId} không tồn tại.");
 
-            var appointment = await _appointmentRepository.GetAppointmentByIdAsync(request.AppointmentId.Value);
-            if (appointment == null)
-                throw new ArgumentException($"Patient ID {request.AppointmentId} không tồn tại.");
+            // Chỉ kiểm tra nếu AppointmentId có giá trị
+            if (request.AppointmentId.HasValue)
+            {
+                var appointment = await _appointmentRepository.GetAppointmentByIdAsync(request.AppointmentId.Value);
+                if (appointment == null)
+                    throw new ArgumentException($"Appointment ID {request.AppointmentId} không tồn tại.");
+            }
 
-            var treatmentStage = await _treatmentStageRepository.GetTreatmentStageByIdAsync(request.TreatmentStageId.Value);
-            if (treatmentStage == null)
-                throw new ArgumentException($"Patient ID {request.TreatmentStageId} không tồn tại.");
+            // Chỉ kiểm tra nếu TreatmentStageId có giá trị
+            if (request.TreatmentStageId.HasValue)
+            {
+                var treatmentStage = await _treatmentStageRepository.GetTreatmentStageByIdAsync(request.TreatmentStageId.Value);
+                if (treatmentStage == null)
+                    throw new ArgumentException($"TreatmentStage ID {request.TreatmentStageId} không tồn tại.");
+            }
 
-
+            // Tạo thông báo
             var notification = new Notification
             {
                 NotificationId = Guid.NewGuid(),
@@ -76,6 +85,7 @@ namespace ServiceLayer.Implements
                 SeenAt = created.SeenAt
             };
         }
+
 
         public async Task<List<Notification>> GetAllByPatientIdAsync(Guid patientId)
         {
