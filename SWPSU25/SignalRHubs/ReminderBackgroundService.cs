@@ -120,7 +120,10 @@ namespace SWPSU25.SignalRHubs
                                 _logger.LogInformation($"--- Sending Appointment Reminder for: '{appointment.AppointmentTitle}' (ID: {appointment.Id}) for {appointment.AppointmentStartDate.ToShortDateString()} ---");
 
                                 appointmentReminder.ReminderSentTime = DateTime.Now; // Cập nhật thời gian gửi thực tế
-                                await _hubContext.Clients.All.SendAsync("ReceiveAppointmentReminder", appointmentReminder, stoppingToken);
+                                await _hubContext.Clients
+                                                    .User(appointment.PatientId.ToString()) // hoặc DoctorId nếu bác sĩ cần nhận
+                                                    .SendAsync("ReceiveAppointmentReminder", appointmentReminder, stoppingToken);
+
 
                                 await dbContext.SaveChangesAsync(stoppingToken);
                                 _logger.LogInformation($"Appointment Reminder for '{appointment.AppointmentTitle}' marked as sent for {DateTime.Now.Date.ToShortDateString()}.");
