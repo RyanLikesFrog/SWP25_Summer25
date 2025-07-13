@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.DTOs;
+using ServiceLayer.DTOs.User.Request;
 using ServiceLayer.Implements;
 using ServiceLayer.Interfaces;
 
@@ -58,6 +59,24 @@ namespace SWPSU25.Controllers
             catch (ArgumentException ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpPut("update-treatment-protocol-status")]
+        public async Task<IActionResult> UpdatePatientTreatmentProtocolStatus([FromBody] UpdatePatientTreatmentProtocolStatusRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var success = await _patientTreatmentProtocolService.UpdatePatientTreatmentProtocolStatusAsync(request);
+
+            if (success)
+            {
+                return Ok(new { Message = $"Cập nhật trạng thái phác đồ {request.ProtocolId} thành công." });
+            }
+            else
+            {
+                return NotFound(new { Message = $"Không tìm thấy phác đồ điều trị với ID {request.ProtocolId} hoặc cập nhật thất bại." });
             }
         }
     }

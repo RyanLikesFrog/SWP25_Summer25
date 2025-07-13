@@ -1,5 +1,6 @@
 ﻿using DataLayer.DbContext;
 using DataLayer.Entities;
+using DataLayer.Enum;
 using Microsoft.EntityFrameworkCore;
 using RepoLayer.Interfaces;
 using System;
@@ -36,6 +37,16 @@ namespace RepoLayer.Implements
             return await _context.PatientTreatmentProtocols
                 .Include(ptp => ptp.TreatmentStages)
                 .FirstOrDefaultAsync(ptp => ptp.Id == patientTreatmentProtocolId);
+        }
+
+        public async Task<bool> UpdatePatientTreatmentProtocolStatusAsync(Guid protocolId, PatientTreatmentStatus newStatus)
+        {
+            var affectedRows = await _context.PatientTreatmentProtocols
+                .Where(p => p.Id == protocolId)
+                .ExecuteUpdateAsync(setter => setter
+                    .SetProperty(p => p.Status, newStatus));
+
+            return affectedRows > 0;
         }
     }
 }

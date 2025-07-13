@@ -1,6 +1,7 @@
 ﻿using DataLayer.Entities;
 using RepoLayer.Interfaces;
 using ServiceLayer.DTOs;
+using ServiceLayer.DTOs.User.Request;
 using ServiceLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -60,7 +61,7 @@ namespace ServiceLayer.Implements
                 var protocol = await _aRVProtocolRepository.GetARVProtocolByIdAsync(request.ARVProtocolId.Value);
                 if (protocol == null)
                 {
-                    throw new ArgumentException("ARVPRotocol not found with the provided PRotocol ID");
+                    throw new ArgumentException("ARVPRotocol not found with the provided Protocol ID");
                 }
             }
 
@@ -119,6 +120,25 @@ namespace ServiceLayer.Implements
         public async Task<PatientTreatmentProtocol?> GetPatientTreatmentProtocolByIdAsync(Guid patientTreatmentProtocolId)
         {
             return await _patientTreatmentProtocolRepository.GetPatientTreatmentProtocolByIdAsync(patientTreatmentProtocolId);
+        }
+
+        public async Task<bool> UpdatePatientTreatmentProtocolStatusAsync(UpdatePatientTreatmentProtocolStatusRequest request)
+        {
+            if (request == null)
+            {
+                return false;
+            }
+
+            var treatmentProtocol = await _patientTreatmentProtocolRepository.GetPatientTreatmentProtocolByIdAsync(request.ProtocolId);
+
+            if (treatmentProtocol == null)
+            {
+                throw new ArgumentException("Treatment Protocol not found with the provided Protocol ID");
+            }
+
+            var success = await _patientTreatmentProtocolRepository.UpdatePatientTreatmentProtocolStatusAsync(request.ProtocolId, request.Status);
+
+            return success;
         }
     }
 }

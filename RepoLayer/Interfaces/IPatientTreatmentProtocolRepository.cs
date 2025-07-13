@@ -1,4 +1,5 @@
 ﻿using DataLayer.Entities;
+using DataLayer.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace RepoLayer.Interfaces
         public Task<PatientTreatmentProtocol?> CreatePatientTreatmentProtocol(PatientTreatmentProtocol patientTreatmentProtocol);   
         public Task<PatientTreatmentProtocol?> GetPatientTreatmentProtocolByIdAsync(Guid patientTreatmentProtocolId);
         public Task<List<PatientTreatmentProtocol?>> GetAllPatientTreatmentProtocolsAsync();
+        public Task<bool> UpdatePatientTreatmentProtocolStatusAsync(Guid protocolId, PatientTreatmentStatus newStatus);
     }
 }
