@@ -37,6 +37,7 @@ namespace ServiceLayer.Implements
             _config = configuration;
             _patientRepository = patientRepository;
             _doctorRepository = doctorRepository;
+            _treatmentStageRepository = treatmentStageRepository;
         }
 
         public async Task<MedicalRecordDetailResponse?> CreateMedicalRecordAsync(CreateMedicalRecordRequest request)
