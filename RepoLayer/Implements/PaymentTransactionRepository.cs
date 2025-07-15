@@ -1,5 +1,6 @@
 ﻿using DataLayer.DbContext;
 using DataLayer.Entities;
+using DataLayer.Enum;
 using Microsoft.EntityFrameworkCore;
 using RepoLayer.Interfaces;
 using System;
@@ -29,6 +30,27 @@ namespace RepoLayer.Implements
             return await _context.PaymentTransactions
                                  .Include(x => x.Appointment) // Bao gồm Appointment nếu cần
                                  .FirstOrDefaultAsync(t => t.TransactionCode == transactionCode);
+        }
+        public async Task<List<PaymentTransaction>> GetSuccessfulTransactionsByDateRangeAsync(DateTime fromDate, DateTime? toDate)
+        {
+            var query = _context.PaymentTransactions
+                .Include(t => t.Appointment)
+                    .ThenInclude(a => a.Patient)
+                .Where(t => t.Status == PaymentTransactionStatus.Success);
+
+            if (toDate == null)
+            {
+                var date = fromDate.Date;
+                query = query.Where(t => t.CreatedDate.Date == date);
+            }
+            else
+            {
+                var from = fromDate.Date;
+                var to = toDate.Value.Date.AddDays(1);
+                query = query.Where(t => t.CreatedDate >= from && t.CreatedDate < to);
+            }
+
+            return await query.ToListAsync();
         }
     }
 }

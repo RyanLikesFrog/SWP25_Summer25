@@ -1,5 +1,6 @@
 ﻿using DataLayer.DbContext;
 using DataLayer.Entities;
+using DataLayer.Enum;
 using Microsoft.EntityFrameworkCore;
 using RepoLayer.Interfaces;
 using System;
@@ -61,9 +62,11 @@ namespace RepoLayer.Implements
 
         public async Task<List<User>> GetAllUsersAsync()
         {
-            return await _context.Users.Include(u => u.Doctor)
-                                       .Include(u => u.Patient)
-                                       .ToListAsync();
+            return await _context.Users
+                                 .Include(u => u.Doctor)
+                                 .Include(u => u.Patient)
+                                 .Where(u => u.Role != UserRole.Admin) 
+                                 .ToListAsync();
         }
     }
 }
