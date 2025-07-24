@@ -13,5 +13,6 @@ namespace DataLayer.Enum
         Cancelled = 2,           // Hủy
         Completed = 3,           // Hoàn thành
         ReArranged = 4,          // Dời lịch
+        CheckedIn = 5,          // Dã check-in
     }
 }
