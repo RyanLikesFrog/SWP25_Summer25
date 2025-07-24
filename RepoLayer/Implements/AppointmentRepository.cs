@@ -1,5 +1,6 @@
 ﻿using DataLayer.DbContext;
 using DataLayer.Entities;
+using DataLayer.Enum;
 using Microsoft.EntityFrameworkCore;
 using RepoLayer.Interfaces;
 using System;
@@ -83,6 +84,18 @@ namespace RepoLayer.Implements
         {
             _context.Appointments.Update(appointment);
             return appointment;
+        }
+
+        public async Task UpdateStatusAsync(Appointment appointment, AppointmentStatus newStatus, string? note)
+        {
+            appointment.Status = newStatus;
+            if (!string.IsNullOrWhiteSpace(note))
+            {
+                appointment.Notes = note;
+            }
+
+            _context.Appointments.Update(appointment);
+            await _context.SaveChangesAsync();
         }
     }
 }

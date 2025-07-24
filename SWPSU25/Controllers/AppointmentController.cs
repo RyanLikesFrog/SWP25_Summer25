@@ -261,7 +261,7 @@ namespace SWPSU25.Controllers
                 return StatusCode(500, "Đã xảy ra lỗi khi cập nhật lịch hẹn.");
             }
         }
-        [HttpPut("reschedule")]
+        [HttpPut("appointment-reschedule")]
         public async Task<IActionResult> ReArrangeDateAppointment([FromBody] UpdateReArrangeDateAppointmentRequest request)
         {
             if (!ModelState.IsValid)
@@ -296,6 +296,17 @@ namespace SWPSU25.Controllers
                 return StatusCode(500, "Đã xảy ra lỗi không mong muốn khi dời lịch hẹn.");
             }
         }
+        [HttpPut("appointment-update-status")]
+        public async Task<IActionResult> UpdateStatus([FromBody] UpdateAppointmentStatusRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var result = await _appointmentService.UpdateAppointmentStatusAsync(request);
+            if (!result)
+                return NotFound("Không tìm thấy cuộc hẹn");
+
+            return Ok("Trạng thái cuộc hẹn được cập nhật thành công.");
+        }
     }
 }

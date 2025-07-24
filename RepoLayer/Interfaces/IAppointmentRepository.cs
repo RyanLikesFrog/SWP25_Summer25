@@ -1,4 +1,5 @@
 ﻿using DataLayer.Entities;
+using DataLayer.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace RepoLayer.Interfaces
         public Task<List<Appointment?>> GetAppointmentsByDoctorIdAsync(Guid doctorId);
         public Task<Appointment?> ReArrangeDateAppointmentAsync (Appointment appointment);
         public Task<bool> IsTimeSlotAvailableAsync(Guid? doctorId, DateTime startDate, DateTime? endDate, Guid excludeAppointmentId);
+        public Task UpdateStatusAsync(Appointment appointment, AppointmentStatus newStatus, string? note);
 
     }
 }   

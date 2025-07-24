@@ -358,5 +358,14 @@ namespace ServiceLayer.Implements
                 throw new ApplicationException($"Đã xảy ra lỗi khi dời lịch hẹn với ID {request.Id}.", ex);
             }
         }
+
+        public async Task<bool> UpdateAppointmentStatusAsync(UpdateAppointmentStatusRequest request)
+        {
+            var appointment = await _appointmentRepository.GetAppointmentByIdAsync(request.AppointmentId);
+            if (appointment == null) return false;
+
+            await _appointmentRepository.UpdateStatusAsync(appointment, request.NewStatus, request.Note);
+            return true;
+        }
     }
 }
