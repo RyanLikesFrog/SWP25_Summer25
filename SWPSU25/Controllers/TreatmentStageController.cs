@@ -53,40 +53,6 @@ namespace SWPSU25.Controllers
                 return StatusCode(500, new { Message = "Đã xảy ra lỗi trong quá trình tạo giai đoạn điều trị.", Detail = ex.Message });
             }
         }
-        [HttpPut("update-treatment-stage-medicine")]
-        public async Task<IActionResult> UpdateTreatmentStageMedicine([FromBody] UpdateTreatmentStateMedicineRequest request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                var updatedStage = await _treatmentStageService.UpdateTreatmentStageAsync(request);
-
-                if (updatedStage == null)
-                {
-                    return NotFound(new { Message = $"Không tìm thấy giai đoạn điều trị với ID {request.Id}." });
-                }
-
-                return Ok(new
-                {
-                    Message = "Cập nhật thuốc trong giai đoạn điều trị thành công.",
-                    Data = updatedStage
-                });
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(new { Message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                // Optional: log the error
-                return StatusCode(500, new { Message = "Đã xảy ra lỗi khi cập nhật thuốc cho giai đoạn điều trị." });
-            }
-        }
-
 
     }
 }

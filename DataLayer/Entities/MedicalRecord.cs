@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataLayer.Enum;
 
 namespace DataLayer.Entities
 {
@@ -28,9 +29,12 @@ namespace DataLayer.Entities
         [Required]
         public DateTime ExaminationDate { get; set; }
 
-        public string? Diagnosis { get; set; } // TEXT
-        public string? Symptoms { get; set; } // TEXT
-        public string? Prescription { get; set; } // TEXT
-        public string? Notes { get; set; } // TEXT
+        public string? Diagnosis { get; set; }
+        public string? Symptoms { get; set; }
+        public string? PrescriptionNote { get; set; }
+        public string? Notes { get; set; }
+
+        // Mối quan hệ 1-1: Một MedicalRecord có một Prescription.
+        public virtual Prescription? Prescription { get; set; }
     }
 }

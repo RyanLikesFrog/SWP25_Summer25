@@ -18,71 +18,107 @@ namespace ServiceLayer.Implements
         private readonly IMedicalRecordRepository _medicalRecordRepository;
         private readonly IPatientTreatmentProtocolRepository _patientTreatmentProtocolRepository;
         private readonly IRepository _repository; 
+        private readonly IPrescriptionItemRepository _prescriptionItemRepository;
+        private readonly IPrescriptionRepository _prescriptionRepository;
 
-        public TreatmentStageService(ITreatmentStageRepository treatmentStageRepository, IMedicalRecordRepository medicalRecordRepository, IPatientTreatmentProtocolRepository patientTreatmentProtocolRepository, IRepository repository)
+        public TreatmentStageService(ITreatmentStageRepository treatmentStageRepository, IMedicalRecordRepository medicalRecordRepository, IPatientTreatmentProtocolRepository patientTreatmentProtocolRepository, IRepository repository, IPrescriptionItemRepository prescriptionItemRepository, IPrescriptionRepository prescriptionRepository)
         {
             _treatmentStageRepository = treatmentStageRepository;
             _medicalRecordRepository = medicalRecordRepository;
             _patientTreatmentProtocolRepository = patientTreatmentProtocolRepository;
             _repository = repository;
+            _prescriptionItemRepository = prescriptionItemRepository;
+            _prescriptionRepository = prescriptionRepository;
         }
 
         public async Task<TreatmentStageDetailResponse?> CreateTreatmentStageAsync(CreateTreatmentStageRequest request)
         {
+            // Bước 1: Kiểm tra sự tồn tại của PatientTreatmentProtocolId
             var patientTreatmentProtocol = await _patientTreatmentProtocolRepository.GetPatientTreatmentProtocolByIdAsync(request.PatientTreatmentProtocolId);
             if (patientTreatmentProtocol == null)
             {
-                throw new ArgumentException($"PatientTreatmentProtocol with ID {request.PatientTreatmentProtocolId} not found.");
+                throw new ArgumentException($"Không tìm thấy phác đồ điều trị với ID {request.PatientTreatmentProtocolId}.");
             }
 
-            if (request.StartDate == null)
-            {
-                throw new ArgumentException("StartDate is required.");
-            }
-
+            // Bước 2: Tạo TreatmentStage và thêm vào DbContext
             var newTreatmentStage = new TreatmentStage
             {
                 Id = Guid.NewGuid(),
                 StageName = request.StageName,
+                StageNumber = request.StageNumber,
                 Description = request.Description,
                 PatientTreatmentProtocolId = request.PatientTreatmentProtocolId,
-                StageNumber = request.StageNumber,
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
                 ReminderTimes = request.ReminderTimes,
                 Status = request.Status,
-                Medicine = request.Medicine
             };
-
             await _treatmentStageRepository.CreateTreatmentStageAsync(newTreatmentStage);
-            await _repository.SaveChangesAsync();
 
-            if(request.PatientId != null && request.PatientId != patientTreatmentProtocol.PatientId)
-            {
-                throw new Exception($"Patient ID {request.PatientId} does not match the PatientTreatmentProtocol's Patient ID {patientTreatmentProtocol.PatientId}.");
-            }
-
-            if(request.DoctorId != null && request.DoctorId != patientTreatmentProtocol.DoctorId)
-            {
-                throw new Exception($"Doctor ID {request.DoctorId} does not match the PatientTreatmentProtocol's Doctor ID {patientTreatmentProtocol.DoctorId}.");
-            }
-
+            // Bước 3: Tạo MedicalRecord và thêm vào DbContext
             var newMedicalRecord = new MedicalRecord
             {
                 Id = Guid.NewGuid(),
                 PatientId = patientTreatmentProtocol.PatientId,
                 DoctorId = patientTreatmentProtocol.DoctorId,
+                TreatmentStageId = newTreatmentStage.Id,
                 ExaminationDate = request.ExaminationDate,
                 Diagnosis = request.Diagnosis,
                 Symptoms = request.Symptoms,
-                Prescription = request.Prescription,
-                Notes = request.Notes
+                Notes = request.Notes,
             };
-
             await _medicalRecordRepository.CreateMedicalRecordAsync(newMedicalRecord);
-            await _repository.SaveChangesAsync();
 
-            return null;
+            // Bước 4: Tạo Prescription (nếu có) và thêm vào DbContext
+            if (request.Prescription != null)
+            {
+                var newPrescription = new Prescription
+                {
+                    Id = Guid.NewGuid(),
+                    MedicalRecordId = newMedicalRecord.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    Note = request.Prescription.PrescriptionNote,
+                    Items = new List<PrescriptionItem>()
+                };
+
+                if (request.Prescription.PrescriptionItems != null && request.Prescription.PrescriptionItems.Any())
+                {
+                    foreach (var item in request.Prescription.PrescriptionItems)
+                    {
+                        var prescriptionItem = new PrescriptionItem
+                        {
+                            Id = Guid.NewGuid(),
+                            PrescriptionId = newPrescription.Id,
+                            DrugName = item.DrugName,
+                            Dosage = item.Dosage,
+                        };
+                        newPrescription.Items.Add(prescriptionItem);
+                    }
+                }
+                await _prescriptionRepository.CreatePrescriptionAsync(newPrescription);
+            }
+
+            try
+            {
+                await _repository.SaveChangesAsync();
+            }
+            catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
+            {
+                Console.WriteLine("Lỗi khi lưu dữ liệu vào cơ sở dữ liệu.");
+                Console.WriteLine($"Message: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                }
+                throw; 
+            }
+
+            var repsonse = new TreatmentStageDetailResponse()
+            {
+                Id = newTreatmentStage.Id,
+                StageName = newTreatmentStage.StageName,
+            };
+            return repsonse;
         }
 
         public async Task<List<TreatmentStage?>> GetAllTreatmentStagesAsync()
@@ -95,25 +131,5 @@ namespace ServiceLayer.Implements
             return await _treatmentStageRepository.GetTreatmentStageByIdAsync(treatmentStageId);
         }
 
-        public async Task<TreatmentStage?> UpdateTreatmentStageAsync(UpdateTreatmentStateMedicineRequest request)
-        {
-            var treatmentStage = await _treatmentStageRepository.GetTreatmentStageByIdAsync(request.Id);
-
-            if (treatmentStage == null)
-            {
-                throw new ArgumentException($"Không tìm thấy TreatmentStage với ID: {request.Id}");
-            }
-
-            // ✅ Update medicine info (only if you have such a field)
-            if (!string.IsNullOrWhiteSpace(request.Medicine))
-            {
-                treatmentStage.Medicine = request.Medicine;
-            }
-
-            await _treatmentStageRepository.UpdateTreatmentStageAsync(treatmentStage);
-            await _repository.SaveChangesAsync();
-
-            return treatmentStage;
-        }
     }
 }

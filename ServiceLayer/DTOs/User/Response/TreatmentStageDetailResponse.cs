@@ -26,9 +26,17 @@ namespace ServiceLayer.DTOs
 
         public string? Medicine { get; set; }
 
+        public List<PrescriptionItemDto>? PrescriptionItems { get; set; }
+
         public List<LabResultDto>? LabResults { get; set; }
 
-        public MedicalRecordDto? MedicalRecord { get; set; } // ⬅️ Optional inclusion of related MedicalRecord
+        public MedicalRecordDto? MedicalRecord { get; set; }
+    }
+
+    public class PrescriptionItemDto
+    {
+        public string DrugName { get; set; } = null!;
+        public string Dosage { get; set; } = null!;
     }
 
     public class LabResultDto
@@ -48,7 +56,7 @@ namespace ServiceLayer.DTOs
         public DateTime ExaminationDate { get; set; }
         public string? Diagnosis { get; set; }
         public string? Symptoms { get; set; }
-        public string? Prescription { get; set; }
+        public string? PrescriptionNote { get; set; }
         public string? Notes { get; set; }
     }
 }

@@ -14,6 +14,5 @@ namespace ServiceLayer.Interfaces
         public Task<TreatmentStage?> GetTreatmentStagebyIdAsync(Guid treatmentStageId);
         public Task<List<TreatmentStage?>> GetAllTreatmentStagesAsync();
         public Task<TreatmentStageDetailResponse?> CreateTreatmentStageAsync(CreateTreatmentStageRequest request);
-        public Task<TreatmentStage?> UpdateTreatmentStageAsync(UpdateTreatmentStateMedicineRequest request);
     }
 }

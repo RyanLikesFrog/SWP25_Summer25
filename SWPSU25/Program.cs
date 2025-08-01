@@ -72,6 +72,8 @@ builder.Services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepo
 builder.Services.AddScoped<ILabPictureRepository, LabPictureRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
+builder.Services.AddScoped<IPrescriptionItemRepository, PrescriptionItemRepository>();
+builder.Services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
 
 
 
@@ -92,9 +94,6 @@ builder.Services.AddScoped<IMomoClient, MomoClient>();
 builder.Services.AddScoped<ReminderService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
-builder.Services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
-
-
 
 // add signalR
 builder.Services.AddSignalR();

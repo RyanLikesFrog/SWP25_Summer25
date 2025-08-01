@@ -17,20 +17,26 @@ namespace DataLayer.Entities
         [Required]
         [MaxLength(100)]
         public string? StageName { get; set; }
-        public int StageNumber { get; set; } // Thứ tự của giai đoạn trong phác đồ
+        public int StageNumber { get; set; }
         public string? Description { get; set; }
 
         [ForeignKey("PatientTreatmentProtocol")]
         public Guid? PatientTreatmentProtocolId { get; set; }
-        public virtual PatientTreatmentProtocol? PatientTreatmentProtocol { get; set; } // Navigation property
+        public virtual PatientTreatmentProtocol? PatientTreatmentProtocol { get; set; }
+
         [Required]
         public DateTime StartDate { get; set; }
-        public DateTime? EndDate { get; set; } // Nullable nếu đang điều trị
-        public string? ReminderTimes { get; set; } // TEXT (ví dụ: "8:00, 20:00")
-        public PatientTreatmentStatus Status { get; set; } // Sử dụng Enum cho trạng thái phác đồ\
-        public string? Medicine { get; set; } // Danh sách thuốc, có thể là JSON hoặc chuỗi phân tách bằng dấu phẩy
-        public ICollection<LabResult>? LabResults { get; set; }
-        public virtual ICollection<Notification> Notifications { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string? ReminderTimes { get; set; }
+        public PatientTreatmentStatus Status { get; set; }
 
+        public virtual ICollection<LabResult> LabResults { get; set; } = new List<LabResult>();
+        public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+
+        // Mối quan hệ 1-nhiều với MedicalRecord
+        public virtual ICollection<MedicalRecord> MedicalRecords { get; set; } = new List<MedicalRecord>();
+
+        // Mối quan hệ 1-nhiều với PrescriptionItem
+        public virtual ICollection<PrescriptionItem> PrescriptionItems { get; set; } = new List<PrescriptionItem>();
     }
 }

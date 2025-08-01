@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataLayer.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,10 +11,15 @@ namespace ServiceLayer.DTOs.Patient.Response
     {
         public Guid StageId { get; set; }
         public string? StageName { get; set; }
-        public int StageNumber { get; set; } // Thứ tự của giai đoạn trong phác đồ
-        public string? Description { get; set; } // Mô tả của giai đoạn điều trị
-        public DateTime ReminderDateTime { get; set; } // Thời điểm nhắc nhở cụ thể
-        public Guid? PatientTreatmentProtocolId { get; set; } // Để Front-end có thể liên kết với bệnh nhân
-        public string? Medicine { get; set; }
+        public int StageNumber { get; set; }
+        public string? Description { get; set; }
+        public DateTime ReminderDateTime { get; set; }
+        public Guid? PatientTreatmentProtocolId { get; set; }
+
+        // Thông tin về thuốc cụ thể
+        public Guid PrescriptionItemId { get; set; }
+        public string? DrugName { get; set; }
+        public string? Dosage { get; set; }
+        public string? Frequency { get; set; }
     }
 }

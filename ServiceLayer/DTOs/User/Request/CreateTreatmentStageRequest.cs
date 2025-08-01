@@ -1,52 +1,58 @@
 ﻿using DataLayer.Enum;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using ServiceLayer.DTOs;
 
-namespace ServiceLayer.DTOs
+public class CreateTreatmentStageRequest
 {
-    public class CreateTreatmentStageRequest
-    {
-        [Required]
-        [MaxLength(100)]
-        public string StageName { get; set; }
+    [Required(ErrorMessage = "Tên giai đoạn không được để trống.")]
+    [MaxLength(100, ErrorMessage = "Tên giai đoạn không được vượt quá 100 ký tự.")]
+    public string StageName { get; set; }
 
-        [Required]
-        public int StageNumber { get; set; }
+    [Required(ErrorMessage = "Số thứ tự giai đoạn không được để trống.")]
+    public int StageNumber { get; set; }
+    public string? Description { get; set; }
 
-        public string? Description { get; set; }
+    [Required(ErrorMessage = "ID phác đồ điều trị không được để trống.")]
+    public Guid PatientTreatmentProtocolId { get; set; }
 
-        [Required]
-        public Guid PatientTreatmentProtocolId { get; set; }
+    [Required(ErrorMessage = "Ngày bắt đầu không được để trống.")]
+    public DateTime StartDate { get; set; }
 
-        [Required]
-        public DateTime StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
 
-        public DateTime? EndDate { get; set; }
+    public string? ReminderTimes { get; set; }
 
-        public string? ReminderTimes { get; set; } // e.g. "08:00,20:00"
+    [Required(ErrorMessage = "Trạng thái điều trị không được để trống.")]
+    public PatientTreatmentStatus Status { get; set; }
 
-        public string? Medicine { get; set; } // e.g. "Paracetamol,Vitamin C"
+    // --- Thông tin Hồ sơ Bệnh án và Đơn thuốc ---
 
-        [Required]
-        public PatientTreatmentStatus Status { get; set; }
+    [Required(ErrorMessage = "Ngày khám bệnh không được để trống.")]
+    public DateTime ExaminationDate { get; set; }
 
-        // MEDICAL RECORD FIELDS
+    public string? Diagnosis { get; set; }
 
-        [Required]
-        public Guid PatientId { get; set; }
+    public string? Symptoms { get; set; }
 
-        [Required]
-        public Guid DoctorId { get; set; }
+    public string? Notes { get; set; }
 
-        [Required]
-        public DateTime ExaminationDate { get; set; }
+    // Đơn thuốc được gom vào một đối tượng riêng
+    public PrescriptionRequest? Prescription { get; set; }
+}
 
-        public string? Diagnosis { get; set; }
+public class PrescriptionRequest
+{
+    public string? PrescriptionNote { get; set; }
 
-        public string? Symptoms { get; set; }
+    public List<PrescriptionItemRequest>? PrescriptionItems { get; set; }
+}
+public class PrescriptionItemRequest
+{
+    [Required(ErrorMessage = "Tên thuốc không được để trống.")]
+    public string DrugName { get; set; }
 
-        public string? Prescription { get; set; }
-
-        public string? Notes { get; set; }
-    }
+    [Required(ErrorMessage = "Liều lượng không được để trống.")]
+    public string Dosage { get; set; }
 }

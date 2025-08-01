@@ -29,6 +29,8 @@ namespace DataLayer.DbContext
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<LabPicture> LabPictures { get; set; } // Thêm DbSet cho LabPicture
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Prescription> Prescriptions { get; set; }
+        public DbSet<PrescriptionItem> PrescriptionItems { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -187,16 +189,6 @@ namespace DataLayer.DbContext
                 .HasForeignKey(ts => ts.PatientTreatmentProtocolId)
                 .IsRequired() // Mặc định là bắt buộc, nhưng thêm để rõ ràng
                 .OnDelete(DeleteBehavior.Restrict); // Không xóa Protocol khi xóa Stage
-
-            // Mối quan hệ 1-1: MedicalRecord có MỘT TreatmentStage (và ngược lại)
-            // Khóa ngoại MedicalRecordID nằm trong TreatmentStage và sẽ là DUY NHẤT
-            modelBuilder.Entity<MedicalRecord>()
-                .HasOne(mr => mr.TreatmentStage)
-                .WithMany() // MedicalRecord có TreatmentStage, nhưng TreatmentStage không có thuộc tính điều hướng ngược về MedicalRecord
-                .HasForeignKey(mr => mr.TreatmentStageId)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.SetNull);
-
             // --- LabResult Entity ---
             modelBuilder.Entity<LabResult>()
                 .HasOne(lr => lr.Patient)
@@ -255,7 +247,41 @@ namespace DataLayer.DbContext
                 .WithMany(a => a.Notifications)
                 .HasForeignKey(n => n.AppointmentId)
                 .OnDelete(DeleteBehavior.NoAction);
+            // Giữ nguyên OnDelete(DeleteBehavior.Cascade) ở đây là hợp lý
+            modelBuilder.Entity<Prescription>()
+                .HasOne(p => p.MedicalRecord)
+                .WithOne(mr => mr.Prescription)
+                .HasForeignKey<Prescription>(p => p.MedicalRecordId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
+            // Mối quan hệ 1-nhiều: TreatmentStage và MedicalRecord
+            // Đây là nơi bạn cần thay đổi!
+            // SetNull là lựa chọn tốt nhất vì TreatmentStageId là nullable
+            modelBuilder.Entity<MedicalRecord>()
+                .HasOne(mr => mr.TreatmentStage)
+                .WithMany(ts => ts.MedicalRecords)
+                .HasForeignKey(mr => mr.TreatmentStageId)
+                .IsRequired(false) // Đảm bảo khóa ngoại có thể là NULL
+                .OnDelete(DeleteBehavior.SetNull); // Sửa thành SetNull
+
+            // Mối quan hệ 1-nhiều: Prescription và PrescriptionItem
+            // Giữ nguyên OnDelete(DeleteBehavior.Cascade) là hợp lý
+            modelBuilder.Entity<PrescriptionItem>()
+                .HasOne(pi => pi.Prescription)
+                .WithMany(p => p.Items)
+                .HasForeignKey(pi => pi.PrescriptionId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Mối quan hệ 1-nhiều: TreatmentStage và PrescriptionItem
+            // Đây cũng là một điểm bạn nên cân nhắc thay đổi
+            modelBuilder.Entity<PrescriptionItem>()
+                .HasOne(pi => pi.TreatmentStage)
+                .WithMany(ts => ts.PrescriptionItems)
+                .HasForeignKey(pi => pi.TreatmentStageId)
+                .IsRequired(false) // Đảm bảo khóa ngoại có thể là NULL
+                .OnDelete(DeleteBehavior.SetNull); // Sửa thành SetNull
         }
     }    
 }

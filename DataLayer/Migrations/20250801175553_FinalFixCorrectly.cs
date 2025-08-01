@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataLayer.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class FinalFixCorrectly : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +21,8 @@ namespace DataLayer.Migrations
                     Indications = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Dosage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SideEffects = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDefault = table.Column<bool>(type: "bit", nullable: false)
+                    IsDefault = table.Column<bool>(type: "bit", nullable: false),
+                    ProtocolType = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -40,7 +41,8 @@ namespace DataLayer.Migrations
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    isActive = table.Column<bool>(type: "bit", nullable: false)
+                    isActive = table.Column<bool>(type: "bit", nullable: false),
+                    ProfilePictureURL = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -81,7 +83,7 @@ namespace DataLayer.Migrations
                     Qualifications = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Experience = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProfilePictureURL = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
+                    isActive = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -106,7 +108,8 @@ namespace DataLayer.Migrations
                     Address = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     ContactPersonName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ContactPersonPhone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    IsAnonymous = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: true),
+                    IsAnonymous = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -125,18 +128,27 @@ namespace DataLayer.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PatientId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ApointmentTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AppointmentTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DoctorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     AppointmentStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AppointmentEndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     AppointmentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OnlineLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsAnonymousAppointment = table.Column<bool>(type: "bit", nullable: false)
+                    IsAnonymousAppointment = table.Column<bool>(type: "bit", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaymentStatus = table.Column<int>(type: "int", nullable: false),
+                    PaymentTransactionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Appointments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Appointments_Doctors_DoctorId",
+                        column: x => x.DoctorId,
+                        principalTable: "Doctors",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Appointments_Patients_PatientId",
                         column: x => x.PatientId,
@@ -181,8 +193,10 @@ namespace DataLayer.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PatientId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DoctorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ProtocolId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ARVProtocolId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     AppointmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    TreatmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -191,8 +205,8 @@ namespace DataLayer.Migrations
                 {
                     table.PrimaryKey("PK_PatientTreatmentProtocols", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PatientTreatmentProtocols_ARVProtocols_ProtocolId",
-                        column: x => x.ProtocolId,
+                        name: "FK_PatientTreatmentProtocols_ARVProtocols_ARVProtocolId",
+                        column: x => x.ARVProtocolId,
                         principalTable: "ARVProtocols",
                         principalColumn: "ProtocolId",
                         onDelete: ReferentialAction.SetNull);
@@ -217,18 +231,52 @@ namespace DataLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PaymentTransactions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    MomoRequestId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MomoTransactionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MomoOrderId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MomoResultCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MomoMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MomoSignature = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MomoResponseTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    MomoExtraData = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ProcessedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AppointmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PaymentTransactions_Appointments_AppointmentId",
+                        column: x => x.AppointmentId,
+                        principalTable: "Appointments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TreatmentStages",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StageName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    StageNumber = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PatientTreatmentProtocolId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ReminderFrequency = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     ReminderTimes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CustomProtocolDetails = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -248,16 +296,23 @@ namespace DataLayer.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PatientId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     TreatmentStageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    TestType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    DoctorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    TestName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    TestType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ResultValue = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Unit = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    ReferenceRange = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ResultSummary = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Conclusion = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LabPictureId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_LabResults", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LabResults_Doctors_DoctorId",
+                        column: x => x.DoctorId,
+                        principalTable: "Doctors",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_LabResults_Patients_PatientId",
                         column: x => x.PatientId,
@@ -283,7 +338,7 @@ namespace DataLayer.Migrations
                     ExaminationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Diagnosis = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Symptoms = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Prescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PrescriptionNote = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -309,10 +364,118 @@ namespace DataLayer.Migrations
                         onDelete: ReferentialAction.SetNull);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    NotificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PatientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TreatmentStageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    AppointmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsSeen = table.Column<bool>(type: "bit", nullable: false),
+                    SeenAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.NotificationId);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Appointments_AppointmentId",
+                        column: x => x.AppointmentId,
+                        principalTable: "Appointments",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_Patients_PatientId",
+                        column: x => x.PatientId,
+                        principalTable: "Patients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notifications_TreatmentStages_TreatmentStageId",
+                        column: x => x.TreatmentStageId,
+                        principalTable: "TreatmentStages",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LabPictures",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LabPictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LabPictureName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    isActive = table.Column<bool>(type: "bit", nullable: false),
+                    LabResultId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LabPictures", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LabPictures_LabResults_LabResultId",
+                        column: x => x.LabResultId,
+                        principalTable: "LabResults",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Prescriptions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MedicalRecordId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Prescriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Prescriptions_MedicalRecords_MedicalRecordId",
+                        column: x => x.MedicalRecordId,
+                        principalTable: "MedicalRecords",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PrescriptionItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PrescriptionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DrugName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Dosage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Frequency = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TreatmentStageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PrescriptionItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PrescriptionItems_Prescriptions_PrescriptionId",
+                        column: x => x.PrescriptionId,
+                        principalTable: "Prescriptions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PrescriptionItems_TreatmentStages_TreatmentStageId",
+                        column: x => x.TreatmentStageId,
+                        principalTable: "TreatmentStages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "CreatedAt", "Email", "Password", "PhoneNumber", "Role", "UpdatedAt", "Username", "isActive" },
-                values: new object[] { new Guid("7f85377c-d97f-4219-b76c-2ae926013d79"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@yourdomain.com", "admin", "0123456789", "Admin", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin", true });
+                columns: new[] { "Id", "CreatedAt", "Email", "Password", "PhoneNumber", "ProfilePictureURL", "Role", "UpdatedAt", "Username", "isActive" },
+                values: new object[] { new Guid("7f85377c-d97f-4219-b76c-2ae926013d79"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@yourdomain.com", "admin", "0123456789", null, "Admin", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin", true });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_DoctorId",
+                table: "Appointments",
+                column: "DoctorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Appointments_PatientId",
@@ -341,6 +504,16 @@ namespace DataLayer.Migrations
                 column: "DoctorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LabPictures_LabResultId",
+                table: "LabPictures",
+                column: "LabResultId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LabResults_DoctorId",
+                table: "LabResults",
+                column: "DoctorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LabResults_PatientId",
                 table: "LabResults",
                 column: "PatientId");
@@ -366,6 +539,21 @@ namespace DataLayer.Migrations
                 column: "TreatmentStageId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Notifications_AppointmentId",
+                table: "Notifications",
+                column: "AppointmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_PatientId",
+                table: "Notifications",
+                column: "PatientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_TreatmentStageId",
+                table: "Notifications",
+                column: "TreatmentStageId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Patients_UserId",
                 table: "Patients",
                 column: "UserId",
@@ -375,6 +563,11 @@ namespace DataLayer.Migrations
                 name: "IX_PatientTreatmentProtocols_AppointmentId",
                 table: "PatientTreatmentProtocols",
                 column: "AppointmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PatientTreatmentProtocols_ARVProtocolId",
+                table: "PatientTreatmentProtocols",
+                column: "ARVProtocolId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PatientTreatmentProtocols_DoctorId",
@@ -387,9 +580,26 @@ namespace DataLayer.Migrations
                 column: "PatientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PatientTreatmentProtocols_ProtocolId",
-                table: "PatientTreatmentProtocols",
-                column: "ProtocolId");
+                name: "IX_PaymentTransactions_AppointmentId",
+                table: "PaymentTransactions",
+                column: "AppointmentId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PrescriptionItems_PrescriptionId",
+                table: "PrescriptionItems",
+                column: "PrescriptionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PrescriptionItems_TreatmentStageId",
+                table: "PrescriptionItems",
+                column: "TreatmentStageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Prescriptions_MedicalRecordId",
+                table: "Prescriptions",
+                column: "MedicalRecordId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_TreatmentStages_PatientTreatmentProtocolId",
@@ -419,7 +629,22 @@ namespace DataLayer.Migrations
                 name: "DoctorSchedules");
 
             migrationBuilder.DropTable(
+                name: "LabPictures");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
+
+            migrationBuilder.DropTable(
+                name: "PaymentTransactions");
+
+            migrationBuilder.DropTable(
+                name: "PrescriptionItems");
+
+            migrationBuilder.DropTable(
                 name: "LabResults");
+
+            migrationBuilder.DropTable(
+                name: "Prescriptions");
 
             migrationBuilder.DropTable(
                 name: "MedicalRecords");

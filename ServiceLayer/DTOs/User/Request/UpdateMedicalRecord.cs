@@ -27,7 +27,7 @@ namespace ServiceLayer.DTOs.User.Request
 
         public string? Diagnosis { get; set; }
         public string? Symptoms { get; set; }
-        public string? Prescription { get; set; }
+        public string? PrescriptionNote { get; set; }
         public string? Notes { get; set; }
     }
 }

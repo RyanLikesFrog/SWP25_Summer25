@@ -63,7 +63,7 @@ namespace ServiceLayer.Implements
                 ExaminationDate = request.ExaminationDate,
                 Diagnosis = request.Diagnosis,
                 Symptoms = request.Symptoms,
-                Prescription = request.Prescription,
+                PrescriptionNote = request.PrescriptionNote,
                 Notes = request.Notes
             };
 
@@ -79,7 +79,7 @@ namespace ServiceLayer.Implements
                 ExaminationDate = medicalRecord.ExaminationDate,
                 Diagnosis = medicalRecord.Diagnosis,
                 Symptoms = medicalRecord.Symptoms,
-                Prescription = medicalRecord.Prescription,
+                Prescription = medicalRecord.PrescriptionNote,
                 Notes = medicalRecord.Notes
             };
         }
@@ -120,7 +120,7 @@ namespace ServiceLayer.Implements
             existingRecord.ExaminationDate = request.ExaminationDate;
             existingRecord.Diagnosis = request.Diagnosis;
             existingRecord.Symptoms = request.Symptoms;
-            existingRecord.Prescription = request.Prescription;
+            existingRecord.PrescriptionNote = request.PrescriptionNote;
             existingRecord.Notes = request.Notes;
 
             await _medicalRecordRepository.UpdateMedicalRecordAsync(existingRecord);

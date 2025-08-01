@@ -246,7 +246,7 @@ namespace ServiceLayer.Implements
 
             // Cập nhật trạng thái của Appointment
             transaction.Appointment.PaymentStatus = appointmentPaymentStatus;
-            transaction.Appointment.Status = (appointmentPaymentStatus == PaymentStatus.Paid) ? AppointmentStatus.Confirmed : transaction.Appointment.Status
+            transaction.Appointment.Status = (appointmentPaymentStatus == PaymentStatus.Paid) ? AppointmentStatus.Confirmed : transaction.Appointment.Status;
 
             await _repository.SaveChangesAsync();
             _logger.LogInformation("Payment transaction {TransId} and related appointment {ApptId} updated to {Status}", orderId, transaction.AppointmentId, transactionStatus);

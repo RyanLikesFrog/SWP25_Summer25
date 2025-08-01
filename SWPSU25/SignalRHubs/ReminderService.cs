@@ -28,49 +28,45 @@ namespace ServiceLayer.Implements.Reminder
         /// <returns>Danh sách các ReminderDetailDto đã sắp xếp theo thời gian.</returns>
         public async Task<List<ReminderDetailDto>> GetCalculatedRemindersAsync(int daysInFuture = 7, bool includePastFewMinutes = false)
         {
-            DateTime now = DateTime.Now; // Thời điểm hiện tại
-            DateTime today = now.Date;   // Ngày hiện tại
+            DateTime now = DateTime.Now;
+            DateTime today = now.Date;
             DateTime futureDateLimit = today.AddDays(daysInFuture);
 
-            // Lấy tất cả các giai đoạn điều trị đang Active
-            // và có ReminderTimes được định nghĩa.
             var stagesToConsider = await _context.TreatmentStages
-                                                .AsNoTracking()
-                                                .Where(s => s.StartDate <= futureDateLimit &&
-                                                           (s.EndDate == null || s.EndDate >= today) && // Giai đoạn đang diễn ra hoặc sẽ kết thúc trong tương lai
-                                                           !string.IsNullOrWhiteSpace(s.ReminderTimes) && // Phải có thời gian nhắc nhở
-                                                           s.Status == PatientTreatmentStatus.Active) // Chỉ các giai đoạn đang hoạt động/chờ
-                                                .ToListAsync();
+                .AsNoTracking()
+                .Include(ts => ts.MedicalRecords) // Include Prescription
+                    .ThenInclude(p => p.Prescription) // Include PrescriptionItems
+                .Where(s => s.StartDate <= futureDateLimit &&
+                            (s.EndDate == null || s.EndDate >= today) &&
+                            !string.IsNullOrWhiteSpace(s.ReminderTimes) &&
+                            s.Status == PatientTreatmentStatus.Active)
+                .ToListAsync();
 
             List<ReminderDetailDto> calculatedReminders = new List<ReminderDetailDto>();
+
             foreach (var stage in stagesToConsider)
             {
-                //Khởi tạo một danh sách rỗng để lưu các giờ nhắc nhở sau khi chuyển đổi từ chuỗi.
-                List<TimeSpan> dailyReminderTimes = new List<TimeSpan>();
+                // Parse ReminderTimes to TimeSpans
+                List<TimeSpan> dailyReminderTimes = stage.ReminderTimes?
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(t => TimeSpan.TryParse(t.Trim(), out var ts) ? ts : (TimeSpan?)null)
+                    .Where(ts => ts.HasValue)
+                    .Select(ts => ts.Value)
+                    .ToList() ?? new();
 
-                //Kiểm tra xem stage.ReminderTimes có giá trị không rỗng, không null, và không toàn khoảng trắng.
-                if (!string.IsNullOrWhiteSpace(stage.ReminderTimes))
-                {
-                    //Tách chuỗi đó theo dấu phẩy , thành từng phần tử (VD: "08:00, 12:30" → "08:00" và "12:30")
-                    foreach (var timeStr in stage.ReminderTimes.Split(',', StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        if (TimeSpan.TryParse(timeStr.Trim(), out TimeSpan timeSpan))
-                        {
-                            dailyReminderTimes.Add(timeSpan);
-                        }
-                    }
-                }
+                if (!dailyReminderTimes.Any()) continue;
 
-                if (!dailyReminderTimes.Any()) continue; // Bỏ qua nếu không có giờ nhắc nhở hợp lệ
-
-                // Ngày bắt đầu lặp: không sớm hơn StartDate và không sớm hơn hôm nay
                 DateTime iterationStartDate = stage.StartDate.Date > today ? stage.StartDate.Date : today;
+                DateTime iterationEndDate = stage.EndDate.HasValue && stage.EndDate.Value.Date < futureDateLimit
+                                            ? stage.EndDate.Value.Date : futureDateLimit;
 
-                // Ngày kết thúc lặp: không muộn hơn EndDate và không muộn hơn futureDateLimit
-                DateTime iterationEndDate = stage.EndDate.HasValue && stage.EndDate.Value.Date < futureDateLimit ? stage.EndDate.Value.Date : futureDateLimit;
-
-                // Đảm bảo ngày bắt đầu không vượt quá ngày kết thúc
                 if (iterationStartDate > iterationEndDate) continue;
+
+                var prescriptionItems = stage.MedicalRecords
+                    .Where(mr => mr.Prescription != null)
+                    .SelectMany(mr => mr.Prescription.Items)
+                    .ToList();
+                if (prescriptionItems == null || !prescriptionItems.Any()) continue;
 
                 for (DateTime date = iterationStartDate; date <= iterationEndDate; date = date.AddDays(1))
                 {
@@ -78,49 +74,35 @@ namespace ServiceLayer.Implements.Reminder
                     {
                         DateTime reminderDateTime = date.Add(time);
 
-                        if (includePastFewMinutes)
+                        bool isValidTime = includePastFewMinutes
+                            ? (reminderDateTime > now.AddHours(-1) && reminderDateTime <= now.AddHours(1))
+                            : (reminderDateTime > now);
+
+                        if (!isValidTime) continue;
+
+                        foreach (var item in prescriptionItems)
                         {
-                            // Cho Background Service: lấy các nhắc nhở trong khoảng (hiện tại - 1 tieng) đến (hiện tại + 1 tieng )
-                            // Khoảng thời gian này có thể điều chỉnh để đảm bảo không bỏ sót nhắc nhở
-                            if (reminderDateTime > now.AddHours(-1) && reminderDateTime <= now.AddHours(1))
+                            calculatedReminders.Add(new ReminderDetailDto
                             {
-                                calculatedReminders.Add(new ReminderDetailDto
-                                {
-                                    StageId = stage.Id,
-                                    StageName = stage.StageName,
-                                    StageNumber = stage.StageNumber,
-                                    Description = stage.Description,
-                                    Medicine = stage.Medicine,
-                                    ReminderDateTime = reminderDateTime,
-                                    PatientTreatmentProtocolId = stage.PatientTreatmentProtocolId,
-                                });
-                            }
-                        }
-                        else // Cho API (Front-end): chỉ lấy các nhắc nhở trong tương lai
-                        {
-                            if (reminderDateTime > now)
-                            {
-                                calculatedReminders.Add(new ReminderDetailDto
-                                {
-                                    StageId = stage.Id,
-                                    StageName = stage.StageName,
-                                    StageNumber = stage.StageNumber,
-                                    Description = stage.Description,
-                                    Medicine = stage.Medicine,
-                                    ReminderDateTime = reminderDateTime,
-                                    PatientTreatmentProtocolId = stage.PatientTreatmentProtocolId,
-                                });
-                            }
+                                StageId = stage.Id,
+                                StageName = stage.StageName,
+                                StageNumber = stage.StageNumber,
+                                Description = stage.Description,
+                                ReminderDateTime = reminderDateTime,
+                                PatientTreatmentProtocolId = stage.PatientTreatmentProtocolId,
+                                PrescriptionItemId = item.Id,
+                                DrugName = item.DrugName,
+                                Dosage = item.Dosage,
+                                Frequency = item.Frequency,
+                            });
                         }
                     }
                 }
             }
+
             return calculatedReminders.OrderBy(r => r.ReminderDateTime).ToList();
         }
-        /// <summary>
-        /// Lấy các cuộc hẹn cần nhắc nhở (trước 1 ngày so với AppointmentStartDate).
-        /// </summary>
-        /// <returns>Danh sách AppointmentReminderDto.</returns>
+
         public async Task<List<AppointmentReminderDto>> GetDueAppointmentRemindersAsync()
         {
             DateTime now = DateTime.Now;

@@ -51,6 +51,7 @@ namespace SWPSU25.SignalRHubs
                             var stage = await dbContext.TreatmentStages
                                                                         .Include(s => s.PatientTreatmentProtocol)
                                                                         .ThenInclude(ptp => ptp.Patient) 
+                                                                        .Include(s => s.PrescriptionItems) 
                                                                         .FirstOrDefaultAsync(s => s.Id == reminder.StageId);
                             var patientId = stage.PatientTreatmentProtocol?.PatientId;
                             // Điều kiện để gửi reminder:
@@ -77,7 +78,7 @@ namespace SWPSU25.SignalRHubs
                                     TreatmentStageId = stage.Id,
                                     CreatedAt = DateTime.Now,
                                     IsSeen = false,
-                                    Message = $"Nhắc nhở uống thuốc: {stage.Medicine}"
+                                    Message = "Nhắc nhở uống thuốc: " + string.Join(", ",stage.PrescriptionItems.Select(p => $"{p.DrugName} {p.Dosage}"))
                                 };
 
                                 dbContext.Notifications.Add(notification);

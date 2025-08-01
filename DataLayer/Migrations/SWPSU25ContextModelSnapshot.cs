@@ -314,7 +314,7 @@ namespace DataLayer.Migrations
                     b.Property<Guid?>("PatientId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Prescription")
+                    b.Property<string>("PrescriptionNote")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Symptoms")
@@ -533,6 +533,60 @@ namespace DataLayer.Migrations
                     b.ToTable("PaymentTransactions");
                 });
 
+            modelBuilder.Entity("DataLayer.Entities.Prescription", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("MedicalRecordId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedicalRecordId")
+                        .IsUnique();
+
+                    b.ToTable("Prescriptions");
+                });
+
+            modelBuilder.Entity("DataLayer.Entities.PrescriptionItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Dosage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DrugName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Frequency")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("PrescriptionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("TreatmentStageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PrescriptionId");
+
+                    b.HasIndex("TreatmentStageId");
+
+                    b.ToTable("PrescriptionItems");
+                });
+
             modelBuilder.Entity("DataLayer.Entities.TreatmentStage", b =>
                 {
                     b.Property<Guid>("Id")
@@ -544,9 +598,6 @@ namespace DataLayer.Migrations
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Medicine")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("PatientTreatmentProtocolId")
                         .HasColumnType("uniqueidentifier");
@@ -743,7 +794,7 @@ namespace DataLayer.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("DataLayer.Entities.TreatmentStage", "TreatmentStage")
-                        .WithMany()
+                        .WithMany("MedicalRecords")
                         .HasForeignKey("TreatmentStageId")
                         .OnDelete(DeleteBehavior.SetNull);
 
@@ -832,6 +883,35 @@ namespace DataLayer.Migrations
                     b.Navigation("Appointment");
                 });
 
+            modelBuilder.Entity("DataLayer.Entities.Prescription", b =>
+                {
+                    b.HasOne("DataLayer.Entities.MedicalRecord", "MedicalRecord")
+                        .WithOne("Prescription")
+                        .HasForeignKey("DataLayer.Entities.Prescription", "MedicalRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MedicalRecord");
+                });
+
+            modelBuilder.Entity("DataLayer.Entities.PrescriptionItem", b =>
+                {
+                    b.HasOne("DataLayer.Entities.Prescription", "Prescription")
+                        .WithMany("Items")
+                        .HasForeignKey("PrescriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataLayer.Entities.TreatmentStage", "TreatmentStage")
+                        .WithMany("PrescriptionItems")
+                        .HasForeignKey("TreatmentStageId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Prescription");
+
+                    b.Navigation("TreatmentStage");
+                });
+
             modelBuilder.Entity("DataLayer.Entities.TreatmentStage", b =>
                 {
                     b.HasOne("DataLayer.Entities.PatientTreatmentProtocol", "PatientTreatmentProtocol")
@@ -869,6 +949,11 @@ namespace DataLayer.Migrations
                     b.Navigation("LabPictures");
                 });
 
+            modelBuilder.Entity("DataLayer.Entities.MedicalRecord", b =>
+                {
+                    b.Navigation("Prescription");
+                });
+
             modelBuilder.Entity("DataLayer.Entities.Patient", b =>
                 {
                     b.Navigation("Appointments");
@@ -887,11 +972,20 @@ namespace DataLayer.Migrations
                     b.Navigation("TreatmentStages");
                 });
 
+            modelBuilder.Entity("DataLayer.Entities.Prescription", b =>
+                {
+                    b.Navigation("Items");
+                });
+
             modelBuilder.Entity("DataLayer.Entities.TreatmentStage", b =>
                 {
                     b.Navigation("LabResults");
 
+                    b.Navigation("MedicalRecords");
+
                     b.Navigation("Notifications");
+
+                    b.Navigation("PrescriptionItems");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.User", b =>

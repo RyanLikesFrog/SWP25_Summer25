@@ -5,24 +5,18 @@
 namespace DataLayer.Migrations
 {
     /// <inheritdoc />
-    public partial class addLabpicture : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "LabPictureName",
-                table: "LabPictures",
-                type: "nvarchar(max)",
-                nullable: true);
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "LabPictureName",
-                table: "LabPictures");
+
         }
     }
 }
