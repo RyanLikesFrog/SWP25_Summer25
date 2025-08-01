@@ -4,6 +4,7 @@ using DataLayer.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(SWPSU25Context))]
-    partial class SWPSU25ContextModelSnapshot : ModelSnapshot
+    [Migration("20250801184534_InitialCreate1")]
+    partial class InitialCreate1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -575,9 +578,14 @@ namespace DataLayer.Migrations
                     b.Property<Guid>("PrescriptionId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("TreatmentStageId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PrescriptionId");
+
+                    b.HasIndex("TreatmentStageId");
 
                     b.ToTable("PrescriptionItems");
                 });
@@ -881,7 +889,7 @@ namespace DataLayer.Migrations
             modelBuilder.Entity("DataLayer.Entities.Prescription", b =>
                 {
                     b.HasOne("DataLayer.Entities.MedicalRecord", "MedicalRecord")
-                        .WithOne("Prescriptions")
+                        .WithOne("Prescription")
                         .HasForeignKey("DataLayer.Entities.Prescription", "MedicalRecordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -897,7 +905,13 @@ namespace DataLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DataLayer.Entities.TreatmentStage", "TreatmentStage")
+                        .WithMany("PrescriptionItems")
+                        .HasForeignKey("TreatmentStageId");
+
                     b.Navigation("Prescription");
+
+                    b.Navigation("TreatmentStage");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.TreatmentStage", b =>
@@ -939,7 +953,7 @@ namespace DataLayer.Migrations
 
             modelBuilder.Entity("DataLayer.Entities.MedicalRecord", b =>
                 {
-                    b.Navigation("Prescriptions");
+                    b.Navigation("Prescription");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Patient", b =>
@@ -972,6 +986,8 @@ namespace DataLayer.Migrations
                     b.Navigation("MedicalRecords");
 
                     b.Navigation("Notifications");
+
+                    b.Navigation("PrescriptionItems");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.User", b =>

@@ -35,8 +35,5 @@ namespace DataLayer.Entities
 
         // Mối quan hệ 1-nhiều với MedicalRecord
         public virtual ICollection<MedicalRecord> MedicalRecords { get; set; } = new List<MedicalRecord>();
-
-        // Mối quan hệ 1-nhiều với PrescriptionItem
-        public virtual ICollection<PrescriptionItem> PrescriptionItems { get; set; } = new List<PrescriptionItem>();
     }
 }

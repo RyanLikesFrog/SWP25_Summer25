@@ -4,6 +4,7 @@ using DataLayer.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(SWPSU25Context))]
-    partial class SWPSU25ContextModelSnapshot : ModelSnapshot
+    [Migration("20250801190425_RemoveIncorrectRelationships2")]
+    partial class RemoveIncorrectRelationships2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -575,9 +578,14 @@ namespace DataLayer.Migrations
                     b.Property<Guid>("PrescriptionId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("TreatmentStageId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PrescriptionId");
+
+                    b.HasIndex("TreatmentStageId");
 
                     b.ToTable("PrescriptionItems");
                 });
@@ -897,6 +905,10 @@ namespace DataLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DataLayer.Entities.TreatmentStage", null)
+                        .WithMany("PrescriptionItems")
+                        .HasForeignKey("TreatmentStageId");
+
                     b.Navigation("Prescription");
                 });
 
@@ -972,6 +984,8 @@ namespace DataLayer.Migrations
                     b.Navigation("MedicalRecords");
 
                     b.Navigation("Notifications");
+
+                    b.Navigation("PrescriptionItems");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.User", b =>

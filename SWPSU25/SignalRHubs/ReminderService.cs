@@ -35,7 +35,7 @@ namespace ServiceLayer.Implements.Reminder
             var stagesToConsider = await _context.TreatmentStages
                 .AsNoTracking()
                 .Include(ts => ts.MedicalRecords) // Include Prescription
-                    .ThenInclude(p => p.Prescription) // Include PrescriptionItems
+                    .ThenInclude(p => p.Prescriptions) // Include PrescriptionItems
                 .Where(s => s.StartDate <= futureDateLimit &&
                             (s.EndDate == null || s.EndDate >= today) &&
                             !string.IsNullOrWhiteSpace(s.ReminderTimes) &&
@@ -63,8 +63,8 @@ namespace ServiceLayer.Implements.Reminder
                 if (iterationStartDate > iterationEndDate) continue;
 
                 var prescriptionItems = stage.MedicalRecords
-                    .Where(mr => mr.Prescription != null)
-                    .SelectMany(mr => mr.Prescription.Items)
+                    .Where(mr => mr.Prescriptions != null)
+                    .SelectMany(mr => mr.Prescriptions.Items)
                     .ToList();
                 if (prescriptionItems == null || !prescriptionItems.Any()) continue;
 

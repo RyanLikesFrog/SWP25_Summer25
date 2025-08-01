@@ -35,6 +35,6 @@ namespace DataLayer.Entities
         public string? Notes { get; set; }
 
         // Mối quan hệ 1-1: Một MedicalRecord có một Prescription.
-        public virtual Prescription? Prescription { get; set; }
+        public virtual Prescription? Prescriptions { get; set; }
     }
 }

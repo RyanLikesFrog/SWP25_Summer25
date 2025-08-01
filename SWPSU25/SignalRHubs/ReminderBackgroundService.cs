@@ -49,10 +49,12 @@ namespace SWPSU25.SignalRHubs
                             // Lấy TreatmentStage từ DB để kiểm tra và cập nhật `LastDailyReminderSentDate`
                             // Sử dụng FindAsync để lấy theo khóa chính một cách hiệu quả
                             var stage = await dbContext.TreatmentStages
-                                                                        .Include(s => s.PatientTreatmentProtocol)
-                                                                        .ThenInclude(ptp => ptp.Patient) 
-                                                                        .Include(s => s.PrescriptionItems) 
-                                                                        .FirstOrDefaultAsync(s => s.Id == reminder.StageId);
+                                .Include(s => s.PatientTreatmentProtocol)
+                                .ThenInclude(ptp => ptp.Patient)
+                                .Include(s => s.MedicalRecords)
+                                .ThenInclude(mr => mr.Prescriptions)
+                                .ThenInclude(p => p.Items)
+                                .FirstOrDefaultAsync(s => s.Id == reminder.StageId);
                             var patientId = stage.PatientTreatmentProtocol?.PatientId;
                             // Điều kiện để gửi reminder:
                             // 1. Giai đoạn phải tồn tại và đang ở trạng thái Active
@@ -66,9 +68,11 @@ namespace SWPSU25.SignalRHubs
                             {
                                 _logger.LogInformation($"--- Sending reminder for Stage: '{reminder.StageName}' (ID: {reminder.StageId}) at {reminder.ReminderDateTime} ---");
 
-                                // Gửi thông báo qua SignalR đến TẤT CẢ các client đang kết nối
-                                // "ReceiveReminder" là tên phương thức/event mà client sẽ lắng nghe
-                                //
+                                // Lấy danh sách PrescriptionItems từ chuỗi quan hệ
+                                var prescriptionItems = stage.MedicalRecords
+                                                           .Select(mr => mr.Prescriptions)
+                                                           .SelectMany(p => p.Items)
+                                                           .ToList();
 
                                 // 1. Tạo Notification trước khi gửi
                                 var notification = new Notification
@@ -78,7 +82,7 @@ namespace SWPSU25.SignalRHubs
                                     TreatmentStageId = stage.Id,
                                     CreatedAt = DateTime.Now,
                                     IsSeen = false,
-                                    Message = "Nhắc nhở uống thuốc: " + string.Join(", ",stage.PrescriptionItems.Select(p => $"{p.DrugName} {p.Dosage}"))
+                                    Message = "Nhắc nhở uống thuốc: " + string.Join(", ", prescriptionItems.Select(p => $"{p.DrugName} {p.Dosage}"))
                                 };
 
                                 dbContext.Notifications.Add(notification);

@@ -17,10 +17,6 @@ namespace DataLayer.Entities
         public string? DrugName { get; set; }
         public string? Dosage { get; set; }
         public string? Frequency { get; set; }
-
-        [ForeignKey("TreatmentStage")]
-        public Guid? TreatmentStageId { get; set; }
-        public virtual TreatmentStage? TreatmentStage { get; set; }
     }
 
 }
