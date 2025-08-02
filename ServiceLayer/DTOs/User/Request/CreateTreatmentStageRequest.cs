@@ -55,4 +55,7 @@ public class PrescriptionItemRequest
 
     [Required(ErrorMessage = "Liều lượng không được để trống.")]
     public string Dosage { get; set; }
+
+    [Required(ErrorMessage = "Tần suất không được để trống")]
+    public string Frequency { get; set; }
 }

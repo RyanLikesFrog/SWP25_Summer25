@@ -91,6 +91,7 @@ namespace ServiceLayer.Implements
                             PrescriptionId = newPrescription.Id,
                             DrugName = item.DrugName,
                             Dosage = item.Dosage,
+                            Frequency = item.Frequency
                         };
                         newPrescription.Items.Add(prescriptionItem);
                     }
