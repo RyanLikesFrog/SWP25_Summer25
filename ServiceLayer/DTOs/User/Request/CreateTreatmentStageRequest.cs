@@ -37,6 +37,7 @@ public class CreateTreatmentStageRequest
     public string? Symptoms { get; set; }
 
     public string? Notes { get; set; }
+    public string? PrescriptionNote { get; set; }
 
     // Đơn thuốc được gom vào một đối tượng riêng
     public PrescriptionRequest? Prescription { get; set; }
@@ -44,7 +45,6 @@ public class CreateTreatmentStageRequest
 
 public class PrescriptionRequest
 {
-    public string? PrescriptionNote { get; set; }
 
     public List<PrescriptionItemRequest>? PrescriptionItems { get; set; }
 }

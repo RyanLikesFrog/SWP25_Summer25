@@ -65,7 +65,8 @@ namespace ServiceLayer.Implements
                 ExaminationDate = request.ExaminationDate,
                 Diagnosis = request.Diagnosis,
                 Symptoms = request.Symptoms,
-                Notes = request.Notes,
+                PrescriptionNote = request.PrescriptionNote,
+                Notes = request.Notes
             };
             await _medicalRecordRepository.CreateMedicalRecordAsync(newMedicalRecord);
 
@@ -77,7 +78,6 @@ namespace ServiceLayer.Implements
                     Id = Guid.NewGuid(),
                     MedicalRecordId = newMedicalRecord.Id,
                     CreatedAt = DateTime.UtcNow,
-                    Note = request.Prescription.PrescriptionNote,
                     Items = new List<PrescriptionItem>()
                 };
 
