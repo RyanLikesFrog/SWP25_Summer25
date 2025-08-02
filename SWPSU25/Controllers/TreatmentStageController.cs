@@ -12,10 +12,11 @@ namespace SWPSU25.Controllers
     public class TreatmentStageController : ControllerBase
     {
         private readonly ITreatmentStageService _treatmentStageService;
-
-        public TreatmentStageController(ITreatmentStageService treatmentStageService)
+        private readonly IPrescriptionService _prescriptionService;
+        public TreatmentStageController(ITreatmentStageService treatmentStageService, IPrescriptionService prescriptionService)
         {
             _treatmentStageService = treatmentStageService;
+            _prescriptionService = prescriptionService;
         }
 
         [HttpGet("get-by-id")]
@@ -27,6 +28,16 @@ namespace SWPSU25.Controllers
                 return NotFound(new { Message = $"Giai đoạn điều trị với ID {treatmentStageId} không tìm thấy." });
             }
             return Ok(user);
+        }
+        [HttpGet("get-prescription-by-id")]
+        public async Task<IActionResult> GetPrescriptionById(Guid prescriptionId)
+        {
+            var prescription = await _prescriptionService.GetPrescriptionByIdAsync(prescriptionId);
+            if(prescription == null)
+            {
+                return NotFound(new { Message = $"Đơn thuốc với ID {prescriptionId} không tìm thấy." });
+            }
+            return Ok(prescription);
         }
 
         [HttpGet("get-list-treatment-stage")]

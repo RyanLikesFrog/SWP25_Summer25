@@ -10,5 +10,6 @@ namespace RepoLayer.Interfaces
     public interface IPrescriptionRepository
     {
         public Task CreatePrescriptionAsync(Prescription prescription);
+        public Task<Prescription?> GetPrescriptionByIdAsync(Guid prescrptionId);
     }
 }

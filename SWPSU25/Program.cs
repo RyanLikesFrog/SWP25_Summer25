@@ -94,6 +94,8 @@ builder.Services.AddScoped<IMomoClient, MomoClient>();
 builder.Services.AddScoped<ReminderService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
+builder.Services.AddScoped<IPrescriptionService, PrescriptionService>();
+
 
 // add signalR
 builder.Services.AddSignalR();

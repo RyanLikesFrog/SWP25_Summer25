@@ -1,5 +1,6 @@
 ﻿using DataLayer.DbContext;
 using DataLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using RepoLayer.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,13 @@ namespace RepoLayer.Implements
         public async Task CreatePrescriptionAsync(Prescription prescription)
         {
             await _context.Prescriptions.AddAsync(prescription);
+        }
+
+        public async Task<Prescription?> GetPrescriptionByIdAsync(Guid prescrptionId)
+        {
+            return await _context.Prescriptions.Include(p => p.Items)   
+                                                .FirstOrDefaultAsync(p => p.Id == prescrptionId) 
+                                                ?? throw new KeyNotFoundException("Prescription not found.");
         }
     }
 }
