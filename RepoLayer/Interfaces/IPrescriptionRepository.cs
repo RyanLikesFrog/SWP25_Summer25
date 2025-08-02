@@ -11,5 +11,6 @@ namespace RepoLayer.Interfaces
     {
         public Task CreatePrescriptionAsync(Prescription prescription);
         public Task<Prescription?> GetPrescriptionByIdAsync(Guid prescrptionId);
+        public Task<Prescription?> GetPrescriptionsByMedicalRecordIdAsync(Guid medicalRecordId);
     }
 }

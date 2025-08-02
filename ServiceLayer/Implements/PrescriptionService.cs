@@ -13,11 +13,19 @@ namespace ServiceLayer.Implements
     {
         private readonly IPrescriptionRepository _prescriptionRepository;
         private readonly IPrescriptionItemRepository _prescriptionItemRepository;
+        private readonly ITreatmentStageService _treatmentStageService;
+        private readonly IMedicalRecordService _medicalRecordService;
 
-        public PrescriptionService(IPrescriptionRepository prescriptionRepository, IPrescriptionItemRepository prescriptionItemRepository)
+        public PrescriptionService(
+            IPrescriptionRepository prescriptionRepository,
+            IPrescriptionItemRepository prescriptionItemRepository,
+            ITreatmentStageService treatmentStageService,
+            IMedicalRecordService medicalRecordService)
         {
             _prescriptionRepository = prescriptionRepository;
             _prescriptionItemRepository = prescriptionItemRepository;
+            _treatmentStageService = treatmentStageService;
+            _medicalRecordService = medicalRecordService;
         }
 
         public async Task<Prescription> GetPrescriptionByIdAsync(Guid prescriptionId)
@@ -29,6 +37,17 @@ namespace ServiceLayer.Implements
             }
 
             return prescription;
+        }
+
+        public Task<Prescription> GetPrescriptionsByMedicalRecordIdAsync(Guid medicalRecordId)
+        {
+            var prescriptions = _prescriptionRepository.GetPrescriptionsByMedicalRecordIdAsync(medicalRecordId);
+            if (prescriptions == null)
+            {
+                throw new ArgumentException($"Không tìm thấy đơn thuốc với ID {medicalRecordId}.");
+            }
+
+            return prescriptions;
         }
     }
 }

@@ -30,5 +30,12 @@ namespace RepoLayer.Implements
                                                 .FirstOrDefaultAsync(p => p.Id == prescrptionId) 
                                                 ?? throw new KeyNotFoundException("Prescription not found.");
         }
+
+        public async Task<Prescription?> GetPrescriptionsByMedicalRecordIdAsync(Guid medicalRecordId)
+        {
+            return await _context.Prescriptions.Include(p => p.Items)
+                                                .FirstOrDefaultAsync(p => p.MedicalRecordId == medicalRecordId) 
+                                                ?? throw new KeyNotFoundException("Prescription not found for the given medical record ID.");
+        }
     }
 }

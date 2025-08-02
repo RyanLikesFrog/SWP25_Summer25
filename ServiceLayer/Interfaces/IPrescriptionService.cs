@@ -10,5 +10,6 @@ namespace ServiceLayer.Interfaces
     public interface IPrescriptionService
     {
         public Task<Prescription> GetPrescriptionByIdAsync (Guid prescriptionId);
+        public Task<Prescription> GetPrescriptionsByMedicalRecordIdAsync(Guid medicalRecordId);
     }
 }

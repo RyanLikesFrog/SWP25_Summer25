@@ -19,6 +19,17 @@ namespace SWPSU25.Controllers
             _prescriptionService = prescriptionService;
         }
 
+        [HttpGet("get-prescription-by-medical-record")]
+        public async Task<IActionResult> GetPrescriptionByMedicalRecordId(Guid medicalRecordId)
+        {
+            var prescriptions = await _prescriptionService.GetPrescriptionsByMedicalRecordIdAsync(medicalRecordId);
+            if (prescriptions == null)
+            {
+                return NotFound(new { Message = $"Không tìm thấy đơn thuốc cho hồ sơ bệnh án với ID {medicalRecordId}." });
+            }
+            return Ok(prescriptions);
+        }
+
         [HttpGet("get-by-id")]
         public async Task<IActionResult> GetTreatmentStageById(Guid treatmentStageId)
         {
