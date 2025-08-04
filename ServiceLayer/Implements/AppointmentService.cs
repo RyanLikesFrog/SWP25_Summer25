@@ -248,6 +248,26 @@ namespace ServiceLayer.Implements
             transaction.Appointment.PaymentStatus = appointmentPaymentStatus;
             transaction.Appointment.Status = (appointmentPaymentStatus == PaymentStatus.Paid) ? AppointmentStatus.Confirmed : transaction.Appointment.Status;
 
+            var dupDoctorSchedule = await _doctorScheduleRepository.GetDuplicatedDoctorScheduleByStartDateEndDateAsync(transaction.Appointment.DoctorId, transaction.Appointment.AppointmentStartDate, transaction.Appointment.AppointmentEndDate);
+            if (dupDoctorSchedule != null)
+            {
+                throw new ArgumentException("duplicated schedule");
+            }
+            else
+            {
+                var doctorschedule = new DoctorSchedule
+                {
+                    Id = Guid.NewGuid(),
+                    AppointmentId = transaction.AppointmentId,
+                    DoctorId = transaction.Appointment.DoctorId.Value,
+                    StartTime = transaction.Appointment.AppointmentStartDate,
+                    EndTime = transaction.Appointment.AppointmentEndDate.Value,
+                    IsAvailable = true,
+                };
+                await _doctorScheduleRepository.CreateDoctorScheduleAsync(doctorschedule);
+            }
+            transaction.Appointment.Status = (appointmentPaymentStatus == PaymentStatus.Paid) ? AppointmentStatus.Confirmed : transaction.Appointment.Status;
+
             await _repository.SaveChangesAsync();
             _logger.LogInformation("Payment transaction {TransId} and related appointment {ApptId} updated to {Status}", orderId, transaction.AppointmentId, transactionStatus);
         }
